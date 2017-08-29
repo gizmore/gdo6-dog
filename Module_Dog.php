@@ -1,8 +1,8 @@
 <?php
-use GDO\Core\Module;
+use GDO\Core\GDO_Module;
 use GDO\Dog\Connector;
 
-final class Module_Dog extends Module
+final class Module_Dog extends GDO_Module
 {
     public function onInit()
     {
