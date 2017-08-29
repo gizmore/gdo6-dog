@@ -1,8 +1,8 @@
 <?php
 namespace GDO\Dog;
-use GDO\Form\GDO_Select;
+use GDO\Form\GDT_Select;
 
-class GDO_Connector extends GDO_Select
+class GDT_Connector extends GDT_Select
 {
     public function __construct()
     {
