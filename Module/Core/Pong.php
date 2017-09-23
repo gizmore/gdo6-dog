@@ -2,7 +2,7 @@
 namespace GDO\Dog\Module\Core;
 use GDO\Dog\Plugin;
 
-class Echo extends Plugin
+class Pong extends Plugin
 {
     
 }

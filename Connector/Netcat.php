@@ -1,5 +1,5 @@
 <?php
-namespace GDO\Dog\Provider;
+namespace GDO\Dog\Connector;
 
 use GDO\Dog\Connector;
 
