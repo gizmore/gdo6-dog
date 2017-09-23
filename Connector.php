@@ -1,10 +1,11 @@
 <?php
 namespace GDO\Dog;
-use GDO\Util\Strings;
-use GDO\File\Filewalker;
+use GDO\Core\WithName;
 
 abstract class Connector
 {
+    use WithName;
+
     /**
      * @var Connector[]
      */
@@ -20,10 +21,6 @@ abstract class Connector
     }
 
     public function displayName() { return t('connector_' . $this->gdoShortName()); }
-    public function gdoClassName() { return self::gdoClassNameS(); }
-    public static function gdoClassNameS() { return get_called_class(); }
-    public function gdoShortName() { return self::gdoShortNameS(); }
-    public static function gdoShortNameS() { return Strings::rsubstrFrom(get_called_class(), '\\'); }
     
     ###
     
