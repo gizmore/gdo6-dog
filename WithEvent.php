@@ -4,7 +4,7 @@ trait WithEvent
 {
     public static $events = [];
     
-    public function emit(string $event, ...$args)
+    public function emit($event, ...$args)
     {
         foreach (self::$events as $event)
         {
@@ -12,7 +12,7 @@ trait WithEvent
         }
     }
     
-    public function on(string $event, $callback)
+    public function on($event, $callback)
     {
         
     }

@@ -27,7 +27,7 @@ abstract class Connector
     
     ###
     public $connected = false;
-    public function connected(bool $connected)
+    public function connected($connected)
     {
         $this->connected = $connected;
         return $this;

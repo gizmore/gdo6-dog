@@ -3,8 +3,8 @@ namespace GDO\Dog;
 use GDO\Core\GDO;
 use GDO\DB\GDT_Object;
 use GDO\DB\GDT_AutoInc;
-use GDO\Type\GDT_String;
-use GDO\Type\GDT_Secret;
+use GDO\DB\GDT_String;
+use GDO\Core\GDT_Secret;
 
 class DOG_Room extends GDO
 {
