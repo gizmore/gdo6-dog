@@ -1,6 +1,6 @@
 <?php
 namespace GDO\Dog;
-use GDO\DB\GDO;
+use GDO\Core\GDO;
 use GDO\DB\GDT_AutoInc;
 use GDO\Dog\GDT_Connector;
 use GDO\User\GDT_Username;
