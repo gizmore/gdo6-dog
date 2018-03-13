@@ -7,27 +7,28 @@ use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Dog;
 use GDO\Util\Strings;
-
 require 'protected/config.php';
 require 'GDO6.php';
 
-Logger::logDebug("Starting dog...\nLoading Connectors");
-Filewalker::traverse('GDO/Dog/Module', function($entry, $path){
-    if ( (false === strpos($path, 'lang')) &&
-         (Strings::endsWith($entry, '.php')) )
-    {
-        $class_name = str_replace('/', "\\", $path);
-        $class_name = substr($class_name, 0, -4);
-        if (class_exists($class_name))
-        {
-            Logger::logDebug("Loaded $class_name");
-        }
-        else
-        {
-            Logger::logError("Error loading $class_name");
-        }
+Logger::logDebug("Starting dog...\nLoading Modules...\n");
+Filewalker::traverse('GDO', false, function($entry, $path){
+	if (Strings::startsWith($entry, 'Dog'))
+	{
+		Filewalker::traverse(["$path/Method", "$path/Connector"], function($entry, $path){
+			$class_name = str_replace('/', "\\", $path);
+			$class_name = substr($class_name, 0, -4);
+			if (class_exists($class_name))
+			{
+				Logger::logCron("Loaded $class_name");
+			}
+			else
+			{
+				Logger::logCron("Error loading $class_name");
+			}
+			var_dump($path);
+		});
     }
-});
+}, false);
     
 $dog = new Dog();
     
@@ -39,9 +40,21 @@ Debug::enableExceptionHandler();
 Debug::setDieOnError(false);
 Debug::setMailOnError(GWF_ERROR_MAIL);
 Database::init();
-ModuleLoader::instance()->loadModulesCache();
+
+ModuleLoader::instance()->loadModules(true, true);
 
 # All fine!
 define('GWF_CORE_STABLE', 1);
 
-$dog->mainloop();
+$dog->init();
+
+if ($argc === 1)
+{
+	$dog->mainloop();
+}
+else
+{
+	$dog->event('dog_stdin', ...$argv);
+}
+
+

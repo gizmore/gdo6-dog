@@ -15,11 +15,17 @@ final class Module_Dog extends GDO_Module
 //         Connector::init();
     }
     
+    public function onInstall()
+    {
+    	
+    }
+    
     public function getClasses()
     {
         return array(
-            'GDO\\Dog\\DOG_Server',
-            'GDO\\Dog\\DOG_Room',
+//             'GDO\\Dog\\DOG_Server',
+//             'GDO\\Dog\\DOG_Room',
+//         	'GDO\\Dog\\DOG_User',
         );
     }
 }

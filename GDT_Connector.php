@@ -14,7 +14,7 @@ class GDT_Connector extends GDT_Select
     public function initChoices()
     {
         $choices = array();
-        foreach (Connector::connectors() as $connector)
+        foreach (DOG_Connector::connectors() as $connector)
         {
             $choices[$connector->gdoShortName()] = $connector->displayName();
             
