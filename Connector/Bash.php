@@ -41,7 +41,7 @@ class Bash extends DOG_Connector
 		
 	}
 	
-	public function dog_stdin(...$argv)
+	public function dog_cmdline(...$argv)
 	{
 		$msg = DOG_Message::make()->server($this->getBashServer())->user($this->getBashUser())->raw(implode(' ', $argv));
 		Dog::instance()->event('dog_message', $msg);

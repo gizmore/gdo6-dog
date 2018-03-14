@@ -54,7 +54,8 @@ if ($argc === 1)
 }
 else
 {
-	$dog->event('dog_stdin', ...$argv);
+	# The cmdline event is exactly used once; only here,
+	$dog->event('dog_cmdline', ...$argv);
 }
 
 
