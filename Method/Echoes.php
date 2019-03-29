@@ -4,13 +4,16 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\DB\GDT_String;
 use GDO\Dog\DOG_Message;
+use GDO\UI\GDT_Message;
 
 final class Echoes extends DOG_Command
 {
+	public function getTrigger() { return 'echo'; }
+	
 	public function gdoParameters()
 	{
 		return array(
-			GDT_String::make('text'),
+			GDT_Message::make('text'),
 		);
 	}
 	

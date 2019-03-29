@@ -22,6 +22,7 @@ final class Dog extends Application
         foreach ($servers->all() as $server)
         {
             $this->mainloopServer($server);
+            usleep(100);
         }
     }
     
@@ -34,7 +35,7 @@ final class Dog extends Application
         }
         else
         {
-        	if ($msg = $connector->readMessage())
+        	while ($msg = $connector->readMessage())
         	{
         		$this->processMessage($msg);
         	}

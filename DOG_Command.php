@@ -2,7 +2,7 @@
 namespace GDO\Dog;
 use GDO\Core\Method;
 
-class DOG_Command extends Method
+abstract class DOG_Command extends Method
 {
 	public $priority = 50;
 	
@@ -27,6 +27,11 @@ class DOG_Command extends Method
 		}
 	}
 	
+	public function getTrigger()
+	{
+		
+	}
+	
 	public function execute()
 	{
 	}
@@ -34,9 +39,20 @@ class DOG_Command extends Method
 	public function onDogExecute(DOG_Message $message)
 	{
 		$args = [];
+		$_REQUEST = [];
+		$i = 1;
+		$matches = null;
+		preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $message->text, $matches);
 		foreach ($this->gdoParameters() as $gdt)
 		{
-			$args[] = $gdt->getParameterValue();
+			$_REQUEST[$gdt->name] = $matches[0][$i++];
+			$value = $gdt->getParameterValue();
+			if (!$gdt->validate($value))
+			{
+				$message->reply(t('err_param'));
+				return;
+			}
+			$args[] = $value;
 		}
 		$this->dogExecute($message, ...$args);
 	}

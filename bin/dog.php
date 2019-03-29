@@ -7,14 +7,18 @@ use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Dog;
 use GDO\Util\Strings;
+use GDO\Dog\DOG_Connector;
+use GDO\Core\Application;
 require 'protected/config.php';
 require 'GDO6.php';
 
+$dog = new Dog();
+
 Logger::logDebug("Starting dog...\nLoading Modules...\n");
-Filewalker::traverse('GDO', false, function($entry, $path){
+Filewalker::traverse('GDO', null, false, function($entry, $path){
 	if (Strings::startsWith($entry, 'Dog'))
 	{
-		Filewalker::traverse(["$path/Method", "$path/Connector"], function($entry, $path){
+		Filewalker::traverse(["$path/Method", "$path/Connector"], null, function($entry, $path){
 			$class_name = str_replace('/', "\\", $path);
 			$class_name = substr($class_name, 0, -4);
 			if (class_exists($class_name))
@@ -25,12 +29,9 @@ Filewalker::traverse('GDO', false, function($entry, $path){
 			{
 				Logger::logCron("Error loading $class_name");
 			}
-			var_dump($path);
 		});
     }
 }, false);
-    
-$dog = new Dog();
     
 Trans::$ISO = GWF_LANGUAGE;
 Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
@@ -55,6 +56,7 @@ if ($argc === 1)
 else
 {
 	# The cmdline event is exactly used once; only here,
+	array_shift($argv);
 	$dog->event('dog_cmdline', ...$argv);
 }
 

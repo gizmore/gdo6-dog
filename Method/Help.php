@@ -4,7 +4,10 @@ use GDO\Dog\DOG_Command;
 
 class Help extends DOG_Command
 {
-	
+	public function dogExecute()
+	{
+		
+	}
 }
 
 DOG_Command::register(new Help());

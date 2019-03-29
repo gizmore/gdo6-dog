@@ -28,7 +28,7 @@ final class DOG_Message
 	 * @var GDO_User
 	 */
 	public $user;
-	public function user(GDO_User $user) { $this->user = $user; return $this; }
+	public function user(DOG_User $user) { $this->user = $user; return $this; }
 	
 	public $raw;
 	public function raw($raw) { $this->raw = $raw; return $this; }
@@ -52,6 +52,6 @@ final class DOG_Message
 
 	public function reply($text)
 	{
-		$this->server->getConnector()->reply($text);
+		$this->server->getConnector()->reply($this, $text);
 	}
 }

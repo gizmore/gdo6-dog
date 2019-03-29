@@ -5,6 +5,8 @@ use GDO\Core\GDO;
 use GDO\DB\GDT_AutoInc;
 use GDO\User\GDT_User;
 use GDO\User\GDO_User;
+use GDO\DB\GDT_Object;
+use GDO\DB\GDT_String;
 
 final class DOG_User extends GDO
 {
@@ -12,6 +14,8 @@ final class DOG_User extends GDO
 	{
 		return array(
 			GDT_AutoInc::make('doguser_id'),
+			GDT_String::make('doguser_name')->utf8()->max(64),
+			GDT_Object::make('doguser_server')->table(DOG_Server::table()),
 			GDT_User::make('doguser_user_id'),
 		);
 	}
@@ -19,7 +23,36 @@ final class DOG_User extends GDO
 	/**
 	 * @return GDO_User
 	 */
-	public function getUser() { return $this->getValue('doguser_user_id'); }
-	public function getUserID() { return $this->getVar('doguser_user_id'); }
+	public function getGDOUser() { return $this->getValue('doguser_user_id'); }
+	public function getGDOUserID() { return $this->getVar('doguser_user_id'); }
 	
+	public static function getOrCreateUser(DOG_Server $server, $name)
+	{
+		if ($user = self::getUser($server, $name))
+		{
+			return $user;
+		}
+		return self::createUser($server, $name);
+	}
+	
+	public static function getUser(DOG_Server $server, $name)
+	{
+		return self::table()->select()->
+			where(sprintf("doguser_server=%s AND doguser_name=%s", $server->getID(), GDO::quoteS($name)))->
+			first()->exec()->fetchObject();
+	}
+	
+	public static function createUser(DOG_Server $server, $name)
+	{
+		$sid = $server->getID();
+		$user = GDO_User::blank(array(
+			'user_type' => GDO_User::MEMBER,
+			'user_name' => "__dog{$sid}_$name",
+		))->insert();
+		return self::blank(array(
+			'doguser_server' => $sid,
+			'doguser_name' => $name,
+			'doguser_user_id' => $user->getID(),
+		))->insert();
+	}
 }

@@ -16,3 +16,5 @@ final class Exec extends DOG_Command
 		}
 	}
 }
+
+DOG_Command::register(new Exec());
