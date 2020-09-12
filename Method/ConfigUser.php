@@ -5,14 +5,13 @@ use GDO\Dog\DOG_Command;
 use GDO\Dog\GDT_DogCommand;
 use GDO\DB\GDT_String;
 use GDO\Dog\DOG_Message;
-use GDO\Dog\Dog;
 
 final class ConfigUser extends DOG_Command
 {
     public $group = 'Config';
     public $trigger = 'confu';
     
-    public function getPermission() { return Dog::OWNER; } 
+    public function isUserRequired() { return true; } 
     
     public function gdoParameters()
     {
@@ -55,7 +54,7 @@ final class ConfigUser extends DOG_Command
     private function showConfigVar(DOG_Message $message, DOG_Command $command, $key)
     {
         $var = $command->getConfigVarUser($message->user, $key);
-        if (!($gdt = $command->getConfigGDTUser($key)))
+        if (!($command->getConfigGDTUser($key)))
         {
             return $message->rply('err_dog_var_unknown', [$command->trigger, $key] );
         }

@@ -94,7 +94,7 @@ elseif (@$argv[1] === 'admin')
 }
 else
 {
-    echo "Usage: {$argv[0]} config|modules|admin\n";
+    echo "Usage: {$argv[0]} config|modules|upgrade|admin\n";
     die(1);
 }
 

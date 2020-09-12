@@ -6,11 +6,12 @@ use GDO\DB\GDT_AutoInc;
 use GDO\DB\GDT_String;
 use GDO\Core\GDT_Secret;
 use GDO\DB\GDT_Char;
-use GDO\DB\GDT_Checkbox;
 use GDO\Language\GDT_Language;
 
 class DOG_Room extends GDO
 {
+    public $users = [];
+    
     public function gdoColumns()
     {
         return array(
@@ -18,9 +19,8 @@ class DOG_Room extends GDO
             GDT_Object::make('room_server')->table(DOG_Server::table())->notNull()->cascade(),
             GDT_String::make('room_name')->notNull(),
             GDT_Secret::make('room_password'),
-            GDT_Checkbox::make('room_autojoin')->notNull()->initial('1'),
             GDT_Char::make('room_trigger')->size(1)->initial('.')->notNull(),
-            GDT_Language::make('room_lang'),
+            GDT_Language::make('room_lang')->notNull()->initial(GWF_LANGUAGE),
         );
     }
 
@@ -31,6 +31,7 @@ class DOG_Room extends GDO
     public function getServerID() { return $this->getVar('room_server'); }
     
     public function getName() { return  $this->getVar('room_name'); }
+    public function getPassword() { return $this->getVar('room_password'); }
     public function getTrigger() { return  $this->getVar('room_trigger'); }
     
     /**
@@ -40,6 +41,10 @@ class DOG_Room extends GDO
      */
     public static function getByName(DOG_Server $server, $roomName)
     {
+        if ($room = $server->getRoomByName($roomName))
+        {
+            return $room;
+        }
         $name = GDO::quoteS($roomName);
         return self::table()->select()->where("room_server={$server->getID()} AND room_name={$name}")->first()->exec()->fetchObject();
     }
@@ -50,15 +55,29 @@ class DOG_Room extends GDO
         {
             return $room;
         }
-        
+        return self::create($server, $roomName);
+    }
+    
+    public static function create(DOG_Server $server, $roomName)
+    {
         return self::blank(array(
             'room_server' => $server->getID(),
             'room_name' => $roomName,
-            GDT_Secret::make('room_password'),
-            GDT_Checkbox::make('room_autojoin')->initial('1'),
-            GDT_Char::make('room_trigger')->size(1)->initial('.'),
-            
         ))->insert();
+    }
+    
+    public function disconnect()
+    {
+        $this->users = [];
+    }
+
+    public function addUser(DOG_User $user)
+    {
+        $userId = $user->getID();
+        if (!isset($this->users[$userId]))
+        {
+            $this->users[$userId] = $user;
+        }
     }
     
 }

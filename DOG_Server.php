@@ -4,10 +4,8 @@ use GDO\Core\GDO;
 use GDO\DB\GDT_AutoInc;
 use GDO\User\GDT_Username;
 use GDO\Core\GDT_Secret;
-use GDO\Language\GDT_Language;
 use GDO\Net\GDT_Url;
 use GDO\DB\GDT_Checkbox;
-use GDO\User\GDO_User;
 use GDO\DB\GDT_Char;
 use GDO\Date\GDT_Duration;
 use GDO\Net\URL;
@@ -24,9 +22,14 @@ final class DOG_Server extends GDO
 	private $connector;
 	
 	/**
-	 * @var GDO_User[]
+	 * @var DOG_User[]
 	 */
-	private $users = [];
+	public $users = [];
+	
+	/**
+	 * @var DOG_Room[]
+	 */
+	public $rooms = [];
 	
     public function gdoColumns()
     {
@@ -43,7 +46,6 @@ final class DOG_Server extends GDO
             GDT_CreatedAt::make('serv_created'),
             GDT_CreatedBy::make('serv_creator'),
             GDT_Char::make('serv_trigger')->size(1)->initial('.')->notNull(),
-            GDT_Language::make('serv_lang')->notNull()->initial('en'),
         );
     }
 
@@ -55,8 +57,14 @@ final class DOG_Server extends GDO
     
     public function displayName()
     {
-        $b = ($this->connector->connected) ? IRCLib::BOLD : '';
-        return sprintf('%s%s%s-%s', $b, $this->getID(), $b, $this->getDomain());
+        $b = $this->isConnected() ? IRCLib::BOLD : '';
+        $name = $this->getURL() ? $this->getDomain() : $this->getConnectorName();
+        return sprintf('%s%s%s-%s', $b, $this->getID(), $b, $name);
+    }
+    
+    public function isConnected()
+    {
+        return $this->connector && $this->connector->connected;
     }
     
     /**
@@ -64,9 +72,8 @@ final class DOG_Server extends GDO
      */
     public function getDomain($short=false)
     {
-        return $this->getURL()->getHost();
+        return $short ? $this->getURL()->getTLD() : $this->getURL()->getHost();
     }
-    
     
     /**
      * @return URL
@@ -111,4 +118,75 @@ final class DOG_Server extends GDO
         }
         return self::getByURL($url);
     }
+    
+    #################
+    ### Live Data ###
+    #################
+    public function disconnect()
+    {
+        foreach ($this->rooms as $room)
+        {
+            $room->disconnect();
+        }
+        $this->users = [];
+        $this->rooms = [];
+    }
+    
+    #############
+    ### Rooms ###
+    #############
+    public function addRoom(DOG_Room $room)
+    {
+        if (!isset($this->rooms[$room->getID()]))
+        {
+            $this->rooms[$room->getID()] = $room;
+            Dog::instance()->event('dog_room_added', $this, $room);
+        }
+    }
+    
+    public function getRoomByName($roomName)
+    {
+        foreach ($this->rooms as $room)
+        {
+            if ($room->getName() === $roomName)
+            {
+                return $room;
+            }
+        }
+    }
+    
+    public function removeRoom(DOG_Room $room)
+    {
+        unset($this->rooms[$room->getID()]);
+    }
+    
+    #############
+    ### Users ###
+    #############
+    public function addUser(DOG_User $user)
+    {
+        if (!isset($this->users[$user->getID()]))
+        {
+            $this->users[$user->getID()] = $user;
+            Dog::instance()->event('dog_user_added', $this, $user);
+        }
+    }
+    
+    public function getUserByName($username)
+    {
+        foreach ($this->users as $user)
+        {
+            if ($user->getName() === $username)
+            {
+                return $user;
+            }
+        }
+    }
+    
+    public function removeUser(DOG_User $user)
+    {
+        unset($this->users[$user->getID()]);
+    }
+    
+    
 }

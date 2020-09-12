@@ -28,33 +28,49 @@ final class AddServer extends DOG_Command
 	
 	public function dogExecute(DOG_Message $message, DOG_Connector $connector, URL $url=null, $username, $password)
 	{
-		if (!($server = DOG_Server::getByURL($url->raw)))
-		{
-		    $data = array(
-				'serv_url' => $url->raw,
-			    'serv_connector' => $connector->getName(),
-		    );
-		    
-		    if ($username)
-		    {
-		        $data['serv_username'] = $username;
-		    }
+	    if ($url)
+	    {
+	        $server = DOG_Server::getByURL($url->getTLD());
+	    }
+	    else
+	    {
+	        $server = DOG_Server::getBy('serv_connector', $connector->getName());
+	    }
+	    
+	    if ($server)
+	    {
+	        return $message->rply('err_dog_server_already_added', [$server->displayName()]);
+	    }
 
-		    if ($password)
-		    {
-		        $data['serv_password'] = $password;
-		    }
-		    
-			$server = DOG_Server::blank($data);
-			
-			$connector->setupServer($server);
-			
-			$server->insert();
-			
-			Dog::instance()->servers[] = $server;
-			
-			$message->rply('server_added', [$server->getID(), $url->raw]);
-		}
+	    # Add
+	    $data = array(
+		    'serv_connector' => $connector->getName(),
+	    );
+
+	    if ($url)
+	    {
+	        $data['serv_url'] = $url->raw;
+	    }
+
+	    if ($username)
+	    {
+	        $data['serv_username'] = $username;
+	    }
+
+	    if ($password)
+	    {
+	        $data['serv_password'] = $password;
+	    }
+	    
+		$server = DOG_Server::blank($data);
+		
+		$connector->setupServer($server);
+		
+		$server->insert();
+		
+		Dog::instance()->servers[] = $server;
+		
+		$message->rply('msg_dog_server_added', [$server->getID(), $server->displayName()]);
 	}
 	
 }

@@ -7,12 +7,12 @@ use GDO\DB\GDT_String;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\Dog;
 
-final class ConfigBot extends DOG_Command
+final class ConfigServer extends DOG_Command
 {
     public $group = 'Config';
-    public $trigger = 'confb';
+    public $trigger = 'confs';
     
-    public function getPermission() { return Dog::OWNER; } 
+    public function getPermission() { return Dog::OPERATOR; } 
     
     public function gdoParameters()
     {
@@ -45,7 +45,7 @@ final class ConfigBot extends DOG_Command
     private function showConfigKeys(DOG_Message $message, DOG_Command $command)
     {
         $keys = [];
-        foreach ($command->getConfigBot() as $gdt)
+        foreach ($command->getConfigServer() as $gdt)
         {
             $keys[] = $gdt->name;
         }
@@ -54,8 +54,8 @@ final class ConfigBot extends DOG_Command
     
     private function showConfigVar(DOG_Message $message, DOG_Command $command, $key)
     {
-        $var = $command->getConfigVarBot($key);
-        if (!($command->getConfigGDTBot($key)))
+        $var = $command->getConfigVarServer($message->user, $key);
+        if (!($command->getConfigGDTUser($key)))
         {
             return $message->rply('err_dog_var_unknown', [$command->trigger, $key] );
         }
@@ -64,8 +64,8 @@ final class ConfigBot extends DOG_Command
     
     private function setConfigVar(DOG_Message $message, DOG_Command $command, $key, $var)
     {
-        $old = $command->getConfigVarBot($key);
-        if (!($gdt = $command->getConfigGDTBot($key)))
+        $old = $command->getConfigVarServer($message->user, $key);
+        if (!($gdt = $command->getConfigGDTUser($key)))
         {
             return $message->rply('err_dog_var_unknown', [$command->trigger, $key]);
         }
@@ -76,7 +76,7 @@ final class ConfigBot extends DOG_Command
             return $message->rply('err_dog_config_invalid', [$key, $command->trigger, $var]);
         }
         
-        $command->setConfigValueBot($key, $value);
+        $command->setConfigValueServer($message->user, $key, $value);
 
         return $message->rply('msg_dog_config_set', [$key, $command->trigger, $old, $var]);
     }

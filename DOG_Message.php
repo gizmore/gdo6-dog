@@ -34,9 +34,16 @@ class DOG_Message
 	 * @var DOG_User
 	 */
 	public $user;
-	public function user(DOG_User $user) { $this->user = $user; return $this; }
+	public function user(DOG_User $user)
+	{
+	    $this->user = $user;
+	    return $this;
+	}
 
-	public function getUser() { return $this->user->getGDOUser(); }
+	/**
+	 * @return \GDO\User\GDO_User
+	 */
+	public function getGDOUser() { return $this->user->getGDOUser(); }
 	
 	public $text;
 	public function text($text) { $this->text = $text; return $this; }
@@ -47,7 +54,16 @@ class DOG_Message
 	###############
 	public function rply($key, $args=null)
 	{
-		$this->reply(t($key, $args));
+		$this->reply($this->t($key, $args));
+	}
+	
+	public function t($key, $args=null)
+	{
+        $text = t($key, $args);
+        $bot = $this->server->getUsername();
+        $trigger = $this->room ? $this->room->getTrigger() : '';
+        $text = str_replace(['#BOT#', '#CMD#'], [$bot, $trigger], $text);
+        return $text;
 	}
 
 	public function reply($text)

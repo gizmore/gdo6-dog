@@ -46,7 +46,7 @@ abstract class DOG_Command extends MethodForm
 	
 	public function getConfigVarBot($key)
 	{
-	    if ($var = DOG_ConfigBot::table()->getById($key))
+	    if ($var = DOG_ConfigBot::table()->getById($this->gdoClassName(), $key))
 	    {
 	        return $var->getVar('confb_var');
 	    }
@@ -71,6 +71,7 @@ abstract class DOG_Command extends MethodForm
 	    $gdt = $this->getConfigGDTBot($key);
 	    $var = $gdt->toVar($value);
 	    DOG_ConfigBot::blank(array(
+	        'confb_command' => $this->gdoClassName(),
 	        'confb_key' => $key,
 	        'confb_var' => $var,
 	    ))->replace();
@@ -102,7 +103,7 @@ abstract class DOG_Command extends MethodForm
 	
 	public function getConfigVarUser(DOG_User $user, $key)
 	{
-	    if ($var = DOG_ConfigUser::table()->getById($key, $user->getID()))
+	    if ($var = DOG_ConfigUser::table()->getById($this->gdoClassName(), $key, $user->getID()))
 	    {
 	        return $var->getVar('confu_var');
 	    }
@@ -127,6 +128,7 @@ abstract class DOG_Command extends MethodForm
 	    $gdt = $this->getConfigGDTUser($key);
 	    $var = $gdt->toVar($value);
 	    DOG_ConfigUser::blank(array(
+	        'confu_command' => $this->gdoClassName(),
 	        'confu_key' => $key,
 	        'confu_user' => $user->getID(),
 	        'confu_var' => $var,
@@ -159,7 +161,7 @@ abstract class DOG_Command extends MethodForm
 	
 	public function getConfigVarRoom(DOG_Room $room, $key)
 	{
-	    if ($var = DOG_ConfigRoom::table()->getById($key, $room->getID()))
+	    if ($var = DOG_ConfigRoom::table()->getById($this->gdoClassName(), $key, $room->getID()))
 	    {
 	        return $var->getVar('confr_var');
 	    }
@@ -181,9 +183,10 @@ abstract class DOG_Command extends MethodForm
 	
 	public function setConfigValueRoom(DOG_Room $room, $key, $value)
 	{
-	    $gdt = $this->getConfigGDTUser($key);
+	    $gdt = $this->getConfigGDTRoom($key);
 	    $var = $gdt->toVar($value);
 	    DOG_ConfigRoom::blank(array(
+	        'confr_command' => $this->gdoClassName(),
 	        'confr_key' => $key,
 	        'confr_room' => $room->getID(),
 	        'confr_var' => $var,
@@ -217,7 +220,7 @@ abstract class DOG_Command extends MethodForm
 	
 	public function getConfigVarServer(DOG_Server $server, $key)
 	{
-	    if ($var = DOG_ConfigServer::table()->getById($key, $server->getID()))
+	    if ($var = DOG_ConfigServer::table()->getById($this->gdoClassName(), $key, $server->getID()))
 	    {
 	        return $var->getVar('confs_var');
 	    }
@@ -242,6 +245,7 @@ abstract class DOG_Command extends MethodForm
 	    $gdt = $this->getConfigGDTServer($key);
 	    $var = $gdt->toVar($value);
 	    DOG_ConfigBot::blank(array(
+	        'confs_command' => $this->gdoClassName(),
 	        'confs_key' => $key,
 	        'confs_user' => $server->getID(),
 	        'confs_var' => $var,
@@ -312,6 +316,15 @@ abstract class DOG_Command extends MethodForm
 	    return in_array($message->server->getConnectorName(), $this->getConnectors());
 	}
 	
+	public function canExecute(DOG_Message $message)
+	{
+	    if (!$this->connectorMatches($message)) { return false; }
+	    if ( (!$this->isRoomMethod()) && ($message->room) ) { return false; }
+	    if ( (!$this->isPrivateMethod()) && (!$message->room) ) { return false; }
+	    if (!$this->hasUserPermission($message->getGDOUser())) { return false; }
+	    return true;
+	}
+	
 	public function onDogExecute(DOG_Message $message)
 	{
 	    if (!$this->connectorMatches($message))
@@ -329,15 +342,20 @@ abstract class DOG_Command extends MethodForm
 	        return $message->rply('err_not_in_private');
 	    }
 	    
-	    if (!$this->hasUserPermission($message->getUser()))
+	    if (!$this->hasUserPermission($message->getGDOUser()))
 	    {
 	        return $message->rply('err_no_permission');
 	    }
 	    
 		$args = [];
 		$_REQUEST = [];
-		$text = mb_substr($message->text, mb_strlen($this->trigger));
-		$text = trim($text);
+		if ($message->room)
+		{
+    		$text = mb_substr($message->text, 1);
+		}
+		
+		$text = trim(Strings::rsubstrFrom($text, ' ', ''));
+
 		foreach ($this->gdoParameters() as $gdt)
 		{
 		    if (!($gdt instanceof GDT_DogString))
@@ -356,9 +374,9 @@ abstract class DOG_Command extends MethodForm
 		    
 		    if (!$gdt->validate($value))
 		    {
-		        $message->reply(sprintf('%s: %s', $gdt->name, $gdt->error));
-		        $message->reply(t('usage', [$this->trigger, $this->getUsageText()]));
-		        return;
+		        $usage = $this->getUsageText($message);
+		        $message->reply(sprintf('%s: %s %s', $gdt->name, $gdt->error, $usage));
+		        return false;
 		    }
 		    $args[] = $value;
 		}
@@ -368,11 +386,23 @@ abstract class DOG_Command extends MethodForm
 		    Logger::logCron("executing " . $this->gdoClassName());
 		}
 		
-		$this->dogExecute($message, ...$args);
-		return true;
+		try
+		{
+    		$this->dogExecute($message, ...$args);
+    		return true;
+		}
+		catch (\Error $e)
+		{
+		    $message->rply('err_dog_error', [get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()]);
+		}
+		catch (\Exception $e)
+		{
+		    $message->rply('err_dog_exception', [get_class($e), $e->getMessage()]);
+		}
+		return false;
 	}
 	
-	public function getUsageText()
+	public function getUsageText(DOG_Message $message)
 	{
 	    $usage = [];
 	    foreach ($this->gdoParameters() as $gdt)
@@ -388,7 +418,12 @@ abstract class DOG_Command extends MethodForm
 	            $usage[] = "[<{$dots}{$gdt->name}{$dots}>]";
 	        }
 	    }
-	    return implode(" ", $usage);
+	    return $message->t('usage', [$this->trigger, implode(' ', $usage)]);
+	}
+	
+	public function getHelpText(DOG_Message $message)
+	{
+	    return $message->t("dog_help_{$this->trigger}");
 	}
 	
 }

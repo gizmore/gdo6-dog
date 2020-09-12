@@ -5,9 +5,7 @@ use GDO\Core\GDO;
 use GDO\DB\GDT_AutoInc;
 use GDO\User\GDT_User;
 use GDO\User\GDO_User;
-use GDO\DB\GDT_Object;
 use GDO\DB\GDT_String;
-use GDO\Language\GDT_Language;
 
 final class DOG_User extends GDO
 {
@@ -18,9 +16,8 @@ final class DOG_User extends GDO
 		return array(
 			GDT_AutoInc::make('doguser_id'),
 			GDT_String::make('doguser_name')->utf8()->max(64)->notNull(),
-		    GDT_Object::make('doguser_server')->table(DOG_Server::table())->notNull()->cascade(),
-		    GDT_User::make('doguser_user_id')->notNull()->cascade(),
-		    GDT_Language::make('doguser_lang'),
+		    GDT_Server::make('doguser_server')->notNull(),
+		    GDT_User::make('doguser_user_id')->notNull(),
 		);
 	}
 	
@@ -29,6 +26,12 @@ final class DOG_User extends GDO
 	 */
 	public function getGDOUser() { return $this->getValue('doguser_user_id'); }
 	public function getGDOUserID() { return $this->getVar('doguser_user_id'); }
+	
+	/**
+	 * @return DOG_Server
+	 */
+	public function getServer() { return $this->getValue('doguser_server'); }
+	public function getServerID() { return $this->getVar('doguser_server'); }
 
 	public function getName() { return $this->getVar('doguser_name'); }
 
@@ -39,15 +42,20 @@ final class DOG_User extends GDO
 	 */
 	public static function getOrCreateUser(DOG_Server $server, $name)
 	{
-		if ($user = self::getUser($server, $name))
+		if (!($user = self::getUser($server, $name)))
 		{
-			return $user;
+    		$user = self::createUser($server, $name);
 		}
-		return self::createUser($server, $name);
+		$server->addUser($user);
+		return $user;
 	}
 	
 	public static function getUser(DOG_Server $server, $name)
 	{
+	    if ($user = $server->getUserByName($name))
+	    {
+	        return $user;
+	    }
 		return self::table()->select()->
 			where(sprintf("doguser_server=%s AND doguser_name=%s", $server->getID(), GDO::quoteS($name)))->
 			first()->exec()->fetchObject();
@@ -69,7 +77,7 @@ final class DOG_User extends GDO
 	
 	public function isRegistered()
 	{
-	    return $this->getGDOUser()->getVar('user_password') !== null;
+	    return !!$this->getGDOUser()->getVar('user_password');
 	}
 	
 	public function isAuthenticated()

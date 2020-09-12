@@ -1,6 +1,7 @@
 <?php
 namespace GDO\Dog\Connector;
 
+use GDO\Dog\DOG_Room;
 use GDO\Dog\DOG_Server;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\Dog;
@@ -71,11 +72,16 @@ class Bash extends DOG_Connector
 		Dog::instance()->event('dog_message', $msg);
 	}
 
-	public function sendTo($receiver, $message)
+	public function sendToUser(DOG_User $user, $text)
 	{
-		echo "$message\n";
+	    echo "$text\n";
 	}
-
+	
+	public function sendToRoom(DOG_Room $room, $text)
+	{
+	    echo "$text\n";
+	}
+	
 	
     
     

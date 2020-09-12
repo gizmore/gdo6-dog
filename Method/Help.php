@@ -3,6 +3,7 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\GDT_DogCommand;
+use GDO\DogIRC\IRCLib;
 
 class Help extends DOG_Command
 {
@@ -29,13 +30,36 @@ class Help extends DOG_Command
 		}
 	}
 	
-	private function showHelpFor(DOG_Message $message, DOG_Command $command)
-	{
-	    
-	}
-	
 	private function showOverallHelp(DOG_Message $message)
 	{
+	    $grouped = [];
+	    foreach (DOG_Command::$COMMANDS as $command)
+	    {
+	        if ($command->trigger && $command->canExecute($message))
+	        {
+    	        if (!isset($grouped[$command->group]))
+    	        {
+    	            $grouped[$command->group] = [];
+    	        }
+    	        
+    	        $grouped[$command->group][] = $command->trigger;
+	        }
+	        
+	    }
 	    
+	    $b = IRCLib::BOLD;
+	    $groupOut = [];
+	    foreach ($grouped as $group => $triggers)
+	    {
+	        $groupOut[] = sprintf("{$b}$group{$b}: %s.", implode(', ', $triggers));
+	    }
+	    
+	    $message->rply('msg_dog_overall_help', [implode(' ', $groupOut)]);
 	}
+
+	private function showHelpFor(DOG_Message $message, DOG_Command $command)
+	{
+	    $message->rply('msg_dog_help', [$command->getUsageText($message), $command->getHelpText($message)]);
+	}
+	
 }

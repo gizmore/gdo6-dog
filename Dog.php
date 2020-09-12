@@ -11,6 +11,7 @@ final class Dog extends Application
     const VOICE = 'voice';
     
     public function isCLI() { return true; }
+    public function isHTML() { return false; }
     public function getFormat() { return 'cli'; }
     
     public $running = true;
@@ -90,7 +91,5 @@ final class Dog extends Application
     		}
     	}
     }
-    
-    
 
 }

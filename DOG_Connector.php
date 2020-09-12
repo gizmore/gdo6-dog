@@ -49,16 +49,22 @@ abstract class DOG_Connector
     
     public function init() {}
     
-    public abstract function sendTo($receiver, $message);
+//     public abstract function sendTo($to, $text);
+    
+    public abstract function sendToUser(DOG_User $user, $text);
+    public abstract function sendToRoom(DOG_Room $room, $text);
+    
     public function reply(DOG_Message $message, $text)
     {
-    	$receiver = $message->user;
     	if ($message->room)
     	{
     		$text = $message->user->getName() . ": " . $text;
-    		$receiver = $message->room;
+    		$this->sendToRoom($message->room, $text);
     	}
-    	$this->sendTo($receiver->getName(), $text);
+    	else
+    	{
+        	$this->sendToUser($message->user, $text);
+    	}
     }
     
     public abstract function connect();
