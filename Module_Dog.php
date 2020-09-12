@@ -20,7 +20,6 @@ final class Module_Dog extends GDO_Module
 	public function getConfig()
 	{
 		return array(
-			
 		);
 	}
 
@@ -29,7 +28,11 @@ final class Module_Dog extends GDO_Module
 		return array(
 			'GDO\\Dog\\DOG_Server',
 			'GDO\\Dog\\DOG_Room',
-			'GDO\\Dog\\DOG_User',
+		    'GDO\\Dog\\DOG_User',
+		    'GDO\\Dog\\DOG_ConfigBot',
+		    'GDO\\Dog\\DOG_ConfigRoom',
+		    'GDO\\Dog\\DOG_ConfigServer',
+		    'GDO\\Dog\\DOG_ConfigUser',
 		);
 	}
 }

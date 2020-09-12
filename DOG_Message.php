@@ -1,6 +1,5 @@
 <?php
 namespace GDO\Dog;
-use GDO\User\GDO_User;
 
 class DOG_Message
 {
@@ -29,7 +28,7 @@ class DOG_Message
 	 * @var DOG_Room
 	 */
 	public $room;
-	public function room(DOG_Room $room) { $this->room = $room; return $this; }
+	public function room(DOG_Room $room=null) { $this->room = $room; return $this; }
 	
 	/**
 	 * @var DOG_User
@@ -39,22 +38,14 @@ class DOG_Message
 
 	public function getUser() { return $this->user->getGDOUser(); }
 	
-	public $raw;
-	public function raw($raw) { $this->raw = $raw; return $this; }
-	
 	public $text;
 	public function text($text) { $this->text = $text; return $this; }
 	
-	/**
-	 * @var DOG_Command
-	 */
-	public $command;
-	public function command(DOG_Command $command) { $this->command = $command; return $this; }
 	
 	###############
 	### Methods ###
 	###############
-	public function rply($key, $args)
+	public function rply($key, $args=null)
 	{
 		$this->reply(t($key, $args));
 	}

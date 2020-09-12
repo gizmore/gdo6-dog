@@ -14,6 +14,9 @@ use GDO\Dog\Module_Dog;
 use GDO\Dog\DOG_User;
 use GDO\Dog\DOG_Server;
 use GDO\User\GDO_UserPermission;
+use GDO\User\GDO_User;
+use GDO\Dog\Connector\Bash;
+use GDO\Dog\DOG_Connector;
 
 @include 'protected/config_dog.php';
 require 'GDO6.php';
@@ -48,17 +51,20 @@ if (@$argv[1] === 'config')
     echo "You can now edit protected/config_dog.php manually.\n";
     
 }
-elseif (@$argv[1] === 'modules')
+elseif ( (@$argv[1] === 'modules') || (@$argv[1] === 'upgrade') )
 {
     echo "Installing modules...\n";
-    ModuleLoader::instance()->loadModules(false, true);
+    ModuleLoader::instance()->loadModules($argv[1] === 'upgrade', true);
     $modules = ModuleLoader::instance()->getInstallableModules();
     foreach ($modules as $module)
     {
-        echo $module->getName() . ' ... ';
+        echo $module->getName() . '... ';
         Installer::installModule($module);
         echo "done\n";
     }
+    echo "\nCreating bash server... done\n";
+    $bash = new Bash();
+    $bash->init();
 }
 elseif (@$argv[1] === 'admin')
 {
@@ -76,6 +82,7 @@ elseif (@$argv[1] === 'admin')
     }
     else
     {
+        GDO_User::$CURRENT = GDO_User::system();
         echo "Granting all permissions to {$argv[3]}.\n";
         $dog_user = DOG_User::getOrCreateUser($server, $argv[3]);
         $gdo_user = $dog_user->getGDOUser();

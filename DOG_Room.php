@@ -7,6 +7,7 @@ use GDO\DB\GDT_String;
 use GDO\Core\GDT_Secret;
 use GDO\DB\GDT_Char;
 use GDO\DB\GDT_Checkbox;
+use GDO\Language\GDT_Language;
 
 class DOG_Room extends GDO
 {
@@ -14,15 +15,23 @@ class DOG_Room extends GDO
     {
         return array(
             GDT_AutoInc::make('room_id'),
-            GDT_Object::make('room_server')->table(DOG_Server::table()),
-            GDT_String::make('room_name'),
+            GDT_Object::make('room_server')->table(DOG_Server::table())->notNull()->cascade(),
+            GDT_String::make('room_name')->notNull(),
             GDT_Secret::make('room_password'),
-            GDT_Checkbox::make('room_autojoin')->initial('1'),
-            GDT_Char::make('room_trigger')->size(1)->initial('.'),
+            GDT_Checkbox::make('room_autojoin')->notNull()->initial('1'),
+            GDT_Char::make('room_trigger')->size(1)->initial('.')->notNull(),
+            GDT_Language::make('room_lang'),
         );
     }
 
-    public function getTrigger() { return $this->getVar('room_trigger'); }
+    /**
+     * @return DOG_Server
+     */
+    public function getServer() { return $this->getValue('room_server'); }
+    public function getServerID() { return $this->getVar('room_server'); }
+    
+    public function getName() { return  $this->getVar('room_name'); }
+    public function getTrigger() { return  $this->getVar('room_trigger'); }
     
     /**
      * @param DOG_Server $server

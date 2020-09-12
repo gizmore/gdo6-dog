@@ -7,16 +7,20 @@ use GDO\User\GDT_User;
 use GDO\User\GDO_User;
 use GDO\DB\GDT_Object;
 use GDO\DB\GDT_String;
+use GDO\Language\GDT_Language;
 
 final class DOG_User extends GDO
 {
-	public function gdoColumns()
+    private $authenticated = false;
+    
+    public function gdoColumns()
 	{
 		return array(
 			GDT_AutoInc::make('doguser_id'),
-			GDT_String::make('doguser_name')->utf8()->max(64),
-			GDT_Object::make('doguser_server')->table(DOG_Server::table()),
-			GDT_User::make('doguser_user_id'),
+			GDT_String::make('doguser_name')->utf8()->max(64)->notNull(),
+		    GDT_Object::make('doguser_server')->table(DOG_Server::table())->notNull()->cascade(),
+		    GDT_User::make('doguser_user_id')->notNull()->cascade(),
+		    GDT_Language::make('doguser_lang'),
 		);
 	}
 	
@@ -25,7 +29,9 @@ final class DOG_User extends GDO
 	 */
 	public function getGDOUser() { return $this->getValue('doguser_user_id'); }
 	public function getGDOUserID() { return $this->getVar('doguser_user_id'); }
-	
+
+	public function getName() { return $this->getVar('doguser_name'); }
+
 	/**
 	 * @param DOG_Server $server
 	 * @param string $name
@@ -59,5 +65,26 @@ final class DOG_User extends GDO
 			'doguser_server' => $sid,
 			'doguser_user_id' => $user->getID(),
 		))->insert();
+	}
+	
+	public function isRegistered()
+	{
+	    return $this->getGDOUser()->getVar('user_password') !== null;
+	}
+	
+	public function isAuthenticated()
+	{
+	    return $this->authenticated;
+	}
+	
+	public function login()
+	{
+	    $this->authenticated = true;
+	    Dog::instance()->event('dog_authenticated', $this);
+	}
+	
+	public function logout()
+	{
+	    $this->authenticated = false;
 	}
 }

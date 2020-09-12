@@ -13,7 +13,12 @@ final class Dog extends Application
     public function isCLI() { return true; }
     public function getFormat() { return 'cli'; }
     
-    private $running = true;
+    public $running = true;
+    
+    /**
+     * @var DOG_Server[]
+     */
+    public $servers;
     
     public function init()
     {
@@ -34,14 +39,17 @@ final class Dog extends Application
         {
             Logger::logCron("Entering mainloop.");
         }
-        $servers = DOG_Server::table();
+        $this->servers = DOG_Server::table()->all();
         while ($this->running)
         {
-            foreach ($servers->all() as $server)
+            foreach ($this->servers as $server)
             {
-                $this->mainloopServer($server);
-                usleep(100);
+                if ($server->isActive())
+                {
+                    $this->mainloopServer($server);
+                }
             }
+            usleep(1000);
         }
     }
     

@@ -7,9 +7,10 @@ use GDO\Dog\GDT_DogString;
 
 final class Echoes extends DOG_Command
 {
-	public function getGroup() { return 'Chat'; }
-	public function getTrigger() { return 'echo'; }
-	public function isWebMethod() { return true; }
+    public $group = 'Chat';
+    public $trigger = 'echo';
+
+    public function isWebMethod() { return true; }
 	
 	public function gdoParameters()
 	{

@@ -6,6 +6,7 @@ use GDO\Dog\DOG_Message;
 use GDO\Dog\Dog;
 use GDO\Dog\DOG_Connector;
 use GDO\Dog\DOG_User;
+use GDO\User\GDO_User;
 
 /**
  * This connector can be called by "dog <..parameters..>".
@@ -13,11 +14,13 @@ use GDO\Dog\DOG_User;
  */
 class Bash extends DOG_Connector
 {
+    private $bashServer;
+    
 	public function init()
 	{
-		if (!($this->getBashServer()))
+		if (!($this->bashServer = $this->getBashServer()))
 		{
-			DOG_Server::table()->blank(array(
+			$this->bashServer = DOG_Server::table()->blank(array(
 				'serv_connector' => $this->gdoShortName(),
 			))->insert();
 		}
@@ -28,6 +31,10 @@ class Bash extends DOG_Connector
 	 */
 	public function getBashServer()
 	{
+	    if ($this->bashServer)
+	    {
+	        return $this->bashServer;
+	    }
 		$query = DOG_Server::table()->select('*');
 		$query->where("serv_connector='{$this->gdoShortName()}'")->first();
 		return $query->exec()->fetchObject();
@@ -35,7 +42,9 @@ class Bash extends DOG_Connector
 	
 	public function getBashUser()
 	{
-		return DOG_User::getOrCreateUser($this->getBashServer(), get_current_user());
+	    $user = DOG_User::getOrCreateUser($this->getBashServer(), get_current_user());
+	    GDO_User::$CURRENT = $user->getGDOUser();
+	    return $user;
 	}
 	
     public function connect()
@@ -58,7 +67,6 @@ class Bash extends DOG_Connector
 		$msg = DOG_Message::make()->
 			server($this->getBashServer())->
 			user($this->getBashUser())->
-			raw($text)->
 			text($text);
 		Dog::instance()->event('dog_message', $msg);
 	}

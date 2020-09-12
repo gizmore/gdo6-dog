@@ -55,10 +55,10 @@ abstract class DOG_Connector
     	$receiver = $message->user;
     	if ($message->room)
     	{
-    		$text = $message->user->displayName() . ": " . $text;
+    		$text = $message->user->getName() . ": " . $text;
     		$receiver = $message->room;
     	}
-    	$this->sendTo($receiver, $text);
+    	$this->sendTo($receiver->getName(), $text);
     }
     
     public abstract function connect();

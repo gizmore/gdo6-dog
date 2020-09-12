@@ -1,11 +1,18 @@
 <?php
 namespace GDO\Dog;
-use GDO\DB\GDT_ObjectSelect;
+use GDO\Form\GDT_Select;
 
-final class GDT_DogCommand extends GDT_ObjectSelect
+final class GDT_DogCommand extends GDT_Select
 {
 	public function initChoices()
 	{
-		$this->choices = DOG_Command::$COMMANDS;
+	    $this->choices = [];
+	    foreach (DOG_Command::$COMMANDS as $command)
+	    {
+	        if ($command->trigger)
+	        {
+	            $this->choices[$command->trigger] = $command;
+	        }
+	    }
 	}
 }
