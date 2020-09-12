@@ -5,8 +5,15 @@ use GDO\Core\Logger;
 
 final class Dog extends Application
 {
+    const OWNER = 'owner';
+    const OPERATOR = 'operator';
+    const HALFOP = 'halfop';
+    const VOICE = 'voice';
+    
     public function isCLI() { return true; }
     public function getFormat() { return 'cli'; }
+    
+    private $running = true;
     
     public function init()
     {
@@ -14,15 +21,27 @@ final class Dog extends Application
     	{
     		$connector->init();
     	}
+    	DOG_Command::sortCommands();
+    	foreach (DOG_Command::$COMMANDS as $command)
+    	{
+    	    $command->init();
+    	}
     }
     
     public function mainloop()
     {
-        $servers = DOG_Server::table();
-        foreach ($servers->all() as $server)
+        if (defined('GWF_CONSOLE_VERBOSE'))
         {
-            $this->mainloopServer($server);
-            usleep(100);
+            Logger::logCron("Entering mainloop.");
+        }
+        $servers = DOG_Server::table();
+        while ($this->running)
+        {
+            foreach ($servers->all() as $server)
+            {
+                $this->mainloopServer($server);
+                usleep(100);
+            }
         }
     }
     
@@ -35,22 +54,19 @@ final class Dog extends Application
         }
         else
         {
-        	while ($msg = $connector->readMessage())
+        	while ($connector->readMessage())
         	{
-        		$this->processMessage($msg);
         	}
         }
         
     }
     
-    private function processMessage(DOG_Message $msg)
-    {
-    	
-    }
-    
     public function event($name, ...$args)
     {
-    	Logger::logCron("Dog::event($name)");
+        if (defined('GWF_CONSOLE_VERBOSE'))
+        {
+        	Logger::logCron("Dog::event($name)");
+        }
     	foreach (DOG_Connector::connectors() as $connector)
     	{
     		if (method_exists($connector, $name))

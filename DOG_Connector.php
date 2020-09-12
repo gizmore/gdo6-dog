@@ -35,6 +35,9 @@ abstract class DOG_Connector
     public $server;
     public function server(DOG_Server $server) { $this->server = $server; return $this; }
     
+    public function setupServer(DOG_Server $server) {}
+    
+    public function getName() { return $this->gdoShortName(); }
     
     ###
     public $connected = false;
@@ -59,6 +62,9 @@ abstract class DOG_Connector
     }
     
     public abstract function connect();
+
+    public abstract function disconnect($reason);
+
     /**
      * DOG_Message
      */

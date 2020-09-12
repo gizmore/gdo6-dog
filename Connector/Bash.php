@@ -7,13 +7,12 @@ use GDO\Dog\Dog;
 use GDO\Dog\DOG_Connector;
 use GDO\Dog\DOG_User;
 
+/**
+ * This connector can be called by "dog <..parameters..>".
+ * @author gizmore
+ */
 class Bash extends DOG_Connector
 {
-	/**
-	 * @var resource
-	 */
-	private $stdin;
-	
 	public function init()
 	{
 		if (!($this->getBashServer()))
@@ -41,33 +40,16 @@ class Bash extends DOG_Connector
 	
     public function connect()
     {
-//     	if (!$this->stdin)
-//     	{
-//     		$this->stdin = fopen('php://stdin', 'r');
-//     	}
     }
     
-    public function disconnect()
+    public function disconnect($reason)
     {
-//     	if ($this->stdin)
-//     	{
-//     		fclose($this->stdin);
-//     		$this->stdin = null;
-//     	}
+        echo "Disconnecting: {$reason}\n";
     }
+    
     
 	public function readMessage()
 	{
-// 		$read = array($this->stdin);
-// 		$write = NULL;
-// 		$exept = NULL;
-// 		if (stream_select($read, $write, $exept, 0) > 0){
-// 			//something happened on our monitors. let's see what it is
-// 			foreach ($read as $input => $fd){
-// 				$line = fgets($fd);
-// 				return $line;
-// 			}
-// 		}
 	}
 	
 	public function dog_cmdline(...$argv)
@@ -83,12 +65,10 @@ class Bash extends DOG_Connector
 
 	public function sendTo($receiver, $message)
 	{
-		echo $message;
+		echo "$message\n";
 	}
 
 	
     
     
 }
-
-DOG_Connector::register(new Bash());

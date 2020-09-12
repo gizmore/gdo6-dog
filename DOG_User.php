@@ -26,6 +26,11 @@ final class DOG_User extends GDO
 	public function getGDOUser() { return $this->getValue('doguser_user_id'); }
 	public function getGDOUserID() { return $this->getVar('doguser_user_id'); }
 	
+	/**
+	 * @param DOG_Server $server
+	 * @param string $name
+	 * @return self
+	 */
 	public static function getOrCreateUser(DOG_Server $server, $name)
 	{
 		if ($user = self::getUser($server, $name))
@@ -47,11 +52,11 @@ final class DOG_User extends GDO
 		$sid = $server->getID();
 		$user = GDO_User::blank(array(
 			'user_type' => GDO_User::MEMBER,
-			'user_name' => "__dog{$sid}_$name",
+			'user_name' => "__dog_{$sid}_{$name}",
 		))->insert();
 		return self::blank(array(
-			'doguser_server' => $sid,
 			'doguser_name' => $name,
+			'doguser_server' => $sid,
 			'doguser_user_id' => $user->getID(),
 		))->insert();
 	}

@@ -2,8 +2,15 @@
 namespace GDO\Dog;
 use GDO\User\GDO_User;
 
-final class DOG_Message
+class DOG_Message
 {
+    public static $LAST_MESSAGE = null;
+    
+    public function __construct()
+    {
+        self::$LAST_MESSAGE = $this;
+    }
+    
 	/**
 	 * return self
 	 */
@@ -25,10 +32,12 @@ final class DOG_Message
 	public function room(DOG_Room $room) { $this->room = $room; return $this; }
 	
 	/**
-	 * @var GDO_User
+	 * @var DOG_User
 	 */
 	public $user;
 	public function user(DOG_User $user) { $this->user = $user; return $this; }
+
+	public function getUser() { return $this->user->getGDOUser(); }
 	
 	public $raw;
 	public function raw($raw) { $this->raw = $raw; return $this; }

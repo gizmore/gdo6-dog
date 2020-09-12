@@ -6,24 +6,47 @@ use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Dog;
-use GDO\Util\Strings;
+use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Connector;
-use GDO\Core\Application;
-require 'protected/config.php';
+
+require 'protected/config_dog.php';
 require 'GDO6.php';
 
+chdir(GDO_PATH);
+Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
 $dog = new Dog();
 
-Logger::logDebug("Starting dog...\nLoading Modules...\n");
+if (defined('GWF_CONSOLE_VERBOSE'))
+{
+    Logger::logCron("Starting dog...\nLoading Modules...");
+}
+
 Filewalker::traverse('GDO', null, false, function($entry, $path){
-	if (Strings::startsWith($entry, 'Dog'))
+	if (preg_match("/^Dog[A-Z]?/", $entry))
 	{
-		Filewalker::traverse(["$path/Method", "$path/Connector"], null, function($entry, $path){
+	    Filewalker::traverse(["$path/Connector", "$path/Method"], null, function($entry, $path){
 			$class_name = str_replace('/', "\\", $path);
 			$class_name = substr($class_name, 0, -4);
 			if (class_exists($class_name))
 			{
-				Logger::logCron("Loaded $class_name");
+			    if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
+			    {
+			        DOG_Command::register(new $class_name());
+    			    if (defined('GWF_CONSOLE_VERBOSE'))
+    			    {
+    			        Logger::logCron("Loaded command $class_name");
+    			    }
+			    }
+			    
+			    if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
+			    {
+			        DOG_Connector::register(new $class_name());
+			        if (defined('GWF_CONSOLE_VERBOSE'))
+			        {
+			            Logger::logCron("Loaded connector $class_name");
+			        }
+			    }
+
 			}
 			else
 			{
@@ -34,7 +57,6 @@ Filewalker::traverse('GDO', null, false, function($entry, $path){
 }, false);
     
 Trans::$ISO = GWF_LANGUAGE;
-Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
 Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();

@@ -9,7 +9,7 @@ class Netcat extends DOG_Connector
 	{
 	}
 
-	public function disconnect()
+	public function disconnect($reason)
 	{
 		
 	}
@@ -22,5 +22,3 @@ class Netcat extends DOG_Connector
 		
 	}
 }
-
-DOG_Connector::register(new Netcat());

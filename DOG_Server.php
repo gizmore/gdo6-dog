@@ -2,9 +2,7 @@
 namespace GDO\Dog;
 use GDO\Core\GDO;
 use GDO\DB\GDT_AutoInc;
-use GDO\Dog\GDT_Connector;
 use GDO\User\GDT_Username;
-use GDO\User\GDT_Password;
 use GDO\Core\GDT_Secret;
 use GDO\Net\GDT_Url;
 use GDO\DB\GDT_Checkbox;
@@ -12,6 +10,10 @@ use GDO\User\GDO_User;
 use GDO\DB\GDT_Char;
 use GDO\Date\GDT_Duration;
 use GDO\Net\URL;
+use GDO\DB\GDT_CreatedAt;
+use GDO\DB\GDT_CreatedBy;
+use GDO\DogIRC\IRCLib;
+use GDO\DB\GDT_UInt;
 
 final class DOG_Server extends GDO
 {
@@ -30,16 +32,39 @@ final class DOG_Server extends GDO
         return array(
             GDT_AutoInc::make('serv_id'),
         	GDT_Url::make('serv_url'),
+            GDT_Checkbox::make('serv_tls')->initial('0'),
         	GDT_Char::make('serv_trigger')->utf8()->max(1),
-//         	GDT_Checkbox::make('serv_tls')->initial('0'),
-            GDT_Connector::make('serv_connector'),
-            GDT_Username::make('serv_username'),
+            GDT_Connector::make('serv_connector')->notNull(),
+            GDT_Username::make('serv_username')->initial("Dog"),
             GDT_Secret::make('serv_password'),
-        	GDT_Duration::make('serv_connect_timeout')->initial('30'),
+            GDT_Duration::make('serv_connect_timeout')->initial('10')->notNull(),
+            GDT_UInt::make('serv_throttle')->initial(4)->notNull(),
+            GDT_Checkbox::make('serv_active')->initial('1')->notNull(),
+            GDT_CreatedAt::make('serv_created'),
+            GDT_CreatedBy::make('serv_creator'),
+            GDT_Char::make('serv_trigger')->size(1)->initial('.'),
         );
     }
 
     public function isTLS() { return $this->getValue('serv_tls'); }
+    public function getUsername() { return $this->getVar('serv_username'); }
+    public function getPassword() { return $this->getVar('serv_password'); }
+    
+    public function displayName()
+    {
+        $b = ($this->connector->connected) ? IRCLib::BOLD : '';
+        return sprintf('%s%s%s-%s', $b, $this->getID(), $b, $this->getDomain());
+    }
+    
+    /**
+     * @return URL
+     */
+    public function getDomain($short=false)
+    {
+        return $this->getURL()->getHost();
+    }
+    
+    
     /**
      * @return URL
      */
@@ -65,10 +90,22 @@ final class DOG_Server extends GDO
 	}
     
     /**
-     * 
      * @param string $url
-     * @return \GDO\Dog\DOG_Server
+     * @return self
      */
     public static function getByURL($url) { $url = GDO::escapeS($url); return self::table()->findWhere("serv_url LIKE '%$url%'"); }
-    
+ 
+
+    /**
+     * @param string $url
+     * @return self
+     */
+    public static function getByArg($url)
+    {
+        if ($server = self::getById($url))
+        {
+            return $server;
+        }
+        return self::getByURL($url);
+    }
 }

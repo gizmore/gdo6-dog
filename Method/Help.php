@@ -9,5 +9,3 @@ class Help extends DOG_Command
 		
 	}
 }
-
-DOG_Command::register(new Help());

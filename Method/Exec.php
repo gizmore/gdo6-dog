@@ -9,12 +9,19 @@ final class Exec extends DOG_Command
 {
 	public function dog_message(DOG_Message $message)
 	{
-		$trigger = Strings::substrTo($message->text, ' ', $message->text);
+	    $text = $message->text;
+	    if ($message->room)
+	    {
+	        if (!Strings::startsWith($text, $message->room->getTrigger()))
+	        {
+	            return;
+	        }
+	        $text = substr($text, 1);
+	    }
+		$trigger = Strings::substrTo($text, ' ', $text);
 		if ($command = DOG_Command::byTrigger($trigger))
 		{
 			$command->onDogExecute($message);
 		}
 	}
 }
-
-DOG_Command::register(new Exec());

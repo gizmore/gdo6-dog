@@ -27,9 +27,9 @@ class GDT_Connector extends GDT_Select
         return $choices;
     }
     
-    protected function errorInvalidChoice($value)
+    protected function errorInvalidChoice()
     {
-    	return $this->error(t('err_connector', [html($value), html(Arrays::implodeHuman(array_keys($this->choices)))]));
+    	return $this->error(t('err_connector', [html($this->getVar()), html(Arrays::implodeHuman(array_keys($this->choices)))]));
     }
 
 }

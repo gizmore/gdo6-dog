@@ -2,18 +2,19 @@
 namespace GDO\Dog\Method;
 
 use GDO\Dog\DOG_Command;
-use GDO\DB\GDT_String;
 use GDO\Dog\DOG_Message;
-use GDO\UI\GDT_Message;
+use GDO\Dog\GDT_DogString;
 
 final class Echoes extends DOG_Command
 {
+	public function getGroup() { return 'Chat'; }
 	public function getTrigger() { return 'echo'; }
+	public function isWebMethod() { return true; }
 	
 	public function gdoParameters()
 	{
 		return array(
-			GDT_Message::make('text'),
+			GDT_DogString::make('text')->notNull(),
 		);
 	}
 	
@@ -21,6 +22,5 @@ final class Echoes extends DOG_Command
 	{
 		$message->reply($text);
 	}
-}
 
-DOG_Command::register(new Echoes());
+}
