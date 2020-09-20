@@ -8,6 +8,7 @@ use GDO\Util\Strings;
 use GDO\Util\Arrays;
 use GDO\Core\Logger;
 use GDO\Core\GDT;
+use GDO\Dog\Method\Disable;
 
 abstract class DOG_Command extends MethodForm
 {
@@ -29,13 +30,23 @@ abstract class DOG_Command extends MethodForm
 	 */
 	public function getConfigBot() { return []; }
 	
+	private $ccBot = null;
+	private function getConfigBotCached()
+	{
+	    if ($this->ccBot === null)
+	    {
+	        $this->ccBot = $this->getConfigBot();
+	    }
+	    return $this->ccBot;
+	}
+	
 	/**
 	 * @param string $key
 	 * @return GDT
 	 */
 	public function getConfigGDTBot($key)
 	{
-	    foreach ($this->getConfigBot() as $gdt)
+	    foreach ($this->getConfigBotCached() as $gdt)
 	    {
 	        if ($gdt->name === $key)
 	        {
@@ -85,6 +96,16 @@ abstract class DOG_Command extends MethodForm
 	 * @return GDT[]
 	 */
 	public function getConfigUser() { return []; }
+
+	private $ccUser = null;
+	private function getConfigUserCached()
+	{
+	    if ($this->ccUser === null)
+	    {
+	        $this->ccUser = $this->getConfigUser();
+	    }
+	    return $this->ccUser;
+	}
 	
 	/**
 	 * @param string $key
@@ -92,7 +113,7 @@ abstract class DOG_Command extends MethodForm
 	 */
 	public function getConfigGDTUser($key)
 	{
-	    foreach ($this->getConfigUser() as $gdt)
+	    foreach ($this->getConfigUserCached() as $gdt)
 	    {
 	        if ($gdt->name === $key)
 	        {
@@ -143,6 +164,16 @@ abstract class DOG_Command extends MethodForm
 	 * @return GDT[]
 	 */
 	public function getConfigRoom() { return []; }
+
+	private $ccRoom = null;
+	private function getConfigRoomCached()
+	{
+	    if ($this->ccRoom === null)
+	    {
+	        $this->ccRoom = $this->getConfigRoom();
+	    }
+	    return $this->ccRoom;
+	}
 	
 	/**
 	 * @param string $key
@@ -150,7 +181,7 @@ abstract class DOG_Command extends MethodForm
 	 */
 	public function getConfigGDTRoom($key)
 	{
-	    foreach ($this->getConfigRoom() as $gdt)
+	    foreach ($this->getConfigRoomCached() as $gdt)
 	    {
 	        if ($gdt->name === $key)
 	        {
@@ -203,13 +234,23 @@ abstract class DOG_Command extends MethodForm
 	 */
 	public function getConfigServer() { return []; }
 
+	private $ccServer = null;
+	private function getConfigServerCached()
+	{
+	    if ($this->ccServer === null)
+	    {
+	        $this->ccServer = $this->getConfigServer();
+	    }
+	    return $this->ccServer;
+	}
+	
 	/**
 	 * @param string $key
 	 * @return GDT
 	 */
 	public function getConfigGDTServer($key)
 	{
-	    foreach ($this->getConfigServer() as $gdt)
+	    foreach ($this->getConfigServerCached() as $gdt)
 	    {
 	        if ($gdt->name === $key)
 	        {
@@ -347,14 +388,27 @@ abstract class DOG_Command extends MethodForm
 	        return $message->rply('err_no_permission');
 	    }
 	    
+	    /**
+	     * @var Disable $disable
+	     */
+	    $disable = DOG_Command::byTrigger('disable');
+	    if ($disable->isDisabled($message, $this))
+	    {
+	        return $message->rply('err_disabled');
+	    }
+	    
 		$args = [];
 		$_REQUEST = [];
 		if ($message->room)
 		{
     		$text = mb_substr($message->text, 1);
 		}
+		else
+		{
+		    $text = $message->text;
+		}
 		
-		$text = trim(Strings::rsubstrFrom($text, ' ', ''));
+		$text = trim(Strings::substrFrom($text, ' ', ''));
 
 		foreach ($this->gdoParameters() as $gdt)
 		{

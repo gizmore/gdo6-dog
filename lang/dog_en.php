@@ -41,4 +41,13 @@ return array(
     
 'dog_help_trigger' => 'Change the char that triggers the bot in a channel.',
 'msg_dog_trigger_changed' => 'The command trigger in %s has changed from %s to %s',
+    
+'dog_help_disable' => 'Disables a command in a room - or server wide when invoked in private.',
+'msg_dog_already_disabled' => '%s is already disabled.',
+'err_cannot_disable' => 'You cannot disable this command.',
+'err_disabled' => 'This command is disabled here.',
+
+'dog_help_enable' => 'Re-enables a command in a room - or server wide when invoked in private.',
+'msg_dog_not_disabled' => '%s is not disabled in this scope.',
+    
 );
