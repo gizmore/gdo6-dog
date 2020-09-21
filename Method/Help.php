@@ -54,7 +54,7 @@ class Help extends DOG_Command
 	        $groupOut[] = sprintf("{$b}$group{$b}: %s.", implode(', ', $triggers));
 	    }
 	    
-	    $message->rply('msg_dog_overall_help', [implode(' ', $groupOut)]);
+	    $message->user->sendNotice($message->t('msg_dog_overall_help', [implode(' ', $groupOut)]));
 	}
 
 	private function showHelpFor(DOG_Message $message, DOG_Command $command)

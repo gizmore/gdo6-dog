@@ -3,9 +3,11 @@ namespace GDO\Dog;
 
 use GDO\Core\GDO;
 use GDO\DB\GDT_AutoInc;
+use GDO\User\GDO_UserPermission;
 use GDO\User\GDT_User;
 use GDO\User\GDO_User;
 use GDO\DB\GDT_String;
+use GDO\DB\GDT_Checkbox;
 
 final class DOG_User extends GDO
 {
@@ -18,9 +20,13 @@ final class DOG_User extends GDO
 			GDT_String::make('doguser_name')->utf8()->max(64)->notNull(),
 		    GDT_Server::make('doguser_server')->notNull(),
 		    GDT_User::make('doguser_user_id')->notNull(),
+		    GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),
 		);
 	}
 	
+	##############
+	### Getter ###
+	##############
 	/**
 	 * @return GDO_User
 	 */
@@ -34,7 +40,28 @@ final class DOG_User extends GDO
 	public function getServerID() { return $this->getVar('doguser_server'); }
 
 	public function getName() { return $this->getVar('doguser_name'); }
+	public function getFullName() { return sprintf('%s{%s}', $this->getName(), $this->getServerID()); }
+	public function displayName() { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
+	public function displayFullName() { return sprintf('%s{%s}', $this->displayName(), $this->getServerID()); }
 
+	public function isOnline() { return $this->getServer()->hasUser($this); }
+	
+	############
+	### Send ###
+	############
+	public function send($text)
+	{
+	    return $this->getServer()->getConnector()->sendToUser($this, $text);
+	}
+	
+	public function sendNotice($text)
+	{
+	    return $this->getServer()->getConnector()->sendNoticeToUser($this, $text);
+	}
+	
+	##############
+	### Static ###
+	##############
 	/**
 	 * @param DOG_Server $server
 	 * @param string $name
@@ -66,7 +93,7 @@ final class DOG_User extends GDO
 		$sid = $server->getID();
 		$user = GDO_User::blank(array(
 			'user_type' => GDO_User::MEMBER,
-			'user_name' => "__dog_{$sid}_{$name}",
+			'user_name' => sprintf('%s{%s}', $name, $sid),
 		))->insert();
 		return self::blank(array(
 			'doguser_name' => $name,
@@ -75,6 +102,23 @@ final class DOG_User extends GDO
 		))->insert();
 	}
 	
+	/**
+	 * Get all users with a permission.
+	 * @param string $permission
+	 * @return self[]
+	 */
+	public static function withPermission($permission)
+	{
+	    return GDO_UserPermission::table()->select('dog_user.*')->
+	    joinObject('perm_user_id')->joinObject('perm_perm_id')->
+	    join('JOIN dog_user ON dog_user.doguser_user_id = gdo_user.user_id')->
+	    where("perm_name=".self::quoteS($permission))->
+	    exec()->fetchAllObjectsAs(self::table());
+	}
+	
+	############
+	### Auth ###
+	############
 	public function isRegistered()
 	{
 	    return !!$this->getGDOUser()->getVar('user_password');

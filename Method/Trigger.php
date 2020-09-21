@@ -12,6 +12,7 @@ use GDO\DB\GDT_Char;
  */
 final class Trigger extends DOG_Command
 {
+    public $group = 'Config';
     public $trigger = 'trigger';
     
     public function getPermission() { return Dog::HALFOP; }

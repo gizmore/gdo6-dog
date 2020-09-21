@@ -43,6 +43,7 @@ final class Dog extends Application
         $this->servers = DOG_Server::table()->all();
         while ($this->running)
         {
+            Application::updateTime();
             foreach ($this->servers as $server)
             {
                 if ($server->isActive())

@@ -48,11 +48,11 @@ abstract class DOG_Connector
     }
     
     public function init() {}
-    
-//     public abstract function sendTo($to, $text);
+    public function obfuscate($string) { return $string; }
     
     public abstract function sendToUser(DOG_User $user, $text);
     public abstract function sendToRoom(DOG_Room $room, $text);
+    public abstract function sendNoticeToUser(DOG_User $user, $text);
     
     public function reply(DOG_Message $message, $text)
     {

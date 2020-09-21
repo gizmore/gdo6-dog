@@ -6,7 +6,6 @@ use GDO\User\GDT_Username;
 use GDO\Core\GDT_Secret;
 use GDO\Net\GDT_Url;
 use GDO\DB\GDT_Checkbox;
-use GDO\DB\GDT_Char;
 use GDO\Date\GDT_Duration;
 use GDO\Net\URL;
 use GDO\DB\GDT_CreatedAt;
@@ -45,7 +44,6 @@ final class DOG_Server extends GDO
             GDT_Checkbox::make('serv_active')->initial('1')->notNull(),
             GDT_CreatedAt::make('serv_created'),
             GDT_CreatedBy::make('serv_creator'),
-            GDT_Char::make('serv_trigger')->size(1)->initial('.')->notNull(),
         );
     }
 
@@ -95,6 +93,7 @@ final class DOG_Server extends GDO
 	    	$classname = get_class($connector);
 	    	$this->connector = new $classname();
 	    	$this->connector->server($this);
+	    	$this->connector->init();
     	}
     	return $this->connector;
 	}
@@ -104,7 +103,6 @@ final class DOG_Server extends GDO
      * @return self
      */
     public static function getByURL($url) { $url = GDO::escapeS($url); return self::table()->findWhere("serv_url LIKE '%$url%'"); }
- 
 
     /**
      * @param string $url
@@ -144,6 +142,11 @@ final class DOG_Server extends GDO
         }
     }
     
+    public function hasRoom(DOG_Room $room=null)
+    {
+        return $room ? isset($this->rooms[$room->getID()]) : false;
+    }
+    
     public function getRoomByName($roomName)
     {
         foreach ($this->rooms as $room)
@@ -170,6 +173,11 @@ final class DOG_Server extends GDO
             $this->users[$user->getID()] = $user;
             Dog::instance()->event('dog_user_added', $this, $user);
         }
+    }
+    
+    public function hasUser(DOG_User $user)
+    {
+        return isset($this->users[$user->getID()]);
     }
     
     public function getUserByName($username)

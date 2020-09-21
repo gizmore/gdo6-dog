@@ -1,6 +1,8 @@
 <?php
 namespace GDO\Dog;
 
+use GDO\Language\Trans;
+
 class DOG_Message
 {
     public static $LAST_MESSAGE = null;
@@ -37,6 +39,7 @@ class DOG_Message
 	public function user(DOG_User $user)
 	{
 	    $this->user = $user;
+	    Trans::setISO($user->getGDOUser()->getLangISO());
 	    return $this;
 	}
 
@@ -57,6 +60,11 @@ class DOG_Message
 		$this->reply($this->t($key, $args));
 	}
 	
+	public function reply($text)
+	{
+		$this->server->getConnector()->reply($this, $text);
+	}
+
 	public function t($key, $args=null)
 	{
         $text = t($key, $args);
@@ -66,8 +74,4 @@ class DOG_Message
         return $text;
 	}
 
-	public function reply($text)
-	{
-		$this->server->getConnector()->reply($this, $text);
-	}
 }

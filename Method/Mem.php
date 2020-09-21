@@ -15,6 +15,8 @@ final class Mem extends DOG_Command
 
     public function dogExecute(DOG_Message $message)
     {
+        var_dump(getrusage());
+        var_dump(getrusage(1));
         $data = GDT_PerfBar::data();
         $data2 = array(
             $data['gdoFiles'],

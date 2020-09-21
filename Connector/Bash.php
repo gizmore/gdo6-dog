@@ -10,8 +10,9 @@ use GDO\Dog\DOG_User;
 use GDO\User\GDO_User;
 
 /**
- * This connector can be called by "dog <..parameters..>".
+ * This connector can be called by shell: "dog <command> <..parameters..>".
  * @author gizmore
+ * @since 6.10
  */
 class Bash extends DOG_Connector
 {
@@ -81,8 +82,10 @@ class Bash extends DOG_Connector
 	{
 	    echo "$text\n";
 	}
-	
-	
-    
+   
+    public function sendNoticeToUser(DOG_User $user, $text)
+    {
+        echo "$text\n";
+    }
     
 }

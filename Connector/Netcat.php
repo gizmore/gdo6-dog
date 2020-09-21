@@ -26,12 +26,14 @@ class Netcat extends DOG_Connector
 	
     public function sendToRoom(DOG_Room $room, $text)
     {
-        
     }
 
     public function sendToUser(DOG_User $user, $text)
     {
-        
+    }
+    
+    public function sendNoticeToUser(DOG_User $user, $text)
+    {
     }
 
 }

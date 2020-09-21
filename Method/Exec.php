@@ -24,4 +24,5 @@ final class Exec extends DOG_Command
 			$command->onDogExecute($message);
 		}
 	}
+
 }

@@ -1,24 +1,49 @@
 <?php
 return array(
-'%s' => '%s',
+##### 
+'%s' => '%s', ### oops hack?
 'none' => 'none',
 'usage' => 'Usage: #CMD#%s %s',
+
+#####
+'dog_user' => 'User',
+'dog_room' => 'Room',
+'dog_server' => 'Server',
+
+#####
 'err_connector' => 'Unknown connector %s. Known connectors: %s.',
 'err_wrong_connector' => 'This command only works in %s.',
 'err_not_in_private' => 'This command does not work in private.',
 'err_not_in_room' => 'This command does not work in rooms.',
-'dog_pong' => 'PONG!',
 'err_dog_bruteforce' => 'Please wait %.01fs before you try again.',
 'err_dog_error' => '%s: %s in %s line %s.',
 'err_dog_exception' => '%s: %s',
+'err_not_same_server' => 'You have to be on the same server as %s.',
+'err_not_same_room' => 'You have to be in the same room as %s.',
+'err_not_online' => '%s is not online.',
+'err_username_ambigous' => 'This username is ambigous and matches %s.',
+'err_exact_username' => 'You have to submit the exact username %s.',
+'err_user_thyself' => 'You may not choose yourself.',
+'err_page' => 'There are only %s pages.',
+'err_no_data' => 'There is no data yet.',
+'err_authenticate_first' => 'You need to authenticate to execute this command.',
+    
 ######
+'perm_voice' => 'Voice',
+'perm_halfop' => 'Halfop',
+'perm_operator' => 'Operator',
+'perm_owner' => 'Owner',
+    
+######
+'dog_help_ping' => 'Test if #BOT# responds.',
+'dog_pong' => 'PONG!',
+
 'dog_help_add_server' => 'Add a new server to your #BOT# installation.',
 'err_dog_server_already_added' => 'A server with this url or connector has already been added: %s',
 'msg_dog_server_added' => 'Server %s has been added: %s.',
     
-    
 'dog_help_stats' => 'Show how much servers, rooms and users are online.',
-'msg_dog_stats' => 'Currently i am online on %s servers, %s rooms and %s users.',
+'msg_dog_stats' => 'Currently i am online on %s servers and %s rooms, seeing %s users including myself and some services.',
     
 'dog_help_mem' => 'Show performance statistics.',
 'dog_mem' => 'Loaded %s GDO files. Using %s memory / max %s. DB Queries read %s / write %s.',
@@ -49,5 +74,4 @@ return array(
 
 'dog_help_enable' => 'Re-enables a command in a room - or server wide when invoked in private.',
 'msg_dog_not_disabled' => '%s is not disabled in this scope.',
-    
 );

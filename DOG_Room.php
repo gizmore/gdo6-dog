@@ -10,8 +10,14 @@ use GDO\Language\GDT_Language;
 
 class DOG_Room extends GDO
 {
+    /**
+     * @var DOG_User[]
+     */
     public $users = [];
     
+    ###########
+    ### GDO ###
+    ###########
     public function gdoColumns()
     {
         return array(
@@ -23,6 +29,10 @@ class DOG_Room extends GDO
             GDT_Language::make('room_lang')->notNull()->initial(GWF_LANGUAGE),
         );
     }
+    
+    ##############
+    ### Getter ###
+    ##############
 
     /**
      * @return DOG_Server
@@ -34,6 +44,13 @@ class DOG_Room extends GDO
     public function getPassword() { return $this->getVar('room_password'); }
     public function getTrigger() { return  $this->getVar('room_trigger'); }
     
+    ############
+    ### Send ###
+    ############
+    
+    ##############
+    ### Static ###
+    ##############
     /**
      * @param DOG_Server $server
      * @param string $roomName
@@ -66,11 +83,17 @@ class DOG_Room extends GDO
         ))->insert();
     }
     
+    ##############
+    ### Events ###
+    ##############
     public function disconnect()
     {
         $this->users = [];
     }
 
+    #############
+    ### Users ###
+    #############
     public function addUser(DOG_User $user)
     {
         $userId = $user->getID();
@@ -78,6 +101,11 @@ class DOG_Room extends GDO
         {
             $this->users[$userId] = $user;
         }
+    }
+    
+    public function hasUser(DOG_User $user=null)
+    {
+        return $user ? isset($this->users[$user->getID()]) : null;
     }
     
 }

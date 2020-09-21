@@ -92,9 +92,30 @@ elseif (@$argv[1] === 'admin')
         $module->onInstall();
     }
 }
+elseif (@$argv[1] === 'module')
+{
+    if (!($moduleName = @$argv[2]))
+    {
+        Logger::logError("You need to specify a module name. Usage: dog_install module <name>.");
+    }
+    else
+    {
+        ModuleLoader::instance()->loadModules(true, false);
+        if (!($module = ModuleLoader::instance()->getModule($moduleName)))
+        {
+            if (!($module = ModuleLoader::instance()->loadModuleFS($moduleName)))
+            {
+                Logger::logError("Module not found!");
+                die(2);
+            }
+        }
+        echo "Installing module {$moduleName}...\n";
+        Installer::installModule($module);
+    }
+}
 else
 {
-    echo "Usage: {$argv[0]} config|modules|upgrade|admin\n";
+    echo "Usage: {$argv[0]} config|modules|upgrade|admin|module\n";
     die(1);
 }
 
