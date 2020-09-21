@@ -6,6 +6,10 @@ use GDO\Dog\DOG_Message;
 use GDO\Perf\GDT_PerfBar;
 use GDO\File\FileUtil;
 
+/**
+ * Show performance statistics.
+ * @author gizmore
+ */
 final class Mem extends DOG_Command
 {
     public $group = 'Stats';
@@ -15,8 +19,6 @@ final class Mem extends DOG_Command
 
     public function dogExecute(DOG_Message $message)
     {
-        var_dump(getrusage());
-        var_dump(getrusage(1));
         $data = GDT_PerfBar::data();
         $data2 = array(
             $data['gdoFiles'],

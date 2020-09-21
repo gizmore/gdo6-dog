@@ -3,7 +3,6 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\GDT_DogCommand;
-use GDO\DogIRC\IRCLib;
 
 class Help extends DOG_Command
 {
@@ -47,7 +46,7 @@ class Help extends DOG_Command
 	        
 	    }
 	    
-	    $b = IRCLib::BOLD;
+	    $b = "\x02";
 	    $groupOut = [];
 	    foreach ($grouped as $group => $triggers)
 	    {

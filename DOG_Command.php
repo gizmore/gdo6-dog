@@ -10,6 +10,7 @@ use GDO\Core\Logger;
 use GDO\Core\GDT;
 use GDO\Dog\Method\Disable;
 use GDO\DB\GDT_Enum;
+use GDO\UI\GDT_Confirm;
 
 abstract class DOG_Command extends MethodForm
 {
@@ -299,30 +300,45 @@ abstract class DOG_Command extends MethodForm
 	 * @var DOG_Command[]
 	 */
 	public static $COMMANDS = [];
-	public static function register(DOG_Command $command) { self::$COMMANDS[] = $command; }
+	
+	/**
+	 * @var DOG_Command[]
+	 */
+	public static $COMMANDS_T = []; # By trigger
+	
+	public static function register(DOG_Command $command)
+	{
+	    self::$COMMANDS[] = $command;
+	    if ($command->trigger)
+	    {
+    	    self::$COMMANDS_T[$command->trigger] = $command;
+	    }
+	}
 	
 	public static function sortCommands()
 	{
 	    uasort(self::$COMMANDS, function(DOG_Command $a, DOG_Command $b) {
 	        return $a->priority - $b->priority;
 	    });
-	}
+        uasort(self::$COMMANDS_T, function(DOG_Command $a, DOG_Command $b) {
+            return $a->priority - $b->priority;
+        });
+    }
 	
 	/**
+	 * Get a command by trigger.
 	 * @param string $trigger
 	 * @return self
 	 */
 	public static function byTrigger($trigger)
 	{
-		foreach (self::$COMMANDS as $command)
-		{
-		    if ($command->trigger === $trigger)
-		    {
-   			    return $command;
-		    }
-		}
+	    return @self::$COMMANDS_T[$trigger];
 	}
 	
+	/**
+	 * Get supported connectors for this command.
+	 * @return string[]
+	 */
 	public function getConnectors()
 	{
 	    return array_map(
@@ -472,6 +488,10 @@ abstract class DOG_Command extends MethodForm
 	        if ($gdt instanceof GDT_Enum)
 	        {
 	            $name = implode('|', $gdt->enumValues);
+	        }
+	        elseif ($gdt instanceof GDT_Confirm)
+	        {
+	            $name = t($gdt->confirmation);
 	        }
 	        else
 	        {

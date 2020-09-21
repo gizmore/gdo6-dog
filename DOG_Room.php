@@ -22,10 +22,11 @@ class DOG_Room extends GDO
     {
         return array(
             GDT_AutoInc::make('room_id'),
-            GDT_Object::make('room_server')->table(DOG_Server::table())->notNull()->cascade(),
-            GDT_String::make('room_name')->notNull(),
-            GDT_Secret::make('room_password'),
+            GDT_Object::make('room_server')->table(DOG_Server::table())->notNull(),
+            GDT_String::make('room_name')->notNull()->max(64),
+            GDT_Secret::make('room_password')->max(64),
             GDT_Char::make('room_trigger')->size(1)->initial('.')->notNull(),
+            GDT_String::make('room_description')->max(512),
             GDT_Language::make('room_lang')->notNull()->initial(GWF_LANGUAGE),
         );
     }
@@ -66,20 +67,21 @@ class DOG_Room extends GDO
         return self::table()->select()->where("room_server={$server->getID()} AND room_name={$name}")->first()->exec()->fetchObject();
     }
     
-    public static function getOrCreate(DOG_Server $server, $roomName)
+    public static function getOrCreate(DOG_Server $server, $roomName, $description=null)
     {
         if ($room = self::getByName($server, $roomName))
         {
-            return $room;
+            return $room->saveVar('room_description', $description);
         }
-        return self::create($server, $roomName);
+        return self::create($server, $roomName, $description);
     }
     
-    public static function create(DOG_Server $server, $roomName)
+    public static function create(DOG_Server $server, $roomName, $description=null)
     {
         return self::blank(array(
             'room_server' => $server->getID(),
             'room_name' => $roomName,
+            'room_description' => $description,
         ))->insert();
     }
     

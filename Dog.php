@@ -51,7 +51,7 @@ final class Dog extends Application
                     $this->mainloopServer($server);
                 }
             }
-            usleep(1000);
+            usleep(100);
         }
     }
     
@@ -64,8 +64,13 @@ final class Dog extends Application
         }
         else
         {
-        	while ($connector->readMessage())
+            $processed = 0;
+        	while ($processed++ < 5)
         	{
+        	    if (!$connector->readMessage())
+        	    {
+        	        break;
+        	    }
         	}
         }
         

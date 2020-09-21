@@ -10,7 +10,6 @@ use GDO\Date\GDT_Duration;
 use GDO\Net\URL;
 use GDO\DB\GDT_CreatedAt;
 use GDO\DB\GDT_CreatedBy;
-use GDO\DogIRC\IRCLib;
 use GDO\DB\GDT_UInt;
 
 final class DOG_Server extends GDO
@@ -55,7 +54,7 @@ final class DOG_Server extends GDO
     
     public function displayName()
     {
-        $b = $this->isConnected() ? IRCLib::BOLD : '';
+        $b = $this->isConnected() ? "\x02" : '';
         $name = $this->getURL() ? $this->getDomain() : $this->getConnectorName();
         return sprintf('%s%s%s-%s', $b, $this->getID(), $b, $name);
     }
