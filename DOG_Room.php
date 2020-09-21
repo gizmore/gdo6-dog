@@ -25,7 +25,7 @@ class DOG_Room extends GDO
             GDT_Object::make('room_server')->table(DOG_Server::table())->notNull(),
             GDT_String::make('room_name')->notNull()->max(64),
             GDT_Secret::make('room_password')->max(64),
-            GDT_Char::make('room_trigger')->size(1)->initial('.')->notNull(),
+            GDT_Char::make('room_trigger')->size(1)->initial('$')->notNull(),
             GDT_String::make('room_description')->max(512),
             GDT_Language::make('room_lang')->notNull()->initial(GWF_LANGUAGE),
         );
@@ -34,7 +34,6 @@ class DOG_Room extends GDO
     ##############
     ### Getter ###
     ##############
-
     /**
      * @return DOG_Server
      */
@@ -48,6 +47,10 @@ class DOG_Room extends GDO
     ############
     ### Send ###
     ############
+    public function send($text)
+    {
+        $this->getServer()->getConnector()->sendToRoom($this, $text);
+    }
     
     ##############
     ### Static ###

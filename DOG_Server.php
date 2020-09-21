@@ -11,6 +11,8 @@ use GDO\Net\URL;
 use GDO\DB\GDT_CreatedAt;
 use GDO\DB\GDT_CreatedBy;
 use GDO\DB\GDT_UInt;
+use GDO\Core\Application;
+use GDO\Util\Common;
 
 final class DOG_Server extends GDO
 {
@@ -19,6 +21,9 @@ final class DOG_Server extends GDO
 	 */
 	private $connector;
 	
+	##############
+	### Online ###
+	##############
 	/**
 	 * @var DOG_User[]
 	 */
@@ -29,6 +34,9 @@ final class DOG_Server extends GDO
 	 */
 	public $rooms = [];
 	
+	###########
+	### GDO ###
+	###########
     public function gdoColumns()
     {
         return array(
@@ -36,16 +44,19 @@ final class DOG_Server extends GDO
         	GDT_Url::make('serv_url'),
             GDT_Checkbox::make('serv_tls')->initial('0')->notNull(),
             GDT_Connector::make('serv_connector')->notNull(),
-            GDT_Username::make('serv_username')->initial("Dog")->notNull(),
+            GDT_Username::make('serv_username')->initial('Dog')->notNull(),
             GDT_Secret::make('serv_password'),
-            GDT_Duration::make('serv_connect_timeout')->initial('10')->notNull(),
-            GDT_UInt::make('serv_throttle')->initial(4)->notNull(),
+            GDT_Duration::make('serv_connect_timeout')->initial('3')->notNull(),
+            GDT_UInt::make('serv_throttle')->initial('4')->notNull(),
             GDT_Checkbox::make('serv_active')->initial('1')->notNull(),
             GDT_CreatedAt::make('serv_created'),
             GDT_CreatedBy::make('serv_creator'),
         );
     }
 
+    ##############
+    ### Getter ###
+    ##############
     public function isTLS() { return $this->getValue('serv_tls'); }
     public function isActive() { return $this->getValue('serv_active'); }
     
@@ -80,6 +91,41 @@ final class DOG_Server extends GDO
     public function getConnectTimeout() { return $this->getValue('serv_connect_timeout'); }
     public function getThrottle() { return $this->getValue('serv_throttle'); }
     
+    ##################
+    ### Connection ###
+    ##################
+    public $connectionAttemptMax = 10000;
+    private $connectionAttemptNum = 0;
+    private $connectionAttemptTime = 0;
+    private $connectionAttemptNext = 0;
+    
+    public function resetConnectionAttempt()
+    {
+        $this->connectionAttemptNext = $this->connectionAttemptNum = $this->connectionAttemptTime = 0;
+    }
+    
+    public function shouldConnect()
+    {
+        if ($this->shouldGiveUp())
+        {
+            return false;
+        }
+        return Application::$TIME >= $this->connectionAttemptNext;
+    }
+    
+    public function shouldGiveUp()
+    {
+        return $this->connectionAttemptNum >= $this->connectionAttemptMax;
+    }
+    
+    public function nextAttempt()
+    {
+        $this->connectionAttemptNum++;
+        $wait = 5 * $this->connectionAttemptNum;
+        $wait = Common::clamp($wait, 0, 600);
+        $this->connectionAttemptNext =  Application::$TIME + $wait;
+    }
+    
     public function getConnectorName() { return $this->getVar('serv_connector'); }
     /**
      * @return \GDO\Dog\DOG_Connector
@@ -97,6 +143,9 @@ final class DOG_Server extends GDO
     	return $this->connector;
 	}
     
+	##############
+	### Static ###
+	##############
     /**
      * @param string $url
      * @return self
@@ -127,6 +176,7 @@ final class DOG_Server extends GDO
         }
         $this->users = [];
         $this->rooms = [];
+        $this->resetConnectionAttempt();
     }
     
     #############

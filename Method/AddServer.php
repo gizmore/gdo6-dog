@@ -11,6 +11,13 @@ use GDO\User\GDT_Username;
 use GDO\User\GDT_Password;
 use GDO\Dog\Dog;
 
+/**
+ * Add a generic new server.
+ * Useful via command line or connectors that are not like IRC.
+ * @author gizmore
+ * @version 6.10
+ * @since 6.10
+ */
 final class AddServer extends DOG_Command
 {
     public $group = 'Config';
@@ -55,6 +62,10 @@ final class AddServer extends DOG_Command
 	    if ($username)
 	    {
 	        $data['serv_username'] = $username;
+	    }
+	    else
+	    {
+	        $data['serv_username'] = $this->getDefaultNickname();
 	    }
 
 	    if ($password)

@@ -2,6 +2,7 @@
 namespace GDO\Dog;
 
 use GDO\Language\Trans;
+use GDO\User\GDO_User;
 
 class DOG_Message
 {
@@ -39,6 +40,7 @@ class DOG_Message
 	public function user(DOG_User $user)
 	{
 	    $this->user = $user;
+	    GDO_User::$CURRENT = $user->getGDOUser();
 	    Trans::setISO($user->getGDOUser()->getLangISO());
 	    return $this;
 	}

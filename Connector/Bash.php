@@ -10,8 +10,12 @@ use GDO\Dog\DOG_User;
 use GDO\User\GDO_User;
 
 /**
- * This connector can be called by shell: "dog <command> <..parameters..>".
+ * This connector can be called by shell: "GDO/Dog/bin/dog <command> [<..parameters..>]"
+ * It is the default and a required connector.
+ * You can dog add_server IRC irc://irc.freenode.net:6667 with it.
+ * 
  * @author gizmore
+ * @version 6.10
  * @since 6.10
  */
 class Bash extends DOG_Connector
@@ -51,6 +55,8 @@ class Bash extends DOG_Connector
 	
     public function connect()
     {
+        $this->connected = true;
+        return true;
     }
     
     public function disconnect($reason)
@@ -61,6 +67,7 @@ class Bash extends DOG_Connector
     
 	public function readMessage()
 	{
+	    return false;
 	}
 	
 	public function dog_cmdline(...$argv)

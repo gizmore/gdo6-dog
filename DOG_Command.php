@@ -27,6 +27,8 @@ abstract class DOG_Command extends MethodForm
 	### Config Bot ###
 	##################
 	
+	public function getDefaultNickname() { return Module_Dog::instance()->getDefaultNickname(); }
+	
 	/**
 	 * @return GDT[]
 	 */
@@ -283,7 +285,7 @@ abstract class DOG_Command extends MethodForm
 	{
 	    $gdt = $this->getConfigGDTServer($key);
 	    $var = $gdt->toVar($value);
-	    DOG_ConfigBot::blank(array(
+	    DOG_ConfigServer::blank(array(
 	        'confs_command' => $this->gdoClassName(),
 	        'confs_key' => $key,
 	        'confs_user' => $server->getID(),

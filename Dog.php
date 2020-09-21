@@ -2,9 +2,13 @@
 namespace GDO\Dog;
 use GDO\Core\Application;
 use GDO\Core\Logger;
+use GDO\Core\Debug;
 
 final class Dog extends Application
 {
+    const ADMIN = 'admin';
+    const STAFF = 'staff';
+
     const OWNER = 'owner';
     const OPERATOR = 'operator';
     const HALFOP = 'halfop';
@@ -20,6 +24,16 @@ final class Dog extends Application
      * @var DOG_Server[]
      */
     public $servers;
+    
+    public function removeServer(DOG_Server $server)
+    {
+        if (false !== ($index = array_search($server, $this->servers)))
+        {
+            unset($this->servers[$index]);
+            return true;
+        }
+        return false;
+    }
     
     public function init()
     {
@@ -51,29 +65,60 @@ final class Dog extends Application
                     $this->mainloopServer($server);
                 }
             }
-            usleep(100);
+            usleep(250);
         }
     }
     
     private function mainloopServer(DOG_Server $server)
     {
     	$connector = $server->getConnector();
+    	
         if (!$connector->connected)
         {
-        	$connector->connect();
+            # Connect
+            if ($server->shouldConnect())
+            {
+            	if ($connector->connect())
+            	{
+            	    Dog::instance()->event('dog_server_connected', $server);
+            	    $server->resetConnectionAttempt();
+            	}
+            	else
+            	{
+            	    # Try again
+            	    $server->nextAttempt();
+            	}
+            }
+            # Give up
+            elseif ($server->shouldGiveUp())
+            {
+                $server->setVar('serv_active', '0');
+                Dog::instance()->event('dog_server_failed', $server);
+            }
         }
-        else
+        
+        else # process a few messages
         {
             $processed = 0;
         	while ($processed++ < 5)
         	{
-        	    if (!$connector->readMessage())
+        	    try
         	    {
-        	        break;
+            	    if (!$connector->readMessage())
+            	    {
+            	        break;
+            	    }
+        	    }
+        	    catch (\Exception $e)
+        	    {
+        	        Debug::exception_handler($e);
+        	    }
+        	    catch (\Error $e)
+        	    {
+        	        Debug::error_handler($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
         	    }
         	}
         }
-        
     }
     
     public function event($name, ...$args)
@@ -82,6 +127,7 @@ final class Dog extends Application
         {
         	Logger::logCron("Dog::event($name)");
         }
+    	
     	foreach (DOG_Connector::connectors() as $connector)
     	{
     		if (method_exists($connector, $name))
@@ -89,6 +135,7 @@ final class Dog extends Application
     			call_user_func([$connector, $name], ...$args);
     		}
     	}
+    	
     	foreach (DOG_Command::$COMMANDS as $command)
     	{
     		if (method_exists($command, $name))

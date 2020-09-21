@@ -2,6 +2,7 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO_Module;
+use GDO\DB\GDT_Name;
 
 /**
  * Dog chatbot.
@@ -20,8 +21,11 @@ final class Module_Dog extends GDO_Module
 	public function getConfig()
 	{
 		return array(
+		    GDT_Name::make('default_nickname')->initial('Dog'),
 		);
 	}
+	
+	public function getDefaultNickname() { return $this->getConfigVar('default_nickname'); }
 
 	public function getClasses()
 	{
