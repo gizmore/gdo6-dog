@@ -32,9 +32,9 @@ final class Disable extends DOG_Command
     public function getConfigRoom()
     {
         $conf = [];
-        foreach (DOG_Command::$COMMANDS as $command)
+        foreach (DOG_Command::$COMMANDS_T as $command)
         {
-            $name = 'disable_'.$command->gdoClassName();
+            $name = 'disable_'.$command->trigger;
             $conf[] = GDT_Checkbox::make($name)->notNull()->initial('0');
         }
         return $conf;
@@ -43,9 +43,9 @@ final class Disable extends DOG_Command
     public function getConfigServer()
     {
         $conf = [];
-        foreach (DOG_Command::$COMMANDS as $command)
+        foreach (DOG_Command::$COMMANDS_T as $command)
         {
-            $name = 'disable_'.$command->gdoClassName();
+            $name = 'disable_'.$command->trigger;
             $conf[] = GDT_Checkbox::make($name)->notNull()->initial('0');
         }
         return $conf;
@@ -65,13 +65,13 @@ final class Disable extends DOG_Command
         
     public function isDisabledRoom(DOG_Message $message, DOG_Command $command)
     {
-        $key = 'disable_'.$command->gdoClassName();
+        $key = 'disable_'.$command->trigger;
         return $this->getConfigValueRoom($message->room, $key);
     }
     
     public function isDisabledServer(DOG_Message $message, DOG_Command $command)
     {
-        $key = 'disable_'.$command->gdoClassName();
+        $key = 'disable_'.$command->trigger;
         return $this->getConfigValueServer($message->server, $key);
     }
     
@@ -88,7 +88,7 @@ final class Disable extends DOG_Command
             {
                 return $message->rply('msg_dog_already_disabled', [$command->trigger]);
             }
-            $key = 'disable_'.$command->gdoClassName();
+            $key = 'disable_'.$command->trigger;
             $this->setConfigValueRoom($message->room, $key, true);
             return $message->rply('msg_dog_disabled');
         }
@@ -98,7 +98,7 @@ final class Disable extends DOG_Command
             {
                 return $message->rply('msg_dog_already_disabled', [$command->trigger]);
             }
-            $key = 'disable_'.$command->gdoClassName();
+            $key = 'disable_'.$command->trigger;
             $this->setConfigValueServer($message->server, $key, true);
             return $message->rply('msg_dog_disabled');
         }

@@ -25,7 +25,7 @@ final class Quit extends DOG_Command
     {
         foreach (DOG_Server::table()->all() as $server)
         {
-            $server->getConnector()->disconnect($text);
+            $server->disconnect($text);
         }
         Dog::instance()->running = false;
     }

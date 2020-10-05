@@ -58,7 +58,7 @@ final class DOG_Server extends GDO
     ### Getter ###
     ##############
     public function isTLS() { return $this->getValue('serv_tls'); }
-    public function isActive() { return $this->getValue('serv_active'); }
+    public function isActive() { return $this->getVar('serv_active') === '1'; }
     
     public function getUsername() { return $this->getVar('serv_username'); }
     public function getPassword() { return $this->getVar('serv_password'); }
@@ -168,15 +168,16 @@ final class DOG_Server extends GDO
     #################
     ### Live Data ###
     #################
-    public function disconnect()
+    public function disconnect($text)
     {
         foreach ($this->rooms as $room)
         {
-            $room->disconnect();
+            $room->disconnect($text);
         }
         $this->users = [];
         $this->rooms = [];
         $this->resetConnectionAttempt();
+        $this->getConnector()->disconnect($text);
     }
     
     #############

@@ -91,7 +91,7 @@ class DOG_Room extends GDO
     ##############
     ### Events ###
     ##############
-    public function disconnect()
+    public function disconnect($text)
     {
         $this->users = [];
     }

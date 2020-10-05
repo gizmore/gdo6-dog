@@ -62,6 +62,7 @@ class Bash extends DOG_Connector
     public function disconnect($reason)
     {
         echo "Disconnecting: {$reason}\n";
+        $this->connected = false;
     }
     
     

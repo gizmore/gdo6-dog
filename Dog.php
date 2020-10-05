@@ -50,10 +50,6 @@ final class Dog extends Application
     
     public function mainloop()
     {
-        if (defined('GWF_CONSOLE_VERBOSE'))
-        {
-            Logger::logCron("Entering mainloop.");
-        }
         $this->servers = DOG_Server::table()->all();
         while ($this->running)
         {
@@ -65,8 +61,25 @@ final class Dog extends Application
                     $this->mainloopServer($server);
                 }
             }
-            usleep(250);
+            usleep(20);
         }
+        
+        while ($this->hasPendingConnections())
+        {
+            sleep(1);
+        }
+    }
+    
+    private function hasPendingConnections()
+    {
+        foreach ($this->servers as $server)
+        {
+            if ($server->isConnected())
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     private function mainloopServer(DOG_Server $server)
@@ -100,24 +113,24 @@ final class Dog extends Application
         else # process a few messages
         {
             $processed = 0;
-        	while ($processed++ < 5)
+       	    try
         	{
-        	    try
+            	while ($processed++ < 5)
         	    {
             	    if (!$connector->readMessage())
             	    {
             	        break;
             	    }
         	    }
-        	    catch (\Exception $e)
-        	    {
-        	        Debug::exception_handler($e);
-        	    }
-        	    catch (\Error $e)
-        	    {
-        	        Debug::error_handler($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
-        	    }
         	}
+    	    catch (\Exception $e)
+    	    {
+    	        Debug::exception_handler($e);
+    	    }
+    	    catch (\Error $e)
+    	    {
+    	        Debug::error($e);
+    	    }
         }
     }
     
@@ -128,8 +141,9 @@ final class Dog extends Application
         	Logger::logCron("Dog::event($name)");
         }
     	
-    	foreach (DOG_Connector::connectors() as $connector)
+    	foreach ($this->servers as $server)
     	{
+    	    $connector =  $server->getConnector();
     		if (method_exists($connector, $name))
     		{
     			call_user_func([$connector, $name], ...$args);
