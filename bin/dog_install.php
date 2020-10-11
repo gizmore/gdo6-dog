@@ -39,7 +39,7 @@ if (@$argv[1] === 'config')
     if (!FileUtil::isFile($configPath))
     {
         echo "Writing config to protected/config_dog.php\n";
-        $form = GDT_Form::make();
+        $form = GDT_Form::make('form');
         foreach (Config::fields() as $gdt)
         {
             $form->addField($gdt);
