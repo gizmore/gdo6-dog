@@ -22,7 +22,7 @@ final class Trigger extends DOG_Command
     public function gdoParameters()
     {
         return array(
-            GDT_Char::make('trigger')->size(1)->notNull(),
+            GDT_Char::make('trigger')->length(1)->notNull(),
         );
     }
     
