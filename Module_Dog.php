@@ -14,7 +14,6 @@ final class Module_Dog extends GDO_Module
     
 	public function defaultEnabled() { return false; }
 
-	public function onInit() {}
 	public function onInstall() { DOG_Install::onInstall($this); }
 	public function onLoadLanguage() { return $this->loadLanguage('lang/dog'); }
 	
