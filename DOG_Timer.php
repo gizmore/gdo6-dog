@@ -17,7 +17,6 @@ final class DOG_Timer
         return $this;
     }
     
-    public 
     public function in($in)
     {
         

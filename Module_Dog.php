@@ -12,7 +12,7 @@ final class Module_Dog extends GDO_Module
 {
     public $module_priority = 40;
     
-	public function defaultEnabled() { return false; }
+	public function defaultEnabled() { return true; }
 
 	public function onInstall() { DOG_Install::onInstall($this); }
 	public function onLoadLanguage() { return $this->loadLanguage('lang/dog'); }
