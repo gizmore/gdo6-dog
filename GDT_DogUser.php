@@ -21,7 +21,7 @@ use GDO\Util\Arrays;
  */
 final class GDT_DogUser extends GDT_Object
 {
-    public function __construct()
+    protected function __construct()
     {
         $this->table = DOG_User::table();
     }

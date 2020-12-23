@@ -5,7 +5,7 @@ use GDO\Util\Arrays;
 
 class GDT_Connector extends GDT_Select
 {
-    public function __construct()
+    protected function __construct()
     {
         $this->choices($this->initChoices());
         $this->encoding = self::ASCII;
