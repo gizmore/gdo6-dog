@@ -150,7 +150,11 @@ final class DOG_Server extends GDO
      * @param string $url
      * @return self
      */
-    public static function getByURL($url) { $url = GDO::escapeS($url); return self::table()->findWhere("serv_url LIKE '%$url%'"); }
+    public static function getByURL($url)
+    {
+        $url = GDO::escapeSearchS($url);
+        return self::table()->getWhere("serv_url LIKE '%$url%'");
+    }
 
     /**
      * @param string $url
