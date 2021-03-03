@@ -9,21 +9,17 @@ use GDO\Form\GDT_Form;
 use GDO\Install\Config;
 use GDO\Language\Trans;
 use GDO\DB\Database;
-use GDO\Dog\Dog;
-use GDO\Dog\Module_Dog;
 use GDO\Dog\DOG_User;
 use GDO\Dog\DOG_Server;
 use GDO\User\GDO_UserPermission;
 use GDO\User\GDO_User;
 use GDO\Dog\Connector\Bash;
-use GDO\Dog\DOG_Connector;
 
 @include 'protected/config_dog.php';
 require 'GDO6.php';
 
 Config::configure(); # fallback
 
-$dog = new Dog();
 Trans::$ISO = GWF_LANGUAGE;
 Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
 Debug::init();
@@ -32,6 +28,9 @@ Debug::enableExceptionHandler();
 Debug::setDieOnError(GWF_ERROR_DIE);
 Debug::setMailOnError(GWF_ERROR_MAIL);
 Database::init();
+
+/** @var $argc int **/
+/** @var $argv string[] **/
 
 if (@$argv[1] === 'config')
 {

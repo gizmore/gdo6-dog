@@ -1,9 +1,18 @@
 <?php
 namespace GDO\Dog;
+
 use GDO\Core\Application;
 use GDO\Core\Logger;
 use GDO\Core\Debug;
+use GDO\File\Filewalker;
 
+/**
+ * Dog chatbot instance.
+ * 
+ * @author gizmore
+ * @version 6.10
+ * @since 6.08
+ */
 final class Dog extends Application
 {
     const ADMIN = 'admin';
@@ -19,6 +28,60 @@ final class Dog extends Application
     public function getFormat() { return 'cli'; }
     
     public $running = true;
+    
+    public static $INSTANCE;
+    
+    /**
+     * @return self
+     */
+    public static function instance() { return self::$INSTANCE; }
+    
+    public function __construct()
+    {
+        self::$INSTANCE = $this;
+    }
+    
+    private $loadedPlugins;
+    public function loadPlugins()
+    {
+        $this->loadedPlugins = true;
+        Filewalker::traverse('GDO', null, false, function($entry, $path){
+            if (preg_match("/^Dog[A-Z]?/", $entry))
+            {
+                Filewalker::traverse(["$path/Connector", "$path/Method"], null, function($entry, $path){
+                    $class_name = str_replace('/', "\\", $path);
+                    $class_name = substr($class_name, 0, -4);
+                    if (class_exists($class_name))
+                    {
+                        if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
+                        {
+                            DOG_Command::register(new $class_name());
+                            if (defined('GWF_CONSOLE_VERBOSE'))
+                            {
+                                Logger::logCron("Loaded command $class_name");
+                            }
+                        }
+                        
+                        if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
+                        {
+                            DOG_Connector::register(new $class_name());
+                            if (defined('GWF_CONSOLE_VERBOSE'))
+                            {
+                                Logger::logCron("Loaded connector $class_name");
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        $this->loadedPlugins = false;
+                        Logger::logCron("Error loading $class_name");
+                    }
+                });
+            }
+        }, false);
+        return $this->loadedPlugins;
+    }
     
     /**
      * @var DOG_Server[]
@@ -123,13 +186,13 @@ final class Dog extends Application
             	    }
         	    }
         	}
-    	    catch (\Exception $e)
-    	    {
-    	        Debug::exception_handler($e);
-    	    }
     	    catch (\Error $e)
     	    {
     	        Debug::error($e);
+    	    }
+    	    catch (\Throwable $e)
+    	    {
+    	        Debug::exception_handler($e);
     	    }
         }
     }

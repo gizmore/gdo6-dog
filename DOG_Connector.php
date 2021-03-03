@@ -19,7 +19,7 @@ abstract class DOG_Connector
     /**
      * @return DOG_Connector
      */
-    public static function connector($name) { return @self::$connectors[$name]; }
+    public static function connector($name) { return self::$connectors[$name]; }
     public static function register(DOG_Connector $connector)
     {
         self::$connectors[$connector->gdoShortName()] = $connector;
