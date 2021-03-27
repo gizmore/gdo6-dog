@@ -14,7 +14,10 @@ use GDO\UI\GDT_Confirm;
 
 abstract class DOG_Command extends MethodForm
 {
-	public $priority = 50;
+    ################
+    ### Override ###
+    ################
+	public $priority = 50; # @TODO: make these into functions?
 	public $trigger = null;
 	public $group = 'Various';
 	
@@ -22,6 +25,15 @@ abstract class DOG_Command extends MethodForm
 	public function isHiddenMethod() { return false; }
 	public function isRoomMethod() { return true; }
 	public function isPrivateMethod() { return true; }
+
+	##############
+	### Helper ###
+	##############
+	public function getFullTrigger()
+	{
+	    $t = $this->group ? "{$this->group}.{$this->trigger}" : $this->trigger;
+	    return strtolower($t);
+	}
 	
 	##################
 	### Config Bot ###
@@ -64,13 +76,13 @@ abstract class DOG_Command extends MethodForm
 	    {
 	        return $var->getVar('confb_var');
 	    }
-	    return $this->getConfigGDTBot($key)->initial;
+	    return $this->getConfigGDTBot($key)->var;
 	}
 	
 	public function getConfigValueBot($key)
 	{
 	    $gdt = $this->getConfigGDTBot($key);
-	    return $gdt->toValue($this->getConfigVarBot($key));
+	    return $gdt->toValue($gdt->var);
 	}
 	
 	public function setConfigVarBot($key, $var)
@@ -313,7 +325,7 @@ abstract class DOG_Command extends MethodForm
 	    self::$COMMANDS[] = $command;
 	    if ($command->trigger)
 	    {
-    	    self::$COMMANDS_T[$command->trigger] = $command;
+    	    self::$COMMANDS_T[$command->getFullTrigger()] = $command;
 	    }
 	}
 	
@@ -369,7 +381,7 @@ abstract class DOG_Command extends MethodForm
 	
 	public function connectorMatches(DOG_Message $message)
 	{
-	    return in_array($message->server->getConnectorName(), $this->getConnectors());
+	    return in_array($message->server->getConnectorName(), $this->getConnectors(), true);
 	}
 	
 	public function canExecute(DOG_Message $message)
@@ -412,7 +424,7 @@ abstract class DOG_Command extends MethodForm
 	    /**
 	     * @var Disable $disable
 	     */
-	    $disable = DOG_Command::byTrigger('disable');
+	    $disable = DOG_Command::byTrigger('config.disable');
 	    if ($disable->isDisabled($message, $this))
 	    {
 	        return $message->rply('err_disabled');
@@ -431,23 +443,49 @@ abstract class DOG_Command extends MethodForm
 		
 		$text = trim(Strings::substrFrom($text, ' ', ''));
 
+		$args = Strings::args($text);
+		
 		try
 		{
-		    foreach ($this->gdoParameters() as $gdt)
+		    foreach ($args as $arg)
 		    {
-		        if (!($gdt instanceof GDT_DogString))
+		        if (Strings::startsWith($arg, '--'))
 		        {
-		            $token = Strings::substrTo($text, ' ', $text);
-		            $text = ltrim(Strings::substrFrom($text, ' ', ''));
+		            $setA = explode('=', ltrim($arg, '-'), 2);
+		            $key = $setA[0];
+		            $val = $setA[1];
+		            $this->gdoParameter($key, $val);
+		        }
+		    }
+		    
+		    foreach ($this->getParametersSorted() as $gdt)
+		    {
+		        $positional = $gdt->notNull && ($gdt->initial === 'null');
+		        
+		        if ($positional)
+		        {
+    		        if (!($gdt instanceof GDT_DogString))
+    		        {
+    		            $token = Strings::substrTo($text, ' ', $text);
+    		            $text = ltrim(Strings::substrFrom($text, ' ', ''));
+    		        }
+    		        else
+    		        {
+    		            $token = $text;
+    		            $text = '';
+    		        }
+    		        
+    		        if ($token === '')
+    		        {
+    		            $token = null;
+    		        }
+    		        $gdt->var($token);
 		        }
 		        else
 		        {
-		            $token = $text;
-		            $text = '';
 		        }
 		        
-		        $_REQUEST[$gdt->name] = $token ? $token : $gdt->initial;
-		        $value = $gdt->getParameterValue();
+	            $value = $gdt->getParameterValue();
 		        
 		        if (!$gdt->validate($value))
 		        {
@@ -477,15 +515,44 @@ abstract class DOG_Command extends MethodForm
 		return false;
 	}
 	
+	public function getParametersSorted()
+	{
+	    $parameters = $this->gdoParameterCache();
+	    
+	    # Sort them by type of param, positional or optionally.
+	    uasort($parameters, function(GDT $a, GDT $b) {
+	        $positionalA = $a->notNull && ($a->initial === null) ? 1 : 0;
+	        $positionalB = $b->notNull && ($b->initial === null) ? 1 : 0;
+	        return $positionalA - $positionalB;
+	    });
+	    
+	    return $parameters;
+	}
+	
 	public function getUsageText(DOG_Message $message)
 	{
 	    $usage = [];
-	    foreach ($this->gdoParameters() as $gdt)
+	    
+	    foreach ($this->getParametersSorted() as $gdt)
 	    {
+	        if (!$gdt->editable)
+	        {
+	            continue;
+	        }
+	        
+	        $nameparam = '';
+	        
 	        $dots = ($gdt instanceof GDT_DogString) ? '...' : '';
 	        
-	        $brk_open = $gdt->notNull ? '<' : '[<';
-	        $brk_close = $gdt->notNull ? '>' : '>]';
+	        $positional = $gdt->notNull && ($gdt->initial === null);
+	        
+	        if (!$positional)
+	        {
+	            $nameparam = "--{$gdt->name}=";
+	        }
+	        
+	        $brk_open = $positional ? '<' : '[<';
+	        $brk_close = $positional ? '>' : '>]';
 	        
 	        if ($gdt instanceof GDT_Enum)
 	        {
@@ -499,7 +566,7 @@ abstract class DOG_Command extends MethodForm
 	        {
 	            $name = $gdt->name;
 	        }
-	        $usage[] = $brk_open . $dots . $name . $dots . $brk_close;
+	        $usage[] = $brk_open . $dots . $nameparam . $name . $dots . $brk_close;
 	    }
 	    return $message->t('usage', [$this->trigger, implode(' ', $usage)]);
 	}

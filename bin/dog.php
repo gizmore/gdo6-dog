@@ -8,18 +8,16 @@ use GDO\Dog\Dog;
 
 require 'protected/config_dog.php';
 require 'GDO6.php';
+$dog = new Dog();
 
 chdir(GDO_PATH);
 Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
-$dog = new Dog();
 
 if (defined('GWF_CONSOLE_VERBOSE'))
 {
     Logger::logCron("Starting dog...\nLoading Modules...");
 }
 
-$dog->loadPlugins();
-    
 Trans::$ISO = GWF_LANGUAGE;
 Debug::init();
 Debug::enableErrorHandler();
@@ -28,7 +26,14 @@ Debug::setDieOnError(false);
 Debug::setMailOnError(GWF_ERROR_MAIL);
 Database::init();
 
-ModuleLoader::instance()->loadModules(true, true);
+$modules = (new ModuleLoader(GDO_PATH.'GDO/'))->loadModules(true);
+
+if (GWF_CONSOLE_VERBOSE)
+{
+    printf("Loaded %s modules.\n", count($modules));
+}
+
+$dog->loadPlugins();
 
 # All fine!
 define('GWF_CORE_STABLE', 1);

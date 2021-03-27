@@ -4,7 +4,7 @@
 cd "$(dirname "$0")"
 PF='./pidfile'
 if kill -0 $(< "$PF") 2> /dev/null; then # process in pidfile is yours and running
-	echo "Websocket server is already running."
+	echo "Dog is already running."
     exit 0
 else
     echo $$ > "$PF"

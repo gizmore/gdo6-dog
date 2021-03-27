@@ -15,42 +15,47 @@ use GDO\User\GDO_User;
  * You can dog add_server IRC irc://irc.freenode.net:6667 with it.
  * 
  * @author gizmore
- * @version 6.10
- * @since 6.10
+ * @version 6.10.1
+ * @since 6.10.0
  */
 class Bash extends DOG_Connector
 {
-    private $bashServer;
+    public static $INSTANCE;
+    
+    /**
+     * @return DOG_Server
+     */
+    public static function instance() { return self::$INSTANCE; }
     
     public function init()
     {
-        if (!($this->bashServer = $this->getBashServer()))
+        if (!self::$INSTANCE)
         {
-            $this->bashServer = DOG_Server::table()->blank(array(
-                'serv_connector' => $this->gdoShortName(),
-            ))->insert();
+            if (!(self::$INSTANCE = $this->getBashServer()))
+            {
+                self::$INSTANCE = DOG_Server::table()->blank([
+                    'serv_connector' => $this->gdoShortName(),
+                ])->insert();
+                Dog::instance()->servers[] = self::$INSTANCE;
+            }
         }
+        return self::$INSTANCE;
     }
     
     /**
      * @return DOG_Server
      */
-    public function getBashServer()
+    private function getBashServer()
     {
-        if ($this->bashServer)
-        {
-            return $this->bashServer;
-        }
-        $query = DOG_Server::table()->select('*')->
-          where("serv_connector='{$this->gdoShortName()}'")->
-          first();
-        return $query->exec()->fetchObject();
+        return DOG_Server::table()->select('*')->
+            where("serv_connector='{$this->gdoShortName()}'")->
+            first()->exec()->fetchObject();
     }
     
     public function getBashUser()
     {
-        $user = DOG_User::getOrCreateUser($this->getBashServer(), get_current_user());
-        GDO_User::$CURRENT = $user->getGDOUser();
+        $user = DOG_User::getOrCreateUser(self::$INSTANCE, get_current_user());
+        GDO_User::setCurrent($user->getGDOUser());
         return $user;
     }
     
@@ -66,7 +71,6 @@ class Bash extends DOG_Connector
         $this->connected = false;
     }
     
-    
     public function readMessage()
     {
         return false;
@@ -75,8 +79,13 @@ class Bash extends DOG_Connector
     public function dog_cmdline(...$argv)
     {
         $text = implode(' ', $argv);
+        $this->dog_cmdline2($text);
+    }
+    
+    public function dog_cmdline2($text)
+    {
         $msg = DOG_Message::make()->
-            server($this->getBashServer())->
+            server(self::$INSTANCE)->
             user($this->getBashUser())->
             text($text);
         Dog::instance()->event('dog_message', $msg);

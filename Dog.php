@@ -5,6 +5,10 @@ use GDO\Core\Application;
 use GDO\Core\Logger;
 use GDO\Core\Debug;
 use GDO\File\Filewalker;
+use GDO\Core\ModuleLoader;
+use GDO\Core\GDO_Module;
+use GDO\Install\Installer;
+use GDO\Cronjob\MethodCronjob;
 
 /**
  * Dog chatbot instance.
@@ -29,25 +33,18 @@ final class Dog extends Application
     
     public $running = true;
     
-    public static $INSTANCE;
-    
-    /**
-     * @return self
-     */
-    public static function instance() { return self::$INSTANCE; }
-    
-    public function __construct()
-    {
-        self::$INSTANCE = $this;
-    }
-    
     private $loadedPlugins;
     public function loadPlugins()
     {
+        if ($this->loadedPlugins)
+        {
+            return;
+        }
         $this->loadedPlugins = true;
         Filewalker::traverse('GDO', null, false, function($entry, $path){
-            if (preg_match("/^Dog[A-Z]?/", $entry))
+            if (preg_match("/^Dog[A-Z0-9]*$/i", $entry))
             {
+//                 if (!module_enabled($entry)) { return; } # else bug in tests
                 Filewalker::traverse(["$path/Connector", "$path/Method"], null, function($entry, $path){
                     $class_name = str_replace('/', "\\", $path);
                     $class_name = substr($class_name, 0, -4);
@@ -80,7 +77,54 @@ final class Dog extends Application
                 });
             }
         }, false);
+        
+        if ($this->loadedPlugins)
+        {
+            $this->loadedPlugins = $this->autoCreateCommands();
+        }
+        
         return $this->loadedPlugins;
+    }
+    
+    /**
+     * Create dog commands automatically from methods.
+     * Certain method types are skipped, as well those not shown in sitemap.
+     * @return boolean
+     */
+    private function autoCreateCommands()
+    {
+        if (GWF_CONSOLE_VERBOSE)
+        {
+            printf("Loading normal GDO methods as dog commands.\n");
+        }
+        $modules = ModuleLoader::instance()->getEnabledModules();
+        foreach ($modules as $module)
+        {
+            $this->autoCreateCommandsForModule($module);
+        }
+        return true;
+    }
+    
+    private function autoCreateCommandsForModule(GDO_Module $module)
+    {
+        Installer::loopMethods($module, function($entry, $fullpath, GDO_Module $module) {
+            $method = Installer::loopMethod($module, $fullpath);
+            if ( ($method instanceof MethodCronjob) || # skip cronjobs
+                 ($method instanceof DOG_Command) ||  # skip real dog commands
+                 (!$method->showInSitemap()) || # skip non sitemap
+                 ($method->isAjax()) ) # skip ajax
+            {
+                return;
+            }
+            
+            if (GWF_CONSOLE_VERBOSE)
+            {
+//                 printf("Loaded normal command {$method->gdoClassName()}\n");
+            }
+
+            DOG_Command::register(new DOG_CommandWrapper($method));
+        });
+        
     }
     
     /**
@@ -100,10 +144,13 @@ final class Dog extends Application
     
     public function init()
     {
+    	$this->servers = DOG_Server::table()->all();
+
     	foreach (DOG_Connector::connectors() as $connector)
     	{
     		$connector->init();
     	}
+    	
     	DOG_Command::sortCommands();
     	foreach (DOG_Command::$COMMANDS as $command)
     	{
@@ -113,7 +160,6 @@ final class Dog extends Application
     
     public function mainloop()
     {
-        $this->servers = DOG_Server::table()->all();
         while ($this->running)
         {
             Application::updateTime();
