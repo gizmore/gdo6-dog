@@ -14,10 +14,10 @@ use GDO\Cronjob\MethodCronjob;
  * Dog chatbot instance.
  * 
  * @author gizmore
- * @version 6.10
- * @since 6.08
+ * @version 6.10.1
+ * @since 6.8.0
  */
-final class Dog extends Application
+final class Dog
 {
     const ADMIN = 'admin';
     const STAFF = 'staff';
@@ -27,11 +27,15 @@ final class Dog extends Application
     const HALFOP = 'halfop';
     const VOICE = 'voice';
     
-    public function isCLI() { return true; }
-    public function isHTML() { return false; }
-    public function getFormat() { return 'cli'; }
-    
     public $running = true;
+    
+    private static $INSTANCE;
+    public static function instance() { return self::$INSTANCE; }
+    
+    public function __construct()
+    {
+        self::$INSTANCE = $this;
+    }
     
     private $loadedPlugins;
     public function loadPlugins()
@@ -252,7 +256,7 @@ final class Dog extends Application
     	
     	foreach ($this->servers as $server)
     	{
-    	    $connector =  $server->getConnector();
+    	    $connector = $server->getConnector();
     		if (method_exists($connector, $name))
     		{
     			call_user_func([$connector, $name], ...$args);

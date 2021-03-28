@@ -5,11 +5,12 @@ use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Dog;
+use GDO\Dog\DogApp;
 
 require 'protected/config_dog.php';
 require 'GDO6.php';
+$dog = new DogApp();
 $dog = new Dog();
-
 chdir(GDO_PATH);
 Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
 
