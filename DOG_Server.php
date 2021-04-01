@@ -87,10 +87,23 @@ final class DOG_Server extends GDO
      * @return URL
      */
     public function getURL() { return $this->getValue('serv_url'); }
-    public function getConnectURL() { return ($url = $this->getURL()) ? $url->getHost() . ':' . $url->getPort() : null; }
     public function getConnectTimeout() { return $this->getValue('serv_connect_timeout'); }
     public function getThrottle() { return $this->getValue('serv_throttle'); }
     
+    public function getConnectURL()
+    {
+        $url = $this->getURL();
+        if ($url)
+        {
+            $host = $url->getHost();
+            if ($port = $url->getPort())
+            {
+                $host .= ':' . $port;
+            }
+            return $host;
+        }
+    }
+
     ##################
     ### Connection ###
     ##################

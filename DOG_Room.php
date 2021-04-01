@@ -40,6 +40,9 @@ class DOG_Room extends GDO
     public function getServer() { return $this->getValue('room_server'); }
     public function getServerID() { return $this->getVar('room_server'); }
     
+    /**
+     * @return string
+     */
     public function getName() { return  $this->getVar('room_name'); }
     public function getPassword() { return $this->getVar('room_password'); }
     public function getTrigger() { return  $this->getVar('room_trigger'); }

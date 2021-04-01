@@ -8,7 +8,7 @@ class DOG_Message
 {
     public static $LAST_MESSAGE = null;
     
-    public function __construct()
+    protected function __construct()
     {
         self::$LAST_MESSAGE = $this;
     }

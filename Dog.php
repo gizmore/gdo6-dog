@@ -166,20 +166,25 @@ final class Dog
     {
         while ($this->running)
         {
-            Application::updateTime();
-            foreach ($this->servers as $server)
-            {
-                if ($server->isActive())
-                {
-                    $this->mainloopServer($server);
-                }
-            }
+            $this->mainloopStep();
             usleep(20);
         }
         
         while ($this->hasPendingConnections())
         {
             sleep(1);
+        }
+    }
+    
+    public function mainloopStep()
+    {
+        Application::updateTime();
+        foreach ($this->servers as $server)
+        {
+            if ($server->isActive())
+            {
+                $this->mainloopServer($server);
+            }
         }
     }
     

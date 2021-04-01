@@ -1,23 +1,26 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\Language\Trans;
 use GDO\Tests\MethodTest;
 use GDO\Tests\TestCase;
 use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
 use GDO\Dog\Connector\Bash;
+use GDO\Util\Strings;
 
 class DogTestCase extends TestCase
 {
     protected $doguser;
     
-//     public function skipUser() { return false; }
+    protected function getServer()
+    {
+        return Bash::instance();
+    }
     
     public function user(GDO_User $user)
     {
-        Trans::setISO($user->getLangISO());
-        $this->doguser = DOG_User::getOrCreateUser(Bash::instance(), $user->displayName());
+        $username = Strings::substrTo($user->getName(), '{', $user->getName());
+        $this->doguser = DOG_User::getOrCreateUser($this->getServer(), $username);
         return parent::user($user);
     }
     

@@ -445,9 +445,10 @@ abstract class DOG_Command extends MethodForm
 
 		$args = Strings::args($text);
 		
+		$lastOptional = 0;
 		try
 		{
-		    foreach ($args as $arg)
+		    foreach ($args as $lastOptional => $arg)
 		    {
 		        if (Strings::startsWith($arg, '--'))
 		        {
@@ -458,9 +459,12 @@ abstract class DOG_Command extends MethodForm
 		        }
 		    }
 		    
-		    foreach ($this->getParametersSorted() as $gdt)
+		    $args = array_slice($args, $lastOptional);
+		    $parameters = [];
+		    
+		    foreach ($this->gdoParameterCache() as $gdt)
 		    {
-		        $positional = $gdt->notNull && ($gdt->initial === 'null');
+		        $positional = $gdt->notNull && ($gdt->initial === null);
 		        
 		        if ($positional)
 		        {
@@ -493,7 +497,7 @@ abstract class DOG_Command extends MethodForm
 		            $message->reply(sprintf('%s: %s %s', $gdt->name, $gdt->error, $usage));
 		            return false;
 		        }
-		        $args[] = $value;
+		        $parameters[] = $value;
 		    }
 		    
 		    if (defined('GWF_CONSOLE_VERBOSE'))
@@ -501,7 +505,7 @@ abstract class DOG_Command extends MethodForm
 		        Logger::logCron("executing " . $this->gdoClassName());
 		    }
 		    
-		    $this->dogExecute($message, ...$args);
+		    $this->dogExecute($message, ...$parameters);
     		return true;
 		}
 		catch (\Error $e)

@@ -17,7 +17,7 @@ final class DOG_User extends GDO
 	{
 		return array(
 			GDT_AutoInc::make('doguser_id'),
-			GDT_String::make('doguser_name')->utf8()->max(64)->notNull(),
+			GDT_String::make('doguser_name')->utf8()->max(64)->caseI()->notNull(),
 		    GDT_Server::make('doguser_server')->notNull(),
 		    GDT_User::make('doguser_user_id')->notNull(),
 		    GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),
@@ -27,6 +27,7 @@ final class DOG_User extends GDO
 	##############
 	### Getter ###
 	##############
+	public function getID() { return $this->getVar('doguser_id'); }
 	/**
 	 * @return GDO_User
 	 */
