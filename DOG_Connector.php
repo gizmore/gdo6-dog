@@ -53,28 +53,28 @@ abstract class DOG_Connector
     public function sendToUser(DOG_User $user, $text)
     {
         Dog::instance()->event('dog_send_to_user', $user, $text);
-        if (GWF_CONSOLE_VERBOSE)
-        {
-            printf("%s: %s\n", $user->displayFullName(), $text);
-        }
+//         if (GWF_CONSOLE_VERBOSE)
+//         {
+//             printf("%s: %s\n", $user->displayFullName(), $text);
+//         }
     }
     
     public function sendToRoom(DOG_Room $room, $text)
     {
         Dog::instance()->event('dog_send_to_room', $room, $text);
-        if (GWF_CONSOLE_VERBOSE)
-        {
-            printf("%s: %s\n", $room->getName(), $text);
-        }
+//         if (GWF_CONSOLE_VERBOSE)
+//         {
+//             printf("%s: %s\n", $room->getName(), $text);
+//         }
     }
     
     public function sendNoticeToUser(DOG_User $user, $text)
     {
         Dog::instance()->event('dog_send_notice_to_user', $user, $text);
-        if (GWF_CONSOLE_VERBOSE)
-        {
-            printf("NOTICE %s: %s\n", $user->getFullName(), $text);
-        }
+//         if (GWF_CONSOLE_VERBOSE)
+//         {
+//             printf("NOTICE %s: %s\n", $user->getFullName(), $text);
+//         }
     }
     
     public function reply(DOG_Message $message, $text)

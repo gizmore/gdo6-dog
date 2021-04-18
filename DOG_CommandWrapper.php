@@ -1,10 +1,13 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\Core\Method;
 use GDO\Form\MethodForm;
-use GDO\Core\MethodAjax;
+use GDO\Core\Method;
 
+/**
+ * Wrap a gdo method in a dog command. 
+ * @author gizmore
+ */
 final class DOG_CommandWrapper extends DOG_Command
 {
     private $method;
@@ -16,7 +19,7 @@ final class DOG_CommandWrapper extends DOG_Command
         $this->method = $method;
         $this->group = $module->getName();
         $this->priority = $module->module_priority;
-        $this->trigger = strtolower($this->group . '.' . $method->gdoShortName());
+        $this->trigger = $method->gdoShortName();
     }
     
     public function gdoParameters()
@@ -29,27 +32,26 @@ final class DOG_CommandWrapper extends DOG_Command
         }
     }
     
-//     public function dogExecute(DOG_Message $message, ...$args)
-//     {
-//         if ($this->method instanceof MethodForm)
-//         {
-//             $this->dogExecuteForm($message, ...$args);
-//         }
-//         else
-//         {
-//             $this->dogExecuteMethod($message, ...$args);
-//         }
-//     }
+    public function dogExecute(DOG_Message $message, ...$args)
+    {
+        if ($this->method instanceof MethodForm)
+        {
+            $this->dogExecuteForm($message, ...$args);
+        }
+        else
+        {
+            $this->dogExecuteMethod($message, ...$args);
+        }
+    }
     
-//     private function dogExecuteMethod(DOG_Message $message, ...$args)
-//     {
-        
-//     }
+    private function dogExecuteMethod(DOG_Message $message, ...$args)
+    {
+        return $message->reply($this->method->exec()->render());
+    }
     
-//     private function dogExecuteForm(DOG_Message $message, ...$args)
-//     {
-        
-//     }
+    private function dogExecuteForm(DOG_Message $message, ...$args)
+    {
+        return $message->reply($this->method->exec()->render());
+    }
     
 }
-

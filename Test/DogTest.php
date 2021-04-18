@@ -45,4 +45,10 @@ final class DogTest extends DogTestCase
         assertTrue($user->hasPermission(Dog::OWNER), 'Test if gizmore{1} is owner.');
     }
     
+    public function testCoreMethods()
+    {
+        $r = $this->bashCommand("core.whoami");
+        assertTrue(strpos($r, 'gizmore{1}') !== false, 'Test the whoami command.');
+    }
+    
 }

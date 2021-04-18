@@ -123,7 +123,7 @@ final class Dog
             
             if (GWF_CONSOLE_VERBOSE)
             {
-//                 printf("Loaded normal command {$method->gdoClassName()}\n");
+                printf("Loaded normal command {$method->gdoClassName()}\n");
             }
 
             DOG_Command::register(new DOG_CommandWrapper($method));

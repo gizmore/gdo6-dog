@@ -93,16 +93,19 @@ class Bash extends DOG_Connector
 
     public function sendToUser(DOG_User $user, $text)
     {
+        parent::sendToUser($user, $text);
         echo "$text\n";
     }
     
     public function sendToRoom(DOG_Room $room, $text)
     {
+        parent::sendToRoom($room, $text);
         echo "$text\n";
     }
    
     public function sendNoticeToUser(DOG_User $user, $text)
     {
+        parent::sendNoticeToUser($user, $text);
         echo "$text\n";
     }
     
