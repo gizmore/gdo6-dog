@@ -8,6 +8,7 @@ use GDO\Dog\Connector\Bash;
 use GDO\Dog\DogTestCase;
 use function PHPUnit\Framework\assertMatchesRegularExpression;
 use GDO\User\GDO_UserPermission;
+use function PHPUnit\Framework\assertEquals;
 
 final class DogTest extends DogTestCase
 {
@@ -48,7 +49,7 @@ final class DogTest extends DogTestCase
     public function testCoreMethods()
     {
         $r = $this->bashCommand("core.whoami");
-        assertTrue(strpos($r, 'gizmore{1}') !== false, 'Test the whoami command.');
+        assertEquals('gizmore{1}', $r, 'Test the whoami command.');
     }
     
 }
