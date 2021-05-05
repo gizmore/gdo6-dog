@@ -15,7 +15,7 @@ use GDO\User\GDO_User;
  * You can dog add_server IRC irc://irc.freenode.net:6667 with it.
  * 
  * @author gizmore
- * @version 6.10.1
+ * @version 6.10.2
  * @since 6.10.0
  */
 class Bash extends DOG_Connector

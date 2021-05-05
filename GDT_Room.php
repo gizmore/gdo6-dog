@@ -7,6 +7,7 @@ final class GDT_Room extends GDT_Object
 {
     protected function __construct()
     {
+        parent::__construct();
         $this->table = DOG_Room::table();
     }
 }

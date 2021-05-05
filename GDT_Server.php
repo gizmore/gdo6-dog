@@ -7,6 +7,7 @@ final class GDT_Server extends GDT_Object
 {
     protected function __construct()
     {
+        parent::__construct();
         $this->table = DOG_Server::table();
     }
 }

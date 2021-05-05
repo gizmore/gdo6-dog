@@ -6,7 +6,7 @@ namespace GDO\Dog;
  * As fallback a softhyphen is inserted.
  * 
  * @author noother
- * @version 6.10.1
+ * @version 6.10.2
  * @since 3.0.0
  */
 final class Obfuscate
