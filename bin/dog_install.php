@@ -20,13 +20,13 @@ require 'GDO6.php';
 
 Config::configure(); # fallback
 
-Trans::$ISO = GWF_LANGUAGE;
-Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
+Trans::$ISO = GDO_LANGUAGE;
+Logger::init(null, GDO_ERROR_LEVEL); # 1st init as guest
 Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();
-Debug::setDieOnError(GWF_ERROR_DIE);
-Debug::setMailOnError(GWF_ERROR_MAIL);
+Debug::setDieOnError(GDO_ERROR_DIE);
+Debug::setMailOnError(GDO_ERROR_MAIL);
 Database::init();
 
 /** @var $argc int **/

@@ -57,7 +57,7 @@ final class Dog
                         if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
                         {
                             DOG_Command::register(new $class_name());
-                            if (defined('GWF_CONSOLE_VERBOSE'))
+                            if (defined('GDO_CONSOLE_VERBOSE'))
                             {
                                 Logger::logCron("Loaded command $class_name");
                             }
@@ -66,7 +66,7 @@ final class Dog
                         if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
                         {
                             DOG_Connector::register(new $class_name());
-                            if (defined('GWF_CONSOLE_VERBOSE'))
+                            if (defined('GDO_CONSOLE_VERBOSE'))
                             {
                                 Logger::logCron("Loaded connector $class_name");
                             }
@@ -97,7 +97,7 @@ final class Dog
      */
     private function autoCreateCommands()
     {
-        if (GWF_CONSOLE_VERBOSE)
+        if (GDO_CONSOLE_VERBOSE)
         {
             printf("Loading normal GDO methods as dog commands.\n");
         }
@@ -121,7 +121,7 @@ final class Dog
                 return;
             }
             
-            if (GWF_CONSOLE_VERBOSE)
+            if (GDO_CONSOLE_VERBOSE)
             {
                 printf("Loaded normal command {$method->gdoClassName()}\n");
             }
@@ -254,7 +254,7 @@ final class Dog
     
     public function event($name, ...$args)
     {
-        if (defined('GWF_CONSOLE_VERBOSE'))
+        if (defined('GDO_CONSOLE_VERBOSE'))
         {
         	Logger::logCron("Dog::event($name)");
         }

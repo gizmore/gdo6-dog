@@ -12,24 +12,24 @@ require 'GDO6.php';
 $dog = new DogApp();
 $dog = new Dog();
 chdir(GDO_PATH);
-Logger::init(null, GWF_ERROR_LEVEL); # 1st init as guest
+Logger::init(null, GDO_ERROR_LEVEL); # 1st init as guest
 
-if (defined('GWF_CONSOLE_VERBOSE'))
+if (defined('GDO_CONSOLE_VERBOSE'))
 {
     Logger::logCron("Starting dog...\nLoading Modules...");
 }
 
-Trans::$ISO = GWF_LANGUAGE;
+Trans::$ISO = GDO_LANGUAGE;
 Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();
 Debug::setDieOnError(false);
-Debug::setMailOnError(GWF_ERROR_MAIL);
+Debug::setMailOnError(GDO_ERROR_MAIL);
 Database::init();
 
 $modules = (new ModuleLoader(GDO_PATH.'GDO/'))->loadModules(true);
 
-if (GWF_CONSOLE_VERBOSE)
+if (GDO_CONSOLE_VERBOSE)
 {
     printf("Loaded %s modules.\n", count($modules));
 }
@@ -37,7 +37,7 @@ if (GWF_CONSOLE_VERBOSE)
 $dog->loadPlugins();
 
 # All fine!
-define('GWF_CORE_STABLE', 1);
+define('GDO_CORE_STABLE', 1);
 
 $dog->init();
 

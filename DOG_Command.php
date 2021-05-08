@@ -500,7 +500,7 @@ abstract class DOG_Command extends MethodForm
 		        $parameters[] = $value;
 		    }
 		    
-		    if (defined('GWF_CONSOLE_VERBOSE'))
+		    if (defined('GDO_CONSOLE_VERBOSE'))
 		    {
 		        Logger::logCron("executing " . $this->gdoClassName());
 		    }
