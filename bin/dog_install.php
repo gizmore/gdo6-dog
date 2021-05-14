@@ -81,7 +81,7 @@ elseif (@$argv[1] === 'admin')
     }
     else
     {
-        GDO_User::$CURRENT = GDO_User::system();
+        GDO_User::setCurrent(GDO_User::system());
         echo "Granting all permissions to {$argv[3]}.\n";
         $dog_user = DOG_User::getOrCreateUser($server, $argv[3]);
         $gdo_user = $dog_user->getGDOUser();

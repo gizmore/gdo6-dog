@@ -40,7 +40,7 @@ class DOG_Message
 	public function user(DOG_User $user)
 	{
 	    $this->user = $user;
-	    GDO_User::$CURRENT = $user->getGDOUser();
+	    GDO_User::setCurrent($user->getGDOUser());
 	    Trans::setISO($user->getGDOUser()->getLangISO());
 	    return $this;
 	}
