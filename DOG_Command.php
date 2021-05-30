@@ -6,11 +6,11 @@ use GDO\Form\GDT_Form;
 use GDO\Form\GDT_Submit;
 use GDO\Util\Strings;
 use GDO\Util\Arrays;
-use GDO\Core\Logger;
 use GDO\Core\GDT;
 use GDO\Dog\Method\Disable;
 use GDO\DB\GDT_Enum;
 use GDO\UI\GDT_Confirm;
+use GDO\Util\CLI;
 
 abstract class DOG_Command extends MethodForm
 {
@@ -25,7 +25,7 @@ abstract class DOG_Command extends MethodForm
 	public function isHiddenMethod() { return false; }
 	public function isRoomMethod() { return true; }
 	public function isPrivateMethod() { return true; }
-
+	
 	##############
 	### Helper ###
 	##############
@@ -82,14 +82,13 @@ abstract class DOG_Command extends MethodForm
 	public function getConfigValueBot($key)
 	{
 	    $gdt = $this->getConfigGDTBot($key);
-	    return $gdt->toValue($gdt->var);
+	    return $gdt->getValue();
 	}
 	
 	public function setConfigVarBot($key, $var)
 	{
-	    $gdt = $this->getConfigGDTBot($key);
-	    $value = $gdt->toValue($var);
-	    return $this->setConfigValueBot($key, $value);
+	    $gdt = $this->getConfigGDTBot($key)->var($var);
+	    return $this->setConfigValueBot($key, $gdt->getValue());
 	}
 	
 	public function setConfigValueBot($key, $value)
@@ -148,14 +147,13 @@ abstract class DOG_Command extends MethodForm
 	public function getConfigValueUser(DOG_User $user, $key)
 	{
 	    $gdt = $this->getConfigGDTUser($key);
-	    return $gdt->toValue($this->getConfigVarUser($user, $key));
+	    return $gdt->getValue();
 	}
 	
 	public function setConfigVarUser(DOG_User $user, $key, $var)
 	{
 	    $gdt = $this->getConfigGDTUser($key);
-	    $value = $gdt->toValue($var);
-	    return $this->setConfigValueUser($user, $key, $value);
+	    return $this->setConfigValueUser($user, $key, $gdt->getValue());
 	}
 	
 	public function setConfigValueUser(DOG_User $user, $key, $value)
@@ -215,14 +213,13 @@ abstract class DOG_Command extends MethodForm
 	public function getConfigValueRoom(DOG_Room $room, $key)
 	{
 	    $gdt = $this->getConfigGDTRoom($key);
-	    return $gdt->toValue($this->getConfigVarRoom($room, $key));
+	    return $gdt->getValue();
 	}
 	
 	public function setConfigVarRoom(DOG_Room $room, $key, $var)
 	{
 	    $gdt = $this->getConfigGDTRoom($key);
-	    $value = $gdt->toValue($var);
-	    return $this->setConfigValueRoom($key, $value);
+	    return $this->setConfigValueRoom($key, $gdt->getValue());
 	}
 	
 	public function setConfigValueRoom(DOG_Room $room, $key, $value)
@@ -283,14 +280,13 @@ abstract class DOG_Command extends MethodForm
 	public function getConfigValueServer(DOG_Server $server, $key)
 	{
 	    $gdt = $this->getConfigGDTServer($key);
-	    return $gdt->toValue($this->getConfigVarServer($server, $key));
+	    return $gdt->getValue();
 	}
 	
 	public function setConfigVarServer(DOG_Server $server, $key, $var)
 	{
 	    $gdt = $this->getConfigGDTServer($key);
-	    $value = $gdt->toValue($var);
-	    return $this->setConfigValueServer($server, $key, $value);
+	    return $this->setConfigValueServer($server, $key, $gdt->getValue());
 	}
 	
 	public function setConfigValueServer(DOG_Server $server, $key, $value)
@@ -300,7 +296,7 @@ abstract class DOG_Command extends MethodForm
 	    DOG_ConfigServer::blank(array(
 	        'confs_command' => $this->gdoClassName(),
 	        'confs_key' => $key,
-	        'confs_user' => $server->getID(),
+	        'confs_server' => $server->getID(),
 	        'confs_var' => $var,
 	    ))->replace();
 	    return true;
@@ -355,10 +351,7 @@ abstract class DOG_Command extends MethodForm
 	 */
 	public function getConnectors()
 	{
-	    return array_map(
-	        function(DOG_Connector $connector) {
-	            return $connector->getName();
-	        }, DOG_Connector::connectors());
+	    return array_keys(DOG_Connector::connectors());
 	}
 	
 	public function createForm(GDT_Form $form)
@@ -430,7 +423,6 @@ abstract class DOG_Command extends MethodForm
 	        return $message->rply('err_disabled');
 	    }
 	    
-		$args = [];
 		$_REQUEST = [];
 		if ($message->room)
 		{
@@ -441,82 +433,20 @@ abstract class DOG_Command extends MethodForm
 		    $text = $message->text;
 		}
 		
+		$trigger = ltrim(Strings::substrTo($text, ' ', $text), '.');
 		$text = trim(Strings::substrFrom($text, ' ', ''));
-
-		$args = Strings::args($text);
 		
-		$lastOptional = 0;
-		try
+		if ( (!$text) && (substr_count($trigger, '.') === 1) )
 		{
-		    foreach ($args as $lastOptional => $arg)
-		    {
-		        if (Strings::startsWith($arg, '--'))
-		        {
-		            $setA = explode('=', ltrim($arg, '-'), 2);
-		            $key = $setA[0];
-		            $val = $setA[1];
-		            $this->gdoParameter($key, $val);
-		        }
-		    }
-		    
-		    $args = array_slice($args, $lastOptional);
-		    $parameters = [];
-		    
-		    foreach ($this->gdoParameterCache() as $gdt)
-		    {
-		        $positional = $gdt->notNull && ($gdt->initial === null);
-		        
-		        if ($positional)
-		        {
-    		        if (!($gdt instanceof GDT_DogString))
-    		        {
-    		            $token = Strings::substrTo($text, ' ', $text);
-    		            $text = ltrim(Strings::substrFrom($text, ' ', ''));
-    		        }
-    		        else
-    		        {
-    		            $token = $text;
-    		            $text = '';
-    		        }
-    		        
-    		        if ($token === '')
-    		        {
-    		            $token = null;
-    		        }
-    		        $gdt->var($token);
-		        }
-		        else
-		        {
-		        }
-		        
-	            $value = $gdt->getParameterValue();
-		        
-		        if (!$gdt->validate($value))
-		        {
-		            $usage = $this->getUsageText($message);
-		            $message->reply(sprintf('%s: %s %s', $gdt->name, $gdt->error, $usage));
-		            return false;
-		        }
-		        $parameters[] = $value;
-		    }
-		    
-		    if (defined('GDO_CONSOLE_VERBOSE'))
-		    {
-		        Logger::logCron("executing " . $this->gdoClassName());
-		    }
-		    
-		    $this->dogExecute($message, ...$parameters);
-    		return true;
+		    return $message->reply($this->renderCLIHelp()->renderCLI());
 		}
-		catch (\Error $e)
-		{
-		    $message->rply('err_dog_error', [get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()]);
-		}
-		catch (\Exception $e)
-		{
-		    $message->rply('err_dog_exception', [get_class($e), $e->getMessage()]);
-		}
-		return false;
+
+		$parameters = CLI::parseArgline($text, $this, true);
+		$parameters = array_values($parameters);
+
+		$this->dogExecute($message, ...$parameters);
+
+		return true;
 	}
 	
 	public function getParametersSorted()

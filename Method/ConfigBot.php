@@ -70,7 +70,7 @@ final class ConfigBot extends DOG_Command
             return $message->rply('err_dog_var_unknown', [$command->trigger, $key]);
         }
         
-        $value = $gdt->toValue($var);
+        $value = $gdt->getValue();
         if (!$gdt->validate($value))
         {
             return $message->rply('err_dog_config_invalid', [$key, $command->trigger, $var]);

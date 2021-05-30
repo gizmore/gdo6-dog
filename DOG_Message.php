@@ -53,18 +53,18 @@ class DOG_Message
 	public $text;
 	public function text($text) { $this->text = $text; return $this; }
 	
-	
 	###############
 	### Methods ###
 	###############
 	public function rply($key, $args=null)
 	{
-		$this->reply($this->t($key, $args));
+		return $this->reply($this->t($key, $args));
 	}
 	
 	public function reply($text)
 	{
 		$this->server->getConnector()->reply($this, $text);
+		return true;
 	}
 
 	public function t($key, $args=null)

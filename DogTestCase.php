@@ -5,8 +5,11 @@ use GDO\Tests\MethodTest;
 use GDO\Tests\TestCase;
 use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
+use GDO\Core\Application;
+use GDO\Core\GDT_Response;
 use GDO\Dog\Connector\Bash;
 use GDO\Util\Strings;
+use GDO\UI\GDT_Page;
 
 class DogTestCase extends TestCase
 {
@@ -33,7 +36,13 @@ class DogTestCase extends TestCase
     protected function setUp() : void
     {
         parent::setUp();
+        Application::instance()->cli(true);
         $this->restoreUserPermissions($this->userGizmore1());
+    }
+    
+    protected function tearDown() : void
+    {
+        Application::instance()->cli(false);
     }
     
     /**
@@ -69,10 +78,17 @@ class DogTestCase extends TestCase
     {
         try
         {
-            ob_implicit_flush(false);
+//             ob_implicit_flush(false);
             ob_start();
+            # Reset vars
+            $_GET = $_POST = $_REQUEST = [];
+            $_REQUEST['fmt'] = 'cli';
+            GDT_Response::$CODE = 200;
+            GDT_Page::$INSTANCE->reset();
+            # run cmd
             Dog::instance()->event('dog_cmdline2', $line);
             $response = ob_get_contents();
+            return $response;
         }
         catch (\Throwable $ex)
         {
@@ -81,8 +97,7 @@ class DogTestCase extends TestCase
         finally
         {
             ob_end_clean();
-            ob_implicit_flush(true);
-            return $response;
+//             ob_implicit_flush(true);
         }
     }
     

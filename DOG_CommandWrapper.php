@@ -1,7 +1,6 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\Form\MethodForm;
 use GDO\Core\Method;
 
 /**
@@ -24,34 +23,12 @@ final class DOG_CommandWrapper extends DOG_Command
     
     public function gdoParameters()
     {
-        if ($this->method instanceof MethodForm)
-        {
-            return array_merge(
-                $this->method->getForm()->getFields(),
-                $this->method->gdoParameters()); 
-        }
+        return $this->method->allParameters();
     }
     
     public function dogExecute(DOG_Message $message, ...$args)
     {
-        if ($this->method instanceof MethodForm)
-        {
-            $this->dogExecuteForm($message, ...$args);
-        }
-        else
-        {
-            $this->dogExecuteMethod($message, ...$args);
-        }
-    }
-    
-    private function dogExecuteMethod(DOG_Message $message, ...$args)
-    {
-        return $message->reply($this->method->exec()->render());
-    }
-    
-    private function dogExecuteForm(DOG_Message $message, ...$args)
-    {
-        return $message->reply($this->method->exec()->render());
+        return $message->reply($this->method->exec()->renderCLI());
     }
     
 }

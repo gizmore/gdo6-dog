@@ -147,13 +147,16 @@ final class DOG_Server extends GDO
     {
     	if (!$this->connector)
     	{
-	    	$connector = DOG_Connector::connector($this->getConnectorName());
-	    	$classname = get_class($connector);
-	    	$this->connector = new $classname();
-	    	$this->connector->server($this);
-	    	$this->connector->init();
+	    	$this->setConnector(DOG_Connector::connector($this->getConnectorName()));
     	}
     	return $this->connector;
+	}
+	
+	public function setConnector(DOG_Connector $connector)
+	{
+	    $this->connector = $connector;
+	    $this->connector->server($this);
+	    return $this;
 	}
     
 	##############

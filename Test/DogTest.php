@@ -3,12 +3,12 @@ namespace GDO\Dog\Test;
 
 use GDO\Dog\Dog;
 use function PHPUnit\Framework\assertTrue;
-use GDO\Dog\DOG_Connector;
 use GDO\Dog\Connector\Bash;
 use GDO\Dog\DogTestCase;
 use function PHPUnit\Framework\assertMatchesRegularExpression;
 use GDO\User\GDO_UserPermission;
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertStringContainsString;
 
 final class DogTest extends DogTestCase
 {
@@ -30,10 +30,10 @@ final class DogTest extends DogTestCase
     
     public function testBashConnector()
     {
-        $bash = DOG_Connector::connector('Bash');
+        $bash = Bash::instance()->getConnector();
         assertTrue($bash instanceof Bash);
-        $response = $this->bashCommand("ping");
-        assertMatchesRegularExpression('/pong/is', $response);
+        $response = $this->bashCommand("test.ping.");
+        assertMatchesRegularExpression('/pong/is', $response, "Test PING via Bash connector.");
     }
     
     public function testGizmoreOp()
@@ -48,8 +48,8 @@ final class DogTest extends DogTestCase
     
     public function testCoreMethods()
     {
-        $r = $this->bashCommand("core.whoami");
-        assertEquals('gizmore{1}', $r, 'Test the whoami command.');
+        $r = $this->bashCommand("core.whoami.");
+        assertStringContainsString('gizmore{1}', $r, 'Test the whoami command.');
     }
     
 }

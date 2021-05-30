@@ -4,6 +4,9 @@ return array(
 '%s' => '%s', ### oops hack?
 'none' => 'none',
 'usage' => 'Usage: #CMD#%s %s',
+    
+#####
+'cfg_default_nickname' => 'Default nickname',
 
 #####
 'dog_user' => 'User',

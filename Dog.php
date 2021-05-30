@@ -9,12 +9,14 @@ use GDO\Core\ModuleLoader;
 use GDO\Core\GDO_Module;
 use GDO\Install\Installer;
 use GDO\Cronjob\MethodCronjob;
+use GDO\Core\GDT_Error;
+use GDO\Dog\Connector\Bash;
 
 /**
  * Dog chatbot instance.
  * 
  * @author gizmore
- * @version 6.10.1
+ * @version 6.10.4
  * @since 6.8.0
  */
 final class Dog
@@ -115,7 +117,8 @@ final class Dog
             $method = Installer::loopMethod($module, $fullpath);
             if ( ($method instanceof MethodCronjob) || # skip cronjobs
                  ($method instanceof DOG_Command) ||  # skip real dog commands
-                 (!$method->showInSitemap()) || # skip non sitemap
+//                  (!$method->showInSitemap()) || # skip non sitemap
+                 (!$method->isCLI()) || # skip non cli
                  ($method->isAjax()) ) # skip ajax
             {
                 return;
@@ -148,13 +151,10 @@ final class Dog
     
     public function init()
     {
-    	$this->servers = DOG_Server::table()->all();
+        (new Bash())->init();
+        
+        $this->servers = DOG_Server::table()->all();
 
-    	foreach (DOG_Connector::connectors() as $connector)
-    	{
-    		$connector->init();
-    	}
-    	
     	DOG_Command::sortCommands();
     	foreach (DOG_Command::$COMMANDS as $command)
     	{
@@ -256,23 +256,31 @@ final class Dog
     {
         if (defined('GDO_CONSOLE_VERBOSE'))
         {
-        	Logger::logCron("Dog::event($name)");
+        	Logger::logCron("Dog::event($name) " . count($args));
+//         	ob_flush();
         }
-    	
-    	foreach ($this->servers as $server)
+        
+        $this->eventB(array_map(function(DOG_Server $s){
+            return $s->getConnector(); }, $this->servers), $name, ...$args);
+        $this->eventB(DOG_Command::$COMMANDS, $name, ...$args);
+    }
+    
+    private function eventB(array $objects, $name, ...$args)
+    {
+    	foreach ($objects as $object)
     	{
-    	    $connector = $server->getConnector();
-    		if (method_exists($connector, $name))
+    		if (method_exists($object, $name))
     		{
-    			call_user_func([$connector, $name], ...$args);
-    		}
-    	}
-    	
-    	foreach (DOG_Command::$COMMANDS as $command)
-    	{
-    		if (method_exists($command, $name))
-    		{
-    			call_user_func([$command, $name], ...$args);
+    		    try
+    		    {
+        			call_user_func([$object, $name], ...$args);
+    		    }
+    		    catch (\Throwable $ex)
+    		    {
+    		        echo GDT_Error::responseException($ex)->renderCLI();
+//     		        ob_flush();
+    		        Logger::logException($ex);
+    		    }
     		}
     	}
     }

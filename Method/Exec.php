@@ -29,7 +29,7 @@ final class Exec extends DOG_Command
 	    
 		$trigger = Strings::substrTo($text, ' ', $text);
 		
-		if ($command = DOG_Command::byTrigger($trigger))
+		if ($command = DOG_Command::byTrigger(trim($trigger, '.')))
 		{
 			$command->onDogExecute($message);
 		}
