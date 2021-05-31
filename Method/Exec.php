@@ -8,8 +8,8 @@ use GDO\Util\Strings;
 /**
  * Listens to the `dog_message` event and calls a command.
  * @author gizmore
- * @version 6.10
- * @since 6.10
+ * @version 6.10.4
+ * @since 6.10.2
  */
 final class Exec extends DOG_Command
 {
@@ -27,7 +27,7 @@ final class Exec extends DOG_Command
 	        $text = substr($text, 1);
 	    }
 	    
-		$trigger = Strings::substrTo($text, ' ', $text);
+		$trigger = strtolower(Strings::substrTo($text, ' ', $text));
 		
 		if ($command = DOG_Command::byTrigger(trim($trigger, '.')))
 		{

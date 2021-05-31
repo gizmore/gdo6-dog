@@ -233,12 +233,13 @@ final class Dog
             $processed = 0;
        	    try
         	{
-            	while ($processed++ < 5)
+            	while ($processed < 5)
         	    {
             	    if (!$connector->readMessage())
             	    {
             	        break;
             	    }
+            	    $processed++;
         	    }
         	}
     	    catch (\Error $e)
@@ -257,7 +258,6 @@ final class Dog
         if (defined('GDO_CONSOLE_VERBOSE'))
         {
         	Logger::logCron("Dog::event($name) " . count($args));
-//         	ob_flush();
         }
         
         $this->eventB(array_map(function(DOG_Server $s){
