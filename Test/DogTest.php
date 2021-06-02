@@ -52,4 +52,10 @@ final class DogTest extends DogTestCase
         assertStringContainsString('gizmore{1}', $r, 'Test the whoami command.');
     }
     
+    public function testHelpCommand()
+    {
+        $r = $this->bashCommand("gdo.help.");
+        assertStringContainsString('you can execute the following commands', $r, 'Test the help command for command overview.');
+    }
+    
 }

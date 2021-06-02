@@ -31,4 +31,24 @@ final class DOG_CommandWrapper extends DOG_Command
         return $message->reply($this->method->exec()->renderCLI());
     }
     
+    public function getCLITrigger()
+    {
+        $m = $this->method;
+        return sprintf('%s.%s', $m->getModuleName(),  $m->getMethodName());
+    }
+ 
+    public function getTitle()
+    {
+        return $this->method->getTitle();
+    }
+    
+    public function getDescription()
+    {
+        return $this->method->getDescription();
+    }
+    
+    public function getButtons()
+    {
+        return $this->method->getButtons();
+    }
 }

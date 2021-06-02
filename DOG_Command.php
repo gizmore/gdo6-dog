@@ -19,7 +19,7 @@ abstract class DOG_Command extends MethodForm
     ################
 	public $priority = 50; # @TODO: make these into functions?
 	public $trigger = null;
-	public $group = 'Various';
+	public $group = 'Dog';
 	
 	public function isWebMethod() { return false; }
 	public function isHiddenMethod() { return false; }

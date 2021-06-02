@@ -20,7 +20,7 @@ use GDO\Dog\Dog;
  */
 final class AddServer extends DOG_Command
 {
-    public $group = 'Config';
+//     public $group = 'Config';
     public $trigger = 'add_server';
 	
 	public function gdoParameters()
