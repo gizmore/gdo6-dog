@@ -23,6 +23,11 @@ final class DOG_CommandWrapper extends DOG_Command
     
     public function gdoParameters()
     {
+        return $this->method->gdoParameters();
+    }
+    
+    public function allParameters()
+    {
         return $this->method->allParameters();
     }
     
