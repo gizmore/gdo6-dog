@@ -442,6 +442,21 @@ abstract class DOG_Command extends MethodForm
 		}
 
 		$parameters = CLI::parseArgline($text, $this, true);
+		
+		if ($parameters === false)
+		{
+		    $errors = [];
+		    foreach ($this->gdoParameterCache() as $gdt)
+		    {
+		        if ($gdt->hasError())
+		        {
+		            $errors[] = $gdt->error;
+		        }
+		    }
+		    $message->rply('err_cli', [implode(' ', $errors)]);
+		    return false;
+		}
+		
 		$parameters = array_values($parameters);
 
 		$this->dogExecute($message, ...$parameters);
