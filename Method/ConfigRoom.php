@@ -9,8 +9,7 @@ use GDO\Dog\Dog;
 
 final class ConfigRoom extends DOG_Command
 {
-    public $group = 'Config';
-    public $trigger = 'confr';
+    public $trigger = 'confc';
     
     public function getPermission() { return Dog::HALFOP; } 
     

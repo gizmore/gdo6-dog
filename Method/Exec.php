@@ -13,7 +13,11 @@ use GDO\Util\Strings;
  */
 final class Exec extends DOG_Command
 {
-	public function dog_message(DOG_Message $message)
+    public function isHiddenMethod() { return true; }
+    public function isRoomMethod() { return false; }
+    public function isPrivateMethod() { return false; }
+    
+    public function dog_message(DOG_Message $message)
 	{
 	    $text = $message->text;
 	    

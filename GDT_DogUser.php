@@ -7,22 +7,26 @@ use GDO\Util\Strings;
 use GDO\Util\Arrays;
 
 /**
- * DOG_User parameter is like an object but features a few options:
+ * GDT_DogUser parameter is like an object but features a few options:
  * 
  * online - only online users are allowed
  * same_room - user has to be in the same room
  * same_server - user has to be on the same server
  * exact - username might not be abbreviated (deprecated)
  * thyself - user might choose thyself
+ * @TODO deleted - also select deleted users
+ * @TODO registrered - only select registered users
+ * @TODO authenticated - only select registered and authenticated users
  * 
  * @author gizmore
- * @version 6.10
- * @since 6.10
+ * @version 6.10.4
+ * @since 6.10.0
  */
 final class GDT_DogUser extends GDT_Object
 {
     protected function __construct()
     {
+        parent::__construct();
         $this->table = DOG_User::table();
     }
     
@@ -140,11 +144,26 @@ final class GDT_DogUser extends GDT_Object
                             return $user;
                         }
                     }
-                    
                 }
                 
+                # Try beginning of name
+                $possible = [];
+                foreach ($users as $user)
+                {
+                    if (stripos($user->displayFullName(), $name) === 0)
+                    {
+                        $possible[] = $user;
+                    }
+                }
+                if (count($possible)===1)
+                {
+                    return $possible[0];
+                }
+
+                # Multiple matches!
                 # Return a dummy user but mark as ambigous for validation.
-                $this->ambigious = array_map(function($user){return $user->displayFullName();}, $users);
+                $this->ambigious = array_map(function($user){
+                    return $user->displayFullName();}, $users);
                 return $users[0];
         }
     }

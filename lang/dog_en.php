@@ -30,7 +30,9 @@ return array(
 'err_page' => 'There are only %s pages.',
 'err_no_data' => 'There is no data yet.',
 'err_authenticate_first' => 'You need to authenticate to execute this command.',
-    
+'err_please_wait' => 'Please wait %ss before you try again.',
+'err_register_first' => 'Please register with #BOT# first to use this function.',
+
 ######
 'perm_voice' => 'Voice',
 'perm_halfop' => 'Halfop',
@@ -63,7 +65,7 @@ return array(
 'msg_dog_overall_help' => 'Here you can execute the following commands; %s',
 'msg_dog_help' => '%s - %s',
 
-'dog_help_lang' => 'Show or change the user interface language.',
+'ft_dog_lang' => 'Show or change the user interface language.',
 'msg_dog_show_language' => 'Your language is currently set to %s. Available languages: %s.',
 'msg_dog_set_language' => 'Your language has been changed from %s to %s.',
     
@@ -72,9 +74,21 @@ return array(
     
 'dog_help_disable' => 'Disables a command in a room - or server wide when invoked in private.',
 'msg_dog_already_disabled' => '%s is already disabled.',
+'msg_dog_disabled' => 'The %s command has been disabled.',
 'err_cannot_disable' => 'You cannot disable this command.',
 'err_disabled' => 'This command is disabled here.',
 
 'dog_help_enable' => 'Re-enables a command in a room - or server wide when invoked in private.',
 'msg_dog_not_disabled' => '%s is not disabled in this scope.',
+'msg_dog_enabled' => 'The %s command has been enabled.',
+    
+'ft_dog_ping' => 'Test if the bot responds.',
+'ft_dog_help' => 'Show commands or the help for a command',
+    
+'ft_dogirc_join' => 'Join an IRC channel.',
+'msg_dog_room_lang' => 'The room\'s language is currently set to %s.',
+'msg_dog_room_lang_now' => 'The room\'s language changed from %s to %s.',
+
+'ft_dog_bot' => 'Show and toggle bot flag for a user.',
+    
 );

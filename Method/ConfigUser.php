@@ -8,7 +8,6 @@ use GDO\Dog\DOG_Message;
 
 final class ConfigUser extends DOG_Command
 {
-    public $group = 'Config';
     public $trigger = 'confu';
     
     public function isUserRequired() { return true; } 

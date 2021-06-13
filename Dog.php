@@ -2,12 +2,15 @@
 namespace GDO\Dog;
 
 use GDO\Core\Application;
+use GDO\Core\GDO;
+use GDO\Core\GDO_Hook;
 use GDO\Core\Logger;
 use GDO\Core\Debug;
 use GDO\File\Filewalker;
 use GDO\Core\ModuleLoader;
 use GDO\Core\GDO_Module;
 use GDO\Install\Installer;
+use GDO\User\GDO_User;
 use GDO\Cronjob\MethodCronjob;
 use GDO\Core\GDT_Error;
 use GDO\Dog\Connector\Bash;
@@ -50,7 +53,11 @@ final class Dog
         Filewalker::traverse('GDO', null, false, function($entry, $path){
             if (preg_match("/^Dog[A-Z0-9]*$/i", $entry))
             {
-//                 if (!module_enabled($entry)) { return; } # else bug in tests
+                if (!Application::instance()->isUnitTests())
+                {
+                    if (!module_enabled($entry)) { return; }
+                }
+                
                 Filewalker::traverse(["$path/Connector", "$path/Method"], null, function($entry, $path){
                     $class_name = str_replace('/', "\\", $path);
                     $class_name = substr($class_name, 0, -4);
@@ -59,19 +66,11 @@ final class Dog
                         if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
                         {
                             DOG_Command::register(new $class_name());
-                            if (defined('GDO_CONSOLE_VERBOSE'))
-                            {
-                                Logger::logCron("Loaded command $class_name");
-                            }
                         }
                         
                         if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
                         {
                             DOG_Connector::register(new $class_name());
-                            if (defined('GDO_CONSOLE_VERBOSE'))
-                            {
-                                Logger::logCron("Loaded connector $class_name");
-                            }
                         }
                         
                     }
@@ -99,10 +98,6 @@ final class Dog
      */
     private function autoCreateCommands()
     {
-        if (GDO_CONSOLE_VERBOSE)
-        {
-            printf("Loading normal GDO methods as dog commands.\n");
-        }
         $modules = ModuleLoader::instance()->getEnabledModules();
         foreach ($modules as $module)
         {
@@ -117,21 +112,14 @@ final class Dog
             $method = Installer::loopMethod($module, $fullpath);
             if ( ($method instanceof MethodCronjob) || # skip cronjobs
                  ($method instanceof DOG_Command) ||  # skip real dog commands
-//                  (!$method->showInSitemap()) || # skip non sitemap
                  (!$method->isCLI()) || # skip non cli
                  ($method->isAjax()) ) # skip ajax
             {
                 return;
             }
             
-            if (GDO_CONSOLE_VERBOSE)
-            {
-                printf("Loaded normal command {$method->gdoClassName()}\n");
-            }
-
             DOG_Command::register(new DOG_CommandWrapper($method));
         });
-        
     }
     
     /**
@@ -156,18 +144,24 @@ final class Dog
         $this->servers = DOG_Server::table()->all();
 
     	DOG_Command::sortCommands();
-    	foreach (DOG_Command::$COMMANDS as $command)
-    	{
-    	    $command->init();
-    	}
+//     	foreach (DOG_Command::$COMMANDS as $command)
+//     	{
+//     	    $command->init();
+//     	}
     }
     
     public function mainloop()
     {
+        $lastIPC = Application::$TIME;
         while ($this->running)
         {
             $this->mainloopStep();
-            usleep(20);
+            if ((Application::$TIME - $lastIPC) >= 10)
+            {
+                $lastIPC = Application::$TIME;
+                $this->ipcTimer();
+            }
+            usleep(25);
         }
         
         while ($this->hasPendingConnections())
@@ -277,6 +271,7 @@ final class Dog
     		    }
     		    catch (\Throwable $ex)
     		    {
+//     		        DOG_Message::$LAST_MESSAGE->server->getConnector()->sendToAdmin($ex->getMessage());
     		        echo GDT_Error::responseException($ex)->renderCLI();
 //     		        ob_flush();
     		        Logger::logException($ex);
@@ -284,5 +279,70 @@ final class Dog
     		}
     	}
     }
+
+    ###########
+    ### IPC ###
+    ###########
+    private function ipcTimer()
+    {
+        if ($messages = GDO_Hook::table()->select()->exec()->fetchAllRows())
+        {
+            foreach ($messages as $message)
+            {
+                $this->webHookDB($message[1]);
+                GDO_Hook::table()->deleteWhere("hook_id=".$message[0], false);
+            }
+        }
+    }
+    
+    private function webHookDB($message)
+    {
+        if (GDO_CONSOLE_VERBOSE)
+        {
+            echo "{$message}\n";
+        }
+        $message = json_decode($message, true);
+        $event = $message['event'];
+        $args = $message['args'];
+        $param = [$event];
+        if ($args)
+        {
+            $param = array_merge($param, $args);
+        }
+        return $this->webHook($param);
+    }
+    
+    private function webHook(array $hookData)
+    {
+        $event = array_shift($hookData);
+        $method_name = "hook$event";
+        if (method_exists($this, $method_name))
+        {
+            call_user_func([$this, $method_name], ...$hookData);
+        }
+    }
+
+    public function hookCacheInvalidate($table, $id)
+    {
+        $table = GDO::tableFor($table);
+        if ($object = $table->reload($id))
+        {
+//             $this->tempReset($object);
+        }
+    }
+
+//     private function tempReset(GDO $gdo)
+//     {
+//         if ($gdo instanceof GDO_User)
+//         {
+// //             $sessid = $gdo->tempGet('sess_id');
+//             $gdo->tempReset();
+// //             $gdo->tempSet('sess_id', $sessid);
+//         }
+//         else
+//         {
+//             $gdo->tempReset();
+//         }
+//     }
 
 }

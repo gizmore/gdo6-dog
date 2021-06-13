@@ -11,28 +11,36 @@ use GDO\Dog\Method\Disable;
 use GDO\DB\GDT_Enum;
 use GDO\UI\GDT_Confirm;
 use GDO\Util\CLI;
+use GDO\Core\Website;
 
 abstract class DOG_Command extends MethodForm
 {
     ################
     ### Override ###
     ################
-	public $priority = 50; # @TODO: make these into functions?
+	public $group = null;
 	public $trigger = null;
-	public $group = 'Dog';
+	public $priority = 50; # @TODO: make these into functions?
 	
 	public function isWebMethod() { return false; }
 	public function isHiddenMethod() { return false; }
 	public function isRoomMethod() { return true; }
 	public function isPrivateMethod() { return true; }
+	public function isAuthRequired() { return false; }
+	public function isRegisterRequired() { return false; }
 	
 	##############
 	### Helper ###
 	##############
-	public function getFullTrigger()
+	public function getCLITrigger()
 	{
 	    $t = $this->group ? "{$this->group}.{$this->trigger}" : $this->trigger;
 	    return strtolower($t);
+	}
+	
+	public function getID()
+	{
+	    return $this->getCLITrigger();
 	}
 	
 	##################
@@ -94,11 +102,11 @@ abstract class DOG_Command extends MethodForm
 	public function setConfigValueBot($key, $value)
 	{
 	    $gdt = $this->getConfigGDTBot($key);
-	    $var = $gdt->toVar($value);
+	    $gdt->value($value);
 	    DOG_ConfigBot::blank(array(
 	        'confb_command' => $this->gdoClassName(),
 	        'confb_key' => $key,
-	        'confb_var' => $var,
+	        'confb_var' => $gdt->var,
 	    ))->replace();
 	    return true;
 	}
@@ -141,7 +149,7 @@ abstract class DOG_Command extends MethodForm
 	    {
 	        return $var->getVar('confu_var');
 	    }
-	    return $this->getConfigGDTUser($key)->initial;
+	    return $this->getConfigGDTUser($key)->var;
 	}
 	
 	public function getConfigValueUser(DOG_User $user, $key)
@@ -159,12 +167,12 @@ abstract class DOG_Command extends MethodForm
 	public function setConfigValueUser(DOG_User $user, $key, $value)
 	{
 	    $gdt = $this->getConfigGDTUser($key);
-	    $var = $gdt->toVar($value);
+	    $gdt->value($value);
 	    DOG_ConfigUser::blank(array(
 	        'confu_command' => $this->gdoClassName(),
 	        'confu_key' => $key,
 	        'confu_user' => $user->getID(),
-	        'confu_var' => $var,
+	        'confu_var' => $gdt->var,
 	    ))->replace();
 	    return true;
 	}
@@ -207,7 +215,7 @@ abstract class DOG_Command extends MethodForm
 	    {
 	        return $var->getVar('confr_var');
 	    }
-	    return $this->getConfigGDTRoom($key)->initial;
+	    return $this->getConfigGDTRoom($key)->var;
 	}
 	
 	public function getConfigValueRoom(DOG_Room $room, $key)
@@ -225,12 +233,12 @@ abstract class DOG_Command extends MethodForm
 	public function setConfigValueRoom(DOG_Room $room, $key, $value)
 	{
 	    $gdt = $this->getConfigGDTRoom($key);
-	    $var = $gdt->toVar($value);
+	    $gdt->value($value);
 	    DOG_ConfigRoom::blank(array(
 	        'confr_command' => $this->gdoClassName(),
 	        'confr_key' => $key,
 	        'confr_room' => $room->getID(),
-	        'confr_var' => $var,
+	        'confr_var' => $gdt->var,
 	    ))->replace();
 	    return true;
 	}
@@ -274,7 +282,7 @@ abstract class DOG_Command extends MethodForm
 	    {
 	        return $var->getVar('confs_var');
 	    }
-	    return $this->getConfigGDTServer($key)->initial;
+	    return $this->getConfigGDTServer($key)->var;
 	}
 	
 	public function getConfigValueServer(DOG_Server $server, $key)
@@ -292,12 +300,12 @@ abstract class DOG_Command extends MethodForm
 	public function setConfigValueServer(DOG_Server $server, $key, $value)
 	{
 	    $gdt = $this->getConfigGDTServer($key);
-	    $var = $gdt->toVar($value);
+	    $gdt->value($value);
 	    DOG_ConfigServer::blank(array(
 	        'confs_command' => $this->gdoClassName(),
 	        'confs_key' => $key,
 	        'confs_server' => $server->getID(),
-	        'confs_var' => $var,
+	        'confs_var' => $gdt->var,
 	    ))->replace();
 	    return true;
 	}
@@ -321,7 +329,7 @@ abstract class DOG_Command extends MethodForm
 	    self::$COMMANDS[] = $command;
 	    if ($command->trigger)
 	    {
-    	    self::$COMMANDS_T[$command->getFullTrigger()] = $command;
+    	    self::$COMMANDS_T[$command->getCLITrigger()] = $command;
 	    }
 	}
 	
@@ -379,6 +387,8 @@ abstract class DOG_Command extends MethodForm
 	
 	public function canExecute(DOG_Message $message)
 	{
+	    if ($this->isRegisterRequired() && (!$message->user->isRegistered())) { return false; }
+	    if ($this->isAuthRequired() && (!$message->user->isAuthenticated())) { return false; }
 	    if (!$this->connectorMatches($message)) { return false; }
 	    if ( (!$this->isRoomMethod()) && ($message->room) ) { return false; }
 	    if ( (!$this->isPrivateMethod()) && (!$message->room) ) { return false; }
@@ -389,6 +399,8 @@ abstract class DOG_Command extends MethodForm
 	
 	public function onDogExecute(DOG_Message $message)
 	{
+	    GDT_Form::$CURRENT = $this->getForm();
+	    
 	    if (!$this->connectorMatches($message))
 	    {
 	        return $message->rply('err_wrong_connector', [Arrays::implodeHuman($this->getConnectors())]);
@@ -402,6 +414,16 @@ abstract class DOG_Command extends MethodForm
 	    if ( (!$this->isPrivateMethod()) && (!$message->room) )
 	    {
 	        return $message->rply('err_not_in_private');
+	    }
+
+	    if ($this->isRegisterRequired() && (!$message->user->isRegistered()))
+	    {
+	        return $message->rply('err_register_first');
+	    }
+	    
+	    if ($this->isAuthRequired() && (!$message->user->isAuthenticated()))
+	    {
+	        return $message->rply('err_authenticate_first');
 	    }
 	    
 	    if ( ($this->getPermission()) && ($message->user->isRegistered() && (!$message->user->isAuthenticated())) )
@@ -417,16 +439,21 @@ abstract class DOG_Command extends MethodForm
 	    /**
 	     * @var Disable $disable
 	     */
-	    $disable = DOG_Command::byTrigger('config.disable');
+	    $disable = Disable::instance();
 	    if ($disable->isDisabled($message, $this))
 	    {
 	        return $message->rply('err_disabled');
 	    }
 	    
 		$_REQUEST = [];
+		if (Website::$TOP_RESPONSE)
+		{
+		    Website::$TOP_RESPONSE->clearFields();
+		}
+		
 		if ($message->room)
 		{
-    		$text = mb_substr($message->text, 1);
+    		$text = substr($message->text, 1);
 		}
 		else
 		{
@@ -436,12 +463,30 @@ abstract class DOG_Command extends MethodForm
 		$trigger = ltrim(Strings::substrTo($text, ' ', $text), '.');
 		$text = trim(Strings::substrFrom($text, ' ', ''));
 		
-		if ( (!$text) && (substr_count($trigger, '.') === 1) )
+		# Generate button from trigger. Default submit
+		$trigger = strtolower($trigger);
+		$button = str_replace($trigger, '', $this->getCLITrigger());
+		$button = $button ? $button : $this->getDefaultButtonLabel();
+		$button = $this->getButtonByLabel($button);
+		$_REQUEST[$this->formName()] = [$button => $button];
+		
+		if (!$text)
 		{
-		    return $message->reply($this->renderCLIHelp()->renderCLI());
+		    if ($this->hasPositionalCLIParameters())
+		    {
+    		    return $message->reply($this->renderCLIHelp()->renderCLI());
+		    }
 		}
 
-		$parameters = CLI::parseArgline($text, $this, true);
+		try
+		{
+    		$parameters = CLI::parseArgline($text, $this, true);
+		}
+		catch (\Throwable $ex)
+		{
+		    $message->rply('err_cli', [$ex->getMessage()]);
+		    return false;
+		}
 		
 		if ($parameters === false)
 		{
@@ -450,7 +495,7 @@ abstract class DOG_Command extends MethodForm
 		    {
 		        if ($gdt->hasError())
 		        {
-		            $errors[] = $gdt->error;
+		            $errors[] = $gdt->displayLabel() . ': ' . $gdt->error;
 		        }
 		    }
 		    $message->rply('err_cli', [implode(' ', $errors)]);
@@ -470,12 +515,17 @@ abstract class DOG_Command extends MethodForm
 	    
 	    # Sort them by type of param, positional or optionally.
 	    uasort($parameters, function(GDT $a, GDT $b) {
-	        $positionalA = $a->notNull && ($a->initial === null) ? 1 : 0;
-	        $positionalB = $b->notNull && ($b->initial === null) ? 1 : 0;
+	        $positionalA = $a->isPositional() ? 1 : 0;
+	        $positionalB = $b->isPositional() ? 1 : 0;
 	        return $positionalA - $positionalB;
 	    });
 	    
 	    return $parameters;
+	}
+	
+	public function getHelpText(DOG_Message $message)
+	{
+	    return $this->getDescription();
 	}
 	
 	public function getUsageText(DOG_Message $message)
@@ -484,7 +534,7 @@ abstract class DOG_Command extends MethodForm
 	    
 	    foreach ($this->getParametersSorted() as $gdt)
 	    {
-	        if (!$gdt->editable)
+	        if ((!$gdt->editable) || (!$gdt->cli))
 	        {
 	            continue;
 	        }
@@ -497,7 +547,7 @@ abstract class DOG_Command extends MethodForm
 	        
 	        if (!$positional)
 	        {
-	            $nameparam = "--{$gdt->name}=";
+	            $nameparam = "--{$gdt->displayCLILabel()}=";
 	        }
 	        
 	        $brk_open = $positional ? '<' : '[<';
@@ -513,16 +563,75 @@ abstract class DOG_Command extends MethodForm
 	        }
 	        else
 	        {
-	            $name = $gdt->name;
+	            $name = $gdt->gdoHumanName();
 	        }
 	        $usage[] = $brk_open . $dots . $nameparam . $name . $dots . $brk_close;
 	    }
-	    return $message->t('usage', [$this->trigger, implode(' ', $usage)]);
+	    return $message->t('usage', [
+	        $this->getCLITrigger() . $this->getButtonChoice(), implode(' ', $usage)]);
 	}
 	
-	public function getHelpText(DOG_Message $message)
+	private function getButtonChoice()
 	{
-	    return $message->t("dog_help_{$this->trigger}");
+	    $choices = [];
+	    $submit = false;
+	    $buttons = $this->getButtons();
+	    foreach ($buttons as $button)
+	    {
+	        if ($button->name !== 'submit')
+	        {
+	            $choices[] = $button->displayCLILabel();
+	        }
+	        else
+	        {
+	            $submit = true;
+	        }
+	    }
+	    
+	    if (count($choices))
+	    {
+	        if ($submit)
+	        {
+	            array_unshift($choices, t('submit'));
+	        }
+	        
+	        return sprintf('.[%s]', implode('|', $choices));
+	    }
+	}
+	
+	private function getDefaultButtonLabel()
+	{
+	    $buttons = $this->getForm()->actions()->getFieldsRec();
+	    if ($button = array_shift($buttons))
+	    {
+	        return $button->displayCLILabel();
+	    }
+	    return t('submit');
+	}
+	
+	private function getButtonByLabel($label)
+	{
+	    foreach ($this->getForm()->actions()->getFieldsRec() as $button)
+	    {
+	        $myLabel = $button->displayCLILabel();
+	        if (strcasecmp($myLabel, $label) === 0)
+	        {
+	            return $button->name;
+	        }
+	    }
+	}
+	
+	private function hasPositionalCLIParameters()
+	{
+	    foreach ($this->gdoParameterCache() as $gdt)
+	    {
+	        if ($gdt->isPositional()
+	            && $gdt->notNull && ($gdt->initial===null))
+	        {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 	
 }

@@ -5,10 +5,9 @@ use GDO\Dog\DOG_Message;
 
 class Ping extends DOG_Command
 {
-    public $group = 'Test';
     public $trigger = 'ping';
     
-    public function dogExecute(DOG_Message $message, ...$argv)
+    public function dogExecute(DOG_Message $message)
     {
     	return $message->rply('dog_pong');
     }

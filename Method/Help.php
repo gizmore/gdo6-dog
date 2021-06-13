@@ -3,9 +3,11 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\GDT_DogCommand;
+use GDO\Util\Strings;
 
 class Help extends DOG_Command
 {
+    public $group = '';
     public $trigger = 'help';
     
     public function isWebMethod() { return true; }
@@ -13,7 +15,7 @@ class Help extends DOG_Command
     public function gdoParameters()
     {
         return array(
-            GDT_DogCommand::make('command')
+            GDT_DogCommand::make('command')->positional(),
         );
     }
     
@@ -34,31 +36,45 @@ class Help extends DOG_Command
 	    $grouped = [];
 	    foreach (DOG_Command::$COMMANDS as $command)
 	    {
-	        if ($command->trigger && $command->canExecute($message))
+	        $trigger = $command->getCLITrigger();
+	        $group = Strings::substrTo($trigger, '.', 'Dog');
+	        $trigger = Strings::substrFrom($trigger, '.', $trigger);
+	        if ($trigger && $command->canExecute($message))
 	        {
-    	        if (!isset($grouped[$command->group]))
+    	        if (!isset($grouped[$group]))
     	        {
-    	            $grouped[$command->group] = [];
+    	            $grouped[$group] = [];
     	        }
     	        
-    	        $grouped[$command->group][] = $command->trigger;
+    	        $grouped[$group][] = $trigger;
 	        }
-	        
+	    }
+	    
+	    ksort($grouped);
+	    foreach ($grouped as $k => $group)
+	    {
+	        asort($group);
+	        $grouped[$k] = $group;
 	    }
 	    
 	    $b = "\x02";
 	    $groupOut = [];
 	    foreach ($grouped as $group => $triggers)
 	    {
-	        $groupOut[] = sprintf("{$b}$group{$b}: %s.", implode(', ', $triggers));
+	        $groupOut[] = sprintf("{$b}$group{$b}: %s.",
+	           implode(', ', $triggers));
 	    }
 	    
-	    $message->user->sendNotice($message->t('msg_dog_overall_help', [implode(' ', $groupOut)]));
+	    $message->user->sendNotice(
+	        $message->t('msg_dog_overall_help', [
+	            implode(' ', $groupOut)]));
 	}
 
 	private function showHelpFor(DOG_Message $message, DOG_Command $command)
 	{
-	    $message->rply('msg_dog_help', [$command->getUsageText($message), $command->getHelpText($message)]);
+	    $message->rply('msg_dog_help', [
+	        $command->getUsageText($message),
+	        $command->getHelpText($message)]);
 	}
 	
 }

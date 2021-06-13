@@ -8,7 +8,6 @@ use GDO\Dog\Dog;
 
 final class Enable extends DOG_Command
 {
-    public $group = "Config";
     public $trigger = 'enable';
     
     public function getPermission() { return Dog::OPERATOR; }
@@ -28,21 +27,21 @@ final class Enable extends DOG_Command
         {
             if (!$disable->isDisabledRoom($message, $command))
             {
-                return $message->rply('msg_dog_not_disabled', [$command->trigger]);
+                return $message->rply('msg_dog_not_disabled', [$command->getCLITrigger()]);
             }
-            $key = 'disable_'.$command->gdoClassName();
+            $key = 'disable_'.$command->getCLITrigger();
             $disable->setConfigValueRoom($message->room, $key, false);
-            return $message->rply('msg_dog_enabled');
+            return $message->rply('msg_dog_enabled', [$command->getCLITrigger()]);
         }
         else
         {
             if (!$disable->isDisabledServer($message, $command))
             {
-                return $message->rply('msg_dog_not_disabled', [$command->trigger]);
+                return $message->rply('msg_dog_not_disabled', [$command->getCLITrigger()]);
             }
-            $key = 'disable_'.$command->gdoClassName();
+            $key = 'disable_'.$command->getCLITrigger();
             $disable->setConfigValueServer($message->server, $key, false);
-            return $message->rply('msg_dog_enabled');
+            return $message->rply('msg_dog_enabled', [$command->getCLITrigger()]);
         }
     }
     

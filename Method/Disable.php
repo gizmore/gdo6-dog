@@ -9,7 +9,6 @@ use GDO\Dog\Dog;
 
 final class Disable extends DOG_Command
 {
-    public $group = "Config";
     public $trigger = 'disable';
     
     public function getPermission() { return Dog::OPERATOR; }
@@ -34,7 +33,7 @@ final class Disable extends DOG_Command
         $conf = [];
         foreach (DOG_Command::$COMMANDS_T as $command)
         {
-            $name = 'disable_'.$command->trigger;
+            $name = 'disable_'.$command->getCLITrigger();
             $conf[] = GDT_Checkbox::make($name)->notNull()->initial('0');
         }
         return $conf;
@@ -45,7 +44,7 @@ final class Disable extends DOG_Command
         $conf = [];
         foreach (DOG_Command::$COMMANDS_T as $command)
         {
-            $name = 'disable_'.$command->trigger;
+            $name = 'disable_'.$command->getCLITrigger();
             $conf[] = GDT_Checkbox::make($name)->notNull()->initial('0');
         }
         return $conf;
@@ -65,13 +64,13 @@ final class Disable extends DOG_Command
         
     public function isDisabledRoom(DOG_Message $message, DOG_Command $command)
     {
-        $key = 'disable_'.$command->trigger;
+        $key = 'disable_'.$command->getCLITrigger();
         return $this->getConfigValueRoom($message->room, $key);
     }
     
     public function isDisabledServer(DOG_Message $message, DOG_Command $command)
     {
-        $key = 'disable_'.$command->trigger;
+        $key = 'disable_'.$command->getCLITrigger();
         return $this->getConfigValueServer($message->server, $key);
     }
     
@@ -86,21 +85,21 @@ final class Disable extends DOG_Command
         {
             if ($this->isDisabledRoom($message, $command))
             {
-                return $message->rply('msg_dog_already_disabled', [$command->trigger]);
+                return $message->rply('msg_dog_already_disabled', [$command->getCLITrigger()]);
             }
-            $key = 'disable_'.$command->trigger;
+            $key = 'disable_'.$command->getCLITrigger();
             $this->setConfigValueRoom($message->room, $key, true);
-            return $message->rply('msg_dog_disabled');
+            return $message->rply('msg_dog_disabled', [$command->getCLITrigger()]);
         }
         else
         {
             if ($this->isDisabledServer($message, $command))
             {
-                return $message->rply('msg_dog_already_disabled', [$command->trigger]);
+                return $message->rply('msg_dog_already_disabled', [$command->getCLITrigger()]);
             }
-            $key = 'disable_'.$command->trigger;
+            $key = 'disable_'.$command->getCLITrigger();
             $this->setConfigValueServer($message->server, $key, true);
-            return $message->rply('msg_dog_disabled');
+            return $message->rply('msg_dog_disabled', [$command->getCLITrigger()]);
         }
     }
     

@@ -57,6 +57,7 @@ class Bash extends DOG_Connector
     {
         $user = DOG_User::getOrCreateUser(self::$INSTANCE, get_current_user());
         GDO_User::setCurrent($user->getGDOUser());
+        $user->login();
         Trans::setISO($user->getGDOUser()->getLangISO());
         return $user;
     }

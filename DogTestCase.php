@@ -78,7 +78,6 @@ class DogTestCase extends TestCase
     {
         try
         {
-//             ob_implicit_flush(false);
             ob_start();
             # Reset vars
             $_GET = $_POST = $_REQUEST = [];
@@ -92,12 +91,11 @@ class DogTestCase extends TestCase
         }
         catch (\Throwable $ex)
         {
-            $response = $ex->__toString();
+            return $ex->getMessage();
         }
         finally
         {
             ob_end_clean();
-//             ob_implicit_flush(true);
         }
     }
     

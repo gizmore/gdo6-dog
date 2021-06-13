@@ -9,7 +9,7 @@ use GDO\Util\Arrays;
 
 final class Lang extends DOG_Command
 {
-    public $group = 'Config';
+//     public $group = 'Config';
     public $trigger = 'lang';
     
     public function gdoParameters()

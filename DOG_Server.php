@@ -13,6 +13,7 @@ use GDO\DB\GDT_CreatedBy;
 use GDO\DB\GDT_UInt;
 use GDO\Core\Application;
 use GDO\Util\Common;
+use GDO\Util\Random;
 
 final class DOG_Server extends GDO
 {
@@ -62,6 +63,7 @@ final class DOG_Server extends GDO
     
     public function getUsername() { return $this->getVar('serv_username'); }
     public function getPassword() { return $this->getVar('serv_password'); }
+    public function nextUsername() { return $this->getUsername().'_'.Random::randomKey(4, Random::NUMERIC); }
     
     public function displayName()
     {

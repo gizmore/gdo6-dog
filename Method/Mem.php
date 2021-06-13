@@ -12,7 +12,6 @@ use GDO\File\FileUtil;
  */
 final class Mem extends DOG_Command
 {
-    public $group = 'Stats';
     public $trigger = 'mem';
     
     public function isWebMethod() { return true; }

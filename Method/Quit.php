@@ -9,7 +9,6 @@ use GDO\Dog\DOG_Server;
 
 final class Quit extends DOG_Command
 {
-    public $group = 'Maintainance';
     public $trigger = 'die';
     
     public function getPermission() { return Dog::OWNER; }

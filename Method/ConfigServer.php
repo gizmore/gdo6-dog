@@ -9,7 +9,6 @@ use GDO\Dog\Dog;
 
 final class ConfigServer extends DOG_Command
 {
-    public $group = 'Config';
     public $trigger = 'confs';
     
     public function getPermission() { return Dog::OPERATOR; } 

@@ -46,6 +46,7 @@ final class DOG_User extends GDO
 	public function displayFullName() { return sprintf('%s{%s}', $this->displayName(), $this->getServerID()); }
 
 	public function isOnline() { return $this->getServer()->hasUser($this); }
+	public function isService() { return $this->getVar('doguser_service'); }
 	
 	############
 	### Send ###
@@ -140,4 +141,5 @@ final class DOG_User extends GDO
 	{
 	    $this->authenticated = false;
 	}
+
 }

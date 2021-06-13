@@ -2,13 +2,17 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
-use GDO\DB\GDT_Object;
 use GDO\DB\GDT_AutoInc;
 use GDO\DB\GDT_String;
 use GDO\Core\GDT_Secret;
 use GDO\DB\GDT_Char;
 use GDO\Language\GDT_Language;
+use GDO\Language\GDO_Language;
 
+/**
+ * A chatroom.
+ * @author gizmore
+ */
 class DOG_Room extends GDO
 {
     /**
@@ -23,7 +27,7 @@ class DOG_Room extends GDO
     {
         return array(
             GDT_AutoInc::make('room_id'),
-            GDT_Object::make('room_server')->table(DOG_Server::table())->notNull(),
+            GDT_Server::make('room_server')->notNull(),
             GDT_String::make('room_name')->notNull()->max(64),
             GDT_Secret::make('room_password')->max(64),
             GDT_Char::make('room_trigger')->length(1)->initial('$')->notNull(),
@@ -47,6 +51,12 @@ class DOG_Room extends GDO
     public function getName() { return  $this->getVar('room_name'); }
     public function getPassword() { return $this->getVar('room_password'); }
     public function getTrigger() { return  $this->getVar('room_trigger'); }
+    
+    /**
+     * @return GDO_Language
+     */
+    public function getLanguage() { return $this->getValue('room_lang'); }
+    public function getLanguageISO() { return $this->getVar('room_lang'); }
     
     ############
     ### Send ###

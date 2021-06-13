@@ -7,6 +7,7 @@ use GDO\DB\Database;
 use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
 use GDO\UI\GDT_Page;
+use GDO\Util\CLI;
 
 require 'protected/config_dog.php';
 require 'GDO6.php';
@@ -27,7 +28,7 @@ Debug::enableExceptionHandler();
 Debug::setDieOnError(false);
 Debug::setMailOnError(GDO_ERROR_MAIL);
 Database::init();
-
+CLI::setServerVars();
 GDT_Page::make();
 
 $modules = (new ModuleLoader(GDO_PATH.'GDO/'))->loadModules(true);

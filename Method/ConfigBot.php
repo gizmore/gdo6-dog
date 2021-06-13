@@ -9,7 +9,6 @@ use GDO\Dog\Dog;
 
 final class ConfigBot extends DOG_Command
 {
-    public $group = 'Config';
     public $trigger = 'confb';
     
     public function getPermission() { return Dog::OWNER; } 
