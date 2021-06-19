@@ -601,23 +601,29 @@ abstract class DOG_Command extends MethodForm
 	
 	private function getDefaultButtonLabel()
 	{
-	    $buttons = $this->getForm()->actions()->getFieldsRec();
-	    if ($button = array_shift($buttons))
+	    if ($form = $this->getForm())
 	    {
-	        return $button->displayCLILabel();
+    	    $buttons = $form->actions()->getFieldsRec();
+    	    if ($button = array_shift($buttons))
+    	    {
+    	        return $button->displayCLILabel();
+    	    }
 	    }
 	    return t('submit');
 	}
 	
 	private function getButtonByLabel($label)
 	{
-	    foreach ($this->getForm()->actions()->getFieldsRec() as $button)
+	    if ($form = $this->getForm())
 	    {
-	        $myLabel = $button->displayCLILabel();
-	        if (strcasecmp($myLabel, $label) === 0)
-	        {
-	            return $button->name;
-	        }
+    	    foreach ($form->actions()->getFieldsRec() as $button)
+    	    {
+    	        $myLabel = $button->displayCLILabel();
+    	        if (strcasecmp($myLabel, $label) === 0)
+    	        {
+    	            return $button->name;
+    	        }
+    	    }
 	    }
 	}
 	

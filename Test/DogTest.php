@@ -32,7 +32,7 @@ final class DogTest extends DogTestCase
     {
         $bash = Bash::instance()->getConnector();
         assertTrue($bash instanceof Bash);
-        $response = $this->bashCommand("test.ping.");
+        $response = $this->bashCommand("ping");
         assertMatchesRegularExpression('/pong/is', $response, "Test PING via Bash connector.");
     }
     
@@ -48,13 +48,13 @@ final class DogTest extends DogTestCase
     
     public function testCoreMethods()
     {
-        $r = $this->bashCommand("core.whoami.");
+        $r = $this->bashCommand("core.whoami");
         assertStringContainsString('gizmore{1}', $r, 'Test the whoami command.');
     }
     
     public function testHelpCommand()
     {
-        $r = $this->bashCommand("dog.help.");
+        $r = $this->bashCommand("help");
         assertStringContainsString('you can execute the following commands', $r, 'Test the help command for command overview.');
     }
     
