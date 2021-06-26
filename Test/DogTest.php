@@ -4,12 +4,15 @@ namespace GDO\Dog\Test;
 use GDO\Dog\Dog;
 use function PHPUnit\Framework\assertTrue;
 use GDO\Dog\Connector\Bash;
-use GDO\Dog\DogTestCase;
 use function PHPUnit\Framework\assertMatchesRegularExpression;
 use GDO\User\GDO_UserPermission;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertStringContainsString;
 
+/**
+ * Basic bash connector testing and dog user creation
+ * @author gizmore
+ */
 final class DogTest extends DogTestCase
 {
     protected function setUp() : void

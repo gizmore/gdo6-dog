@@ -1,15 +1,17 @@
 <?php
-namespace GDO\Dog;
+namespace GDO\Dog\Test;
 
-use GDO\Tests\MethodTest;
-use GDO\Tests\TestCase;
-use GDO\User\GDO_User;
-use GDO\User\GDO_UserPermission;
 use GDO\Core\Application;
 use GDO\Core\GDT_Response;
+use GDO\Dog\DOG_User;
+use GDO\Dog\Dog;
 use GDO\Dog\Connector\Bash;
-use GDO\Util\Strings;
+use GDO\Tests\MethodTest;
+use GDO\Tests\TestCase;
 use GDO\UI\GDT_Page;
+use GDO\User\GDO_User;
+use GDO\User\GDO_UserPermission;
+use GDO\Util\Strings;
 
 class DogTestCase extends TestCase
 {
@@ -25,6 +27,12 @@ class DogTestCase extends TestCase
         $username = Strings::substrTo($user->getName(), '{', $user->getName());
         $this->doguser = DOG_User::getOrCreateUser($this->getServer(), $username);
         return parent::user($user);
+    }
+    
+    public function dogUser($username)
+    {
+        $user = GDO_User::getByName($username);
+        return $this->user($user);
     }
     
     public function userGizmore1()
