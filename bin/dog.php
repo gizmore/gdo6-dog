@@ -9,8 +9,8 @@ use GDO\Dog\DogApp;
 use GDO\UI\GDT_Page;
 use GDO\Util\CLI;
 
-require 'protected/config_dog.php';
 require 'GDO6.php';
+require 'protected/config_dog.php';
 $dog = new DogApp();
 $dog = new Dog();
 chdir(GDO_PATH);
