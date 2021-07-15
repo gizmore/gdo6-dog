@@ -1,6 +1,7 @@
 <?php
 namespace GDO\Dog;
 
+use GDO\Date\Time;
 use GDO\Language\Trans;
 use GDO\User\GDO_User;
 
@@ -40,8 +41,10 @@ class DOG_Message
 	public function user(DOG_User $user)
 	{
 	    $this->user = $user;
-	    GDO_User::setCurrent($user->getGDOUser());
-	    Trans::setISO($user->getGDOUser()->getLangISO());
+	    $gdoUser = $user->getGDOUser();
+	    GDO_User::setCurrent($gdoUser);
+	    Trans::setISO($gdoUser->getLangISO());
+	    Time::setTimezone($gdoUser->getTimezone());
 	    return $this;
 	}
 
