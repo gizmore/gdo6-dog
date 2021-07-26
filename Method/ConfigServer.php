@@ -53,31 +53,34 @@ final class ConfigServer extends DOG_Command
     
     private function showConfigVar(DOG_Message $message, DOG_Command $command, $key)
     {
-        $var = $command->getConfigVarServer($message->user, $key);
-        if (!($command->getConfigGDTUser($key)))
+        if (!($command->getConfigGDTServer($key)))
         {
             return $message->rply('err_dog_var_unknown', [$command->trigger, $key] );
         }
+        $var = $command->getConfigVarServer($message->server, $key);
         return $message->rply('msg_dog_config_key', [$command->trigger, $var]);
     }
     
     private function setConfigVar(DOG_Message $message, DOG_Command $command, $key, $var)
     {
-        $old = $command->getConfigVarServer($message->user, $key);
-        if (!($gdt = $command->getConfigGDTUser($key)))
+        if (!($gdt = $command->getConfigGDTServer($key)))
         {
             return $message->rply('err_dog_var_unknown', [$command->trigger, $key]);
         }
         
-        $value = $gdt->getValue();
+        $old = $command->getConfigVarServer($message->server, $key);
+        $value = $gdt->toValue($gdt->inputToVar($var));
         if (!$gdt->validate($value))
         {
             return $message->rply('err_dog_config_invalid', [$key, $command->trigger, $var]);
         }
+        $new = $gdt->toVar($value);
         
-        $command->setConfigValueServer($message->user, $key, $value);
+        $command->setConfigValueServer($message->server, $key, $value);
 
-        return $message->rply('msg_dog_config_set', [$key, $command->trigger, $old, $var]);
+        return $message->rply('msg_dog_config_set', [
+            $key, $command->trigger,
+            $gdt->displayValue($old), $gdt->displayValue($new)]);
     }
     
 }

@@ -65,6 +65,9 @@ final class DOG_Server extends GDO
     public function getPassword() { return $this->getVar('serv_password'); }
     public function nextUsername() { return $this->getUsername().'_'.Random::randomKey(4, Random::NUMERIC); }
     
+    public function getNickname() { return $this->getConnector()->getNickname(); }
+    public function getDog() { return DOG_User::getUser($this, $this->getNickname()); }
+    
     public function displayName()
     {
         $b = $this->isConnected() ? "\x02" : '';

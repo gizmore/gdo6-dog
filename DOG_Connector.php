@@ -93,6 +93,11 @@ abstract class DOG_Connector
     	}
     }
     
+    public function getNickname()
+    {
+        return Module_Dog::instance()->cfgDefaultNickname();
+    }
+    
     public abstract function connect();
 
     public abstract function disconnect($reason);

@@ -6,7 +6,10 @@ use GDO\DB\GDT_Name;
 
 /**
  * Dog chatbot.
+ * 
  * @author gizmore
+ * @version 6.10.4
+ * @since 6.8.0
  */
 final class Module_Dog extends GDO_Module
 {
@@ -19,23 +22,23 @@ final class Module_Dog extends GDO_Module
 	
 	public function getConfig()
 	{
-		return array(
+		return [
 		    GDT_Name::make('default_nickname')->initial('Dog'),
-		);
+		];
 	}
-	
-	public function getDefaultNickname() { return $this->getConfigVar('default_nickname'); }
+	public function cfgDefaultNickname() { return $this->getConfigVar('default_nickname'); }
 
 	public function getClasses()
 	{
-		return array(
-			'GDO\\Dog\\DOG_Server',
-			'GDO\\Dog\\DOG_Room',
-		    'GDO\\Dog\\DOG_User',
-		    'GDO\\Dog\\DOG_ConfigBot',
-		    'GDO\\Dog\\DOG_ConfigRoom',
-		    'GDO\\Dog\\DOG_ConfigServer',
-		    'GDO\\Dog\\DOG_ConfigUser',
-		);
+		return [
+		    DOG_Server::class,
+		    DOG_Room::class,
+		    DOG_User::class,
+		    DOG_ConfigBot::class,
+		    DOG_ConfigRoom::class,
+		    DOG_ConfigServer::class,
+		    DOG_ConfigUser::class,
+		];
 	}
+	
 }

@@ -47,7 +47,7 @@ abstract class DOG_Command extends MethodForm
 	### Config Bot ###
 	##################
 	
-	public function getDefaultNickname() { return Module_Dog::instance()->getDefaultNickname(); }
+	public function getDefaultNickname() { return Module_Dog::instance()->cfgDefaultNickname(); }
 	
 	/**
 	 * @return GDT[]
@@ -96,18 +96,22 @@ abstract class DOG_Command extends MethodForm
 	public function setConfigVarBot($key, $var)
 	{
 	    $gdt = $this->getConfigGDTBot($key)->var($var);
-	    return $this->setConfigValueBot($key, $gdt->getValue());
+	    $value = $gdt->toVar($gdt->inputToVar($var));
+	    return $this->setConfigValueBot($key, $value);
 	}
 	
 	public function setConfigValueBot($key, $value)
 	{
 	    $gdt = $this->getConfigGDTBot($key);
-	    $gdt->value($value);
-	    DOG_ConfigBot::blank(array(
+	    if (!$gdt->validate($value))
+	    {
+	        return false;
+	    }
+	    DOG_ConfigBot::blank([
 	        'confb_command' => $this->gdoClassName(),
 	        'confb_key' => $key,
-	        'confb_var' => $gdt->var,
-	    ))->replace();
+	        'confb_var' => $gdt->toVar($value),
+	    ])->replace();
 	    return true;
 	}
 	
@@ -161,19 +165,23 @@ abstract class DOG_Command extends MethodForm
 	public function setConfigVarUser(DOG_User $user, $key, $var)
 	{
 	    $gdt = $this->getConfigGDTUser($key);
-	    return $this->setConfigValueUser($user, $key, $gdt->getValue());
+	    $value = $gdt->toValue($gdt->inputToVar($var));
+	    return $this->setConfigValueUser($user, $key, $value);
 	}
 	
 	public function setConfigValueUser(DOG_User $user, $key, $value)
 	{
 	    $gdt = $this->getConfigGDTUser($key);
-	    $gdt->value($value);
-	    DOG_ConfigUser::blank(array(
+	    if (!$gdt->validate($value))
+	    {
+	        return false;
+	    }
+	    DOG_ConfigUser::blank([
 	        'confu_command' => $this->gdoClassName(),
 	        'confu_key' => $key,
 	        'confu_user' => $user->getID(),
-	        'confu_var' => $gdt->var,
-	    ))->replace();
+	        'confu_var' => $gdt->toVar($value),
+	    ])->replace();
 	    return true;
 	}
 	
@@ -221,25 +229,30 @@ abstract class DOG_Command extends MethodForm
 	public function getConfigValueRoom(DOG_Room $room, $key)
 	{
 	    $gdt = $this->getConfigGDTRoom($key);
-	    return $gdt->getValue();
+	    $var = $this->getConfigVarRoom($room, $key);
+	    return $gdt->toValue($var);
 	}
 	
 	public function setConfigVarRoom(DOG_Room $room, $key, $var)
 	{
 	    $gdt = $this->getConfigGDTRoom($key);
-	    return $this->setConfigValueRoom($key, $gdt->getValue());
+	    $value = $gdt->toValue($gdt->inputToVar($var));
+	    return $this->setConfigValueRoom($room, $key, $value);
 	}
 	
 	public function setConfigValueRoom(DOG_Room $room, $key, $value)
 	{
 	    $gdt = $this->getConfigGDTRoom($key);
-	    $gdt->value($value);
-	    DOG_ConfigRoom::blank(array(
+	    if (!$gdt->validate($value))
+	    {
+	        return false;
+	    }
+	    DOG_ConfigRoom::blank([
 	        'confr_command' => $this->gdoClassName(),
 	        'confr_key' => $key,
 	        'confr_room' => $room->getID(),
-	        'confr_var' => $gdt->var,
-	    ))->replace();
+	        'confr_var' => $gdt->toVar($value),
+	    ])->replace();
 	    return true;
 	}
 	
@@ -288,25 +301,30 @@ abstract class DOG_Command extends MethodForm
 	public function getConfigValueServer(DOG_Server $server, $key)
 	{
 	    $gdt = $this->getConfigGDTServer($key);
-	    return $gdt->getValue();
+	    $var = $this->getConfigVarServer($server, $key);
+	    return $gdt->toValue($var);
 	}
 	
 	public function setConfigVarServer(DOG_Server $server, $key, $var)
 	{
 	    $gdt = $this->getConfigGDTServer($key);
-	    return $this->setConfigValueServer($server, $key, $gdt->getValue());
+	    $value = $gdt->toValue($gdt->inputToVar($var));
+	    return $this->setConfigValueServer($server, $key, $value);
 	}
 	
 	public function setConfigValueServer(DOG_Server $server, $key, $value)
 	{
 	    $gdt = $this->getConfigGDTServer($key);
-	    $gdt->value($value);
-	    DOG_ConfigServer::blank(array(
+	    if (!$gdt->validate($value))
+	    {
+	        return false;
+	    }
+	    DOG_ConfigServer::blank([
 	        'confs_command' => $this->gdoClassName(),
 	        'confs_key' => $key,
 	        'confs_server' => $server->getID(),
-	        'confs_var' => $gdt->var,
-	    ))->replace();
+	        'confs_var' => $gdt->toVar($value),
+	    ])->replace();
 	    return true;
 	}
 	

@@ -10,7 +10,6 @@ use GDO\File\Filewalker;
 use GDO\Core\ModuleLoader;
 use GDO\Core\GDO_Module;
 use GDO\Install\Installer;
-use GDO\User\GDO_User;
 use GDO\Cronjob\MethodCronjob;
 use GDO\Core\GDT_Error;
 use GDO\Dog\Connector\Bash;
@@ -31,6 +30,8 @@ final class Dog
     const OPERATOR = 'operator';
     const HALFOP = 'halfop';
     const VOICE = 'voice';
+    
+    const MICROSLEEP = 20000;
     
     public $running = true;
     
@@ -144,6 +145,9 @@ final class Dog
         $this->servers = DOG_Server::table()->all();
 
     	DOG_Command::sortCommands();
+    	
+//     	DOG_Command::readConfig();
+    	
 //     	foreach (DOG_Command::$COMMANDS as $command)
 //     	{
 //     	    $command->init();
@@ -161,7 +165,7 @@ final class Dog
                 $lastIPC = Application::$TIME;
                 $this->ipcTimer();
             }
-            usleep(25);
+            usleep(self::MICROSLEEP);
         }
         
         while ($this->hasPendingConnections())
@@ -273,7 +277,7 @@ final class Dog
     		    {
 //     		        DOG_Message::$LAST_MESSAGE->server->getConnector()->sendToAdmin($ex->getMessage());
     		        echo GDT_Error::responseException($ex)->renderCLI();
-//     		        ob_flush();
+    		        ob_flush();
     		        Logger::logException($ex);
     		    }
     		}

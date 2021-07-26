@@ -113,6 +113,11 @@ class DOG_Room extends GDO
     #############
     ### Users ###
     #############
+    public function hasUser(DOG_User $user=null)
+    {
+        return $user ? isset($this->users[$user->getID()]) : false;
+    }
+    
     public function addUser(DOG_User $user)
     {
         $userId = $user->getID();
@@ -122,9 +127,9 @@ class DOG_Room extends GDO
         }
     }
     
-    public function hasUser(DOG_User $user=null)
+    public function removeUser(DOG_User $user)
     {
-        return $user ? isset($this->users[$user->getID()]) : null;
+        unset($this->users[$user->getID()]);
     }
     
 }
