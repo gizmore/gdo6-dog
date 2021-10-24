@@ -89,7 +89,7 @@ class DogTestCase extends TestCase
             ob_start();
             # Reset vars
             $_GET = $_POST = $_REQUEST = [];
-            $_REQUEST['fmt'] = 'cli';
+            $_REQUEST['_fmt'] = 'cli';
             GDT_Response::$CODE = 200;
             GDT_Page::$INSTANCE->reset();
             # run cmd
