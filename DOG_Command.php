@@ -10,7 +10,7 @@ use GDO\Core\GDT;
 use GDO\Dog\Method\Disable;
 use GDO\DB\GDT_Enum;
 use GDO\UI\GDT_Confirm;
-use GDO\Util\CLI;
+use GDO\CLI\CLI;
 use GDO\Core\Website;
 
 abstract class DOG_Command extends MethodForm

@@ -7,7 +7,7 @@ use GDO\DB\Database;
 use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
 use GDO\UI\GDT_Page;
-use GDO\Util\CLI;
+use GDO\CLI\CLI;
 
 require 'GDO6.php';
 require 'protected/config_dog.php';
