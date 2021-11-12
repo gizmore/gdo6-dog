@@ -19,6 +19,10 @@ final class Module_Dog extends GDO_Module
 
 	public function onInstall() { DOG_Install::onInstall($this); }
 	public function onLoadLanguage() { return $this->loadLanguage('lang/dog'); }
+	public function getDependencies()
+	{
+		return ['Cronjob'];
+	}
 	
 	public function getConfig()
 	{
