@@ -329,10 +329,7 @@ final class Dog
     public function hookCacheInvalidate($table, $id)
     {
         $table = GDO::tableFor($table);
-        if ($object = $table->reload($id))
-        {
-//             $this->tempReset($object);
-        }
+        $table->reload($id);
     }
 
 //     private function tempReset(GDO $gdo)
