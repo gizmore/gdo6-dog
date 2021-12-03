@@ -60,11 +60,6 @@ final class DOG_CommandWrapper extends DOG_Command
         return $this->method->gdoParameters();
     }
     
-    public function allParameters()
-    {
-        return $this->method->allParameters();
-    }
-    
     public function dogExecute(DOG_Message $message, ...$args)
     {
         try
