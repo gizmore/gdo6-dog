@@ -24,7 +24,7 @@ final class Exec extends DOG_Command
 	    # Remove trigger char if inside room.
 	    if ($message->room)
 	    {
-	        if (!Strings::startsWith($text, $message->room->getTrigger()))
+	        if (!str_starts_with($text, $message->room->getTrigger()))
 	        {
 	            return;
 	        }
