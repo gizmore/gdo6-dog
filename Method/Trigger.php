@@ -3,7 +3,7 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\Dog;
-use GDO\DB\GDT_Char;
+use GDO\Core\GDT_Char;
 
 /**
  * Change the trigger char for a room.
@@ -15,11 +15,11 @@ final class Trigger extends DOG_Command
     public $group = 'Config';
     public $trigger = 'trigger';
     
-    public function getPermission() { return Dog::HALFOP; }
+    public function getPermission() : ?string { return Dog::HALFOP; }
     
     public function isPrivateMethod() { return false; }
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_Char::make('trigger')->length(1)->notNull(),

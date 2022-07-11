@@ -37,8 +37,8 @@ final class DOG_CommandWrapper extends DOG_Command
         }
     }
     
-    public function beforeExecute() { return $this->method->beforeExecute(); }
-    public function isUserRequired() { return $this->method->isUserRequired(); }
+    public function beforeExecute() : void { return $this->method->beforeExecute(); }
+    public function isUserRequired() : bool { return $this->method->isUserRequired(); }
     public function isGuestAllowed() { return $this->method->isGuestAllowed(); }
     
     public function formName()
@@ -55,7 +55,7 @@ final class DOG_CommandWrapper extends DOG_Command
         return $this->method->gdoParameterCache();
     }
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return $this->method->gdoParameters();
     }

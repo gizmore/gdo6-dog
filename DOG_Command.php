@@ -8,7 +8,7 @@ use GDO\Util\Strings;
 use GDO\Util\Arrays;
 use GDO\Core\GDT;
 use GDO\Dog\Method\Disable;
-use GDO\DB\GDT_Enum;
+use GDO\Core\GDT_Enum;
 use GDO\UI\GDT_Confirm;
 use GDO\CLI\CLI;
 use GDO\Core\Website;
@@ -38,7 +38,7 @@ abstract class DOG_Command extends MethodForm
 	    return strtolower($t);
 	}
 	
-	public function getID()
+	public function getID() : ?string
 	{
 	    return $this->getCLITrigger();
 	}
@@ -82,7 +82,7 @@ abstract class DOG_Command extends MethodForm
 	{
 	    if ($var = DOG_ConfigBot::table()->getById($this->gdoClassName(), $key))
 	    {
-	        return $var->getVar('confb_var');
+	        return $var->gdoVar('confb_var');
 	    }
 	    return $this->getConfigGDTBot($key)->var;
 	}
@@ -151,7 +151,7 @@ abstract class DOG_Command extends MethodForm
 	{
 	    if ($var = DOG_ConfigUser::table()->getById($this->gdoClassName(), $key, $user->getID()))
 	    {
-	        return $var->getVar('confu_var');
+	        return $var->gdoVar('confu_var');
 	    }
 	    return $this->getConfigGDTUser($key)->var;
 	}
@@ -221,7 +221,7 @@ abstract class DOG_Command extends MethodForm
 	{
 	    if ($var = DOG_ConfigRoom::table()->getById($this->gdoClassName(), $key, $room->getID()))
 	    {
-	        return $var->getVar('confr_var');
+	        return $var->gdoVar('confr_var');
 	    }
 	    return $this->getConfigGDTRoom($key)->var;
 	}
@@ -293,7 +293,7 @@ abstract class DOG_Command extends MethodForm
 	{
 	    if ($var = DOG_ConfigServer::table()->getById($this->gdoClassName(), $key, $server->getID()))
 	    {
-	        return $var->getVar('confs_var');
+	        return $var->gdoVar('confs_var');
 	    }
 	    return $this->getConfigGDTServer($key)->var;
 	}
@@ -380,7 +380,7 @@ abstract class DOG_Command extends MethodForm
 	    return array_keys(DOG_Connector::connectors());
 	}
 	
-	public function createForm(GDT_Form $form)
+	public function createForm(GDT_Form $form) : void
 	{
         $form->addFields($this->gdoParameters());
         $form->actions()->addField(GDT_Submit::make());

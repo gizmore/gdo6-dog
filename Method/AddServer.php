@@ -8,7 +8,7 @@ use GDO\Dog\GDT_Connector;
 use GDO\Dog\DOG_Connector;
 use GDO\Net\URL;
 use GDO\User\GDT_Username;
-use GDO\User\GDT_Password;
+use GDO\Crypto\GDT_Password;
 use GDO\Dog\Dog;
 
 /**
@@ -22,9 +22,9 @@ final class AddServer extends DOG_Command
 {
     public $trigger = 'add_server';
     
-    public function getPermission() { return Dog::OPERATOR; }
+    public function getPermission() : ?string { return Dog::OPERATOR; }
 	
-	public function gdoParameters()
+	public function gdoParameters() : array
 	{
 		return array(
 			GDT_Connector::make('connector')->notNull(),

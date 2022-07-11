@@ -15,7 +15,7 @@ final class RoomLanguage extends DOG_Command
     public function isRoomMethod() { return true; }
     public function isPrivateMethod() { return false; }
  
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return [
             GDT_Language::make('lang'),

@@ -4,14 +4,14 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\GDT_DogCommand;
 use GDO\Dog\DOG_Message;
-use GDO\DB\GDT_Checkbox;
+use GDO\Core\GDT_Checkbox;
 use GDO\Dog\Dog;
 
 final class Disable extends DOG_Command
 {
     public $trigger = 'disable';
     
-    public function getPermission() { return Dog::OPERATOR; }
+    public function getPermission() : ?string { return Dog::OPERATOR; }
     
     /**
      * @return self
@@ -21,7 +21,7 @@ final class Disable extends DOG_Command
         return DOG_Command::byTrigger('disable');
     }
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_DogCommand::make('command')->notNull(),

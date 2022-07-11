@@ -10,9 +10,9 @@ final class Enable extends DOG_Command
 {
     public $trigger = 'enable';
     
-    public function getPermission() { return Dog::OPERATOR; }
+    public function getPermission() : ?string { return Dog::OPERATOR; }
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_DogCommand::make('command')->notNull(),

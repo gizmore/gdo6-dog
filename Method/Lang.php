@@ -12,7 +12,7 @@ final class Lang extends DOG_Command
 //     public $group = 'Config';
     public $trigger = 'lang';
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_Language::make('language'),

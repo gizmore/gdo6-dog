@@ -12,7 +12,7 @@ class Help extends DOG_Command
     
     public function isWebMethod() { return true; }
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_DogCommand::make('command')->positional(),

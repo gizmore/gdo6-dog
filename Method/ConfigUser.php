@@ -3,16 +3,16 @@ namespace GDO\Dog\Method;
 
 use GDO\Dog\DOG_Command;
 use GDO\Dog\GDT_DogCommand;
-use GDO\DB\GDT_String;
+use GDO\Core\GDT_String;
 use GDO\Dog\DOG_Message;
 
 final class ConfigUser extends DOG_Command
 {
     public $trigger = 'confu';
     
-    public function isUserRequired() { return true; } 
+    public function isUserRequired() : bool { return true; } 
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_DogCommand::make('command')->notNull(),

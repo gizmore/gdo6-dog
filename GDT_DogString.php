@@ -1,7 +1,7 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\DB\GDT_String;
+use GDO\Core\GDT_String;
 
 /**
  * This is like a string but allows spaces / rest of message for the chatbot.

@@ -30,7 +30,7 @@ abstract class DOG_Connector
         }
     }
 
-    public function getID()
+    public function getID() : ?string
     {
         return $this->gdoShortName();
     }

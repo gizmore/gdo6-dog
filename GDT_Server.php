@@ -1,7 +1,7 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\DB\GDT_Object;
+use GDO\Core\GDT_Object;
 
 /**
  * A chat server GDT.

@@ -1,16 +1,16 @@
 <?php
 namespace GDO\Dog;
 use GDO\Core\GDO;
-use GDO\DB\GDT_AutoInc;
+use GDO\Core\GDT_AutoInc;
 use GDO\User\GDT_Username;
 use GDO\Core\GDT_Secret;
 use GDO\Net\GDT_Url;
-use GDO\DB\GDT_Checkbox;
+use GDO\Core\GDT_Checkbox;
 use GDO\Date\GDT_Duration;
 use GDO\Net\URL;
-use GDO\DB\GDT_CreatedAt;
-use GDO\DB\GDT_CreatedBy;
-use GDO\DB\GDT_UInt;
+use GDO\Core\GDT_CreatedAt;
+use GDO\Core\GDT_CreatedBy;
+use GDO\Core\GDT_UInt;
 use GDO\Core\Application;
 use GDO\Util\Common;
 use GDO\Util\Random;
@@ -38,7 +38,7 @@ final class DOG_Server extends GDO
 	###########
 	### GDO ###
 	###########
-    public function gdoColumns()
+    public function gdoColumns() : array
     {
         return array(
             GDT_AutoInc::make('serv_id'),
@@ -59,10 +59,10 @@ final class DOG_Server extends GDO
     ### Getter ###
     ##############
     public function isTLS() { return $this->getValue('serv_tls'); }
-    public function isActive() { return $this->getVar('serv_active') === '1'; }
+    public function isActive() { return $this->gdoVar('serv_active') === '1'; }
     
-    public function getUsername() { return $this->getVar('serv_username'); }
-    public function getPassword() { return $this->getVar('serv_password'); }
+    public function getUsername() { return $this->gdoVar('serv_username'); }
+    public function getPassword() { return $this->gdoVar('serv_password'); }
     public function nextUsername() { return $this->getUsername().'_'.Random::randomKey(4, Random::NUMERIC); }
     
     public function getNickname() { return $this->getConnector()->getNickname(); }
@@ -144,7 +144,7 @@ final class DOG_Server extends GDO
         $this->connectionAttemptNext =  Application::$TIME + $wait;
     }
     
-    public function getConnectorName() { return $this->getVar('serv_connector'); }
+    public function getConnectorName() { return $this->gdoVar('serv_connector'); }
     /**
      * @return \GDO\Dog\DOG_Connector
      */

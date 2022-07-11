@@ -1,7 +1,7 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\DB\GDT_Object;
+use GDO\Core\GDT_Object;
 use GDO\Core\GDO;
 use GDO\Util\Strings;
 use GDO\Util\Arrays;
@@ -171,7 +171,7 @@ final class GDT_DogUser extends GDT_Object
     /**
      * Validate object first, then options.
      */
-    public function validate($value)
+    public function validate($value) : bool
     {
         if (!parent::validate($value))
         {

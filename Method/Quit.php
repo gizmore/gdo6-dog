@@ -11,9 +11,9 @@ final class Quit extends DOG_Command
 {
     public $trigger = 'die';
     
-    public function getPermission() { return Dog::OWNER; }
+    public function getPermission() : ?string { return Dog::OWNER; }
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_DogString::make('text'),

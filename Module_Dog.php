@@ -2,7 +2,7 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO_Module;
-use GDO\DB\GDT_Name;
+use GDO\Core\GDT_Name;
 
 /**
  * Dog chatbot.
@@ -13,18 +13,18 @@ use GDO\DB\GDT_Name;
  */
 final class Module_Dog extends GDO_Module
 {
-    public $module_priority = 40;
+    public int $priority = 40;
     
-	public function defaultEnabled() { return true; }
+	public function defaultEnabled() : bool { return true; }
 
-	public function onInstall() { DOG_Install::onInstall($this); }
-	public function onLoadLanguage() { return $this->loadLanguage('lang/dog'); }
-	public function getDependencies()
+	public function onInstall() : void { DOG_Install::onInstall($this); }
+	public function onLoadLanguage() : void { $this->loadLanguage('lang/dog'); }
+	public function getDependencies() : array
 	{
 		return ['Cronjob'];
 	}
 	
-	public function getConfig()
+	public function getConfig() : array
 	{
 		return [
 		    GDT_Name::make('default_nickname')->initial('Dog'),
@@ -32,7 +32,7 @@ final class Module_Dog extends GDO_Module
 	}
 	public function cfgDefaultNickname() { return $this->getConfigVar('default_nickname'); }
 
-	public function getClasses()
+	public function getClasses() : array
 	{
 		return [
 		    DOG_Server::class,

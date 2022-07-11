@@ -3,7 +3,7 @@ namespace GDO\Dog\Method;
 
 use GDO\Dog\DOG_Command;
 use GDO\Dog\GDT_DogCommand;
-use GDO\DB\GDT_String;
+use GDO\Core\GDT_String;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\Dog;
 
@@ -11,9 +11,9 @@ final class ConfigServer extends DOG_Command
 {
     public $trigger = 'confs';
     
-    public function getPermission() { return Dog::OPERATOR; } 
+    public function getPermission() : ?string { return Dog::OPERATOR; } 
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return array(
             GDT_DogCommand::make('command')->notNull(),

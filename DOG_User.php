@@ -2,18 +2,18 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
-use GDO\DB\GDT_AutoInc;
+use GDO\Core\GDT_AutoInc;
 use GDO\User\GDO_UserPermission;
 use GDO\User\GDT_User;
 use GDO\User\GDO_User;
-use GDO\DB\GDT_String;
-use GDO\DB\GDT_Checkbox;
+use GDO\Core\GDT_String;
+use GDO\Core\GDT_Checkbox;
 
 final class DOG_User extends GDO
 {
     private $authenticated = false;
     
-    public function gdoColumns()
+    public function gdoColumns() : array
 	{
 		return array(
 			GDT_AutoInc::make('doguser_id'),
@@ -27,26 +27,26 @@ final class DOG_User extends GDO
 	##############
 	### Getter ###
 	##############
-	public function getID() { return $this->getVar('doguser_id'); }
+	public function getID() : ?string { return $this->gdoVar('doguser_id'); }
 	/**
 	 * @return GDO_User
 	 */
 	public function getGDOUser() { return $this->getValue('doguser_user_id'); }
-	public function getGDOUserID() { return $this->getVar('doguser_user_id'); }
+	public function getGDOUserID() { return $this->gdoVar('doguser_user_id'); }
 	
 	/**
 	 * @return DOG_Server
 	 */
 	public function getServer() { return $this->getValue('doguser_server'); }
-	public function getServerID() { return $this->getVar('doguser_server'); }
+	public function getServerID() { return $this->gdoVar('doguser_server'); }
 
-	public function getName() { return $this->getVar('doguser_name'); }
+	public function getName() { return $this->gdoVar('doguser_name'); }
 	public function getFullName() { return sprintf('%s{%s}', $this->getName(), $this->getServerID()); }
 	public function displayName() { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
 	public function displayFullName() { return sprintf('%s{%s}', $this->displayName(), $this->getServerID()); }
 
 	public function isOnline() { return $this->getServer()->hasUser($this); }
-	public function isService() { return $this->getVar('doguser_service'); }
+	public function isService() { return $this->gdoVar('doguser_service'); }
 	
 	############
 	### Send ###
@@ -123,7 +123,7 @@ final class DOG_User extends GDO
 	############
 	public function isRegistered()
 	{
-	    return !!$this->getGDOUser()->getVar('user_password');
+	    return !!$this->getGDOUser()->gdoVar('user_password');
 	}
 	
 	public function isAuthenticated()

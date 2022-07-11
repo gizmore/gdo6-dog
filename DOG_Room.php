@@ -2,10 +2,10 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
-use GDO\DB\GDT_AutoInc;
-use GDO\DB\GDT_String;
+use GDO\Core\GDT_AutoInc;
+use GDO\Core\GDT_String;
 use GDO\Core\GDT_Secret;
-use GDO\DB\GDT_Char;
+use GDO\Core\GDT_Char;
 use GDO\Language\GDT_Language;
 use GDO\Language\GDO_Language;
 
@@ -23,7 +23,7 @@ class DOG_Room extends GDO
     ###########
     ### GDO ###
     ###########
-    public function gdoColumns()
+    public function gdoColumns() : array
     {
         return array(
             GDT_AutoInc::make('room_id'),
@@ -43,20 +43,20 @@ class DOG_Room extends GDO
      * @return DOG_Server
      */
     public function getServer() { return $this->getValue('room_server'); }
-    public function getServerID() { return $this->getVar('room_server'); }
+    public function getServerID() { return $this->gdoVar('room_server'); }
     
     /**
      * @return string
      */
-    public function getName() { return  $this->getVar('room_name'); }
-    public function getPassword() { return $this->getVar('room_password'); }
-    public function getTrigger() { return  $this->getVar('room_trigger'); }
+    public function getName() { return  $this->gdoVar('room_name'); }
+    public function getPassword() { return $this->gdoVar('room_password'); }
+    public function getTrigger() { return  $this->gdoVar('room_trigger'); }
     
     /**
      * @return GDO_Language
      */
     public function getLanguage() { return $this->getValue('room_lang'); }
-    public function getLanguageISO() { return $this->getVar('room_lang'); }
+    public function getLanguageISO() { return $this->gdoVar('room_lang'); }
     
     ############
     ### Send ###

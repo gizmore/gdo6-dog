@@ -12,7 +12,7 @@ final class Echoes extends DOG_Command
 
     public function isWebMethod() { return true; }
 	
-	public function gdoParameters()
+	public function gdoParameters() : array
 	{
 		return array(
 			GDT_DogString::make('text')->notNull(),

@@ -2,7 +2,7 @@
 namespace GDO\Dog\Method;
 
 use GDO\Dog\DOG_Command;
-use GDO\DB\GDT_Checkbox;
+use GDO\Core\GDT_Checkbox;
 use GDO\Dog\DOG_Message;
 use GDO\Dog\GDT_DogUser;
 use GDO\Dog\DOG_User;
@@ -12,7 +12,7 @@ final class Bot extends DOG_Command
 {
     public $trigger = 'bot';
     
-    public function gdoParameters()
+    public function gdoParameters() : array
     {
         return [
             GDT_DogUser::make('user')->sameServer()->notNull(),
@@ -31,7 +31,7 @@ final class Bot extends DOG_Command
         if ($botflag === null)
         {
             $k = $u->isBot() ? 'msg_dog_is_bot' : 'msg_dog_no_bot';
-            return $message->rply($k, [$user->displayName()]);
+            return $message->rply($k, [$user->renderUserName()]);
         }
         
         if ($u->isBot() === $botflag)

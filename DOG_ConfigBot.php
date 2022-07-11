@@ -2,11 +2,11 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
-use GDO\DB\GDT_String;
+use GDO\Core\GDT_String;
 
 final class DOG_ConfigBot extends GDO
 {
-    public function gdoColumns()
+    public function gdoColumns() : array
     {
         return array(
             GDT_String::make('confb_command')->primary()->ascii()->notNull()->max(128),
