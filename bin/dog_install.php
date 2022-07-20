@@ -3,7 +3,7 @@ use GDO\Core\Debug;
 use GDO\Core\GDT_Template;
 use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
-use GDO\File\FileUtil;
+use GDO\Util\FileUtil;
 use GDO\Install\Installer;
 use GDO\Form\GDT_Form;
 use GDO\Install\Config;

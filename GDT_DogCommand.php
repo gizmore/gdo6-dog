@@ -1,7 +1,7 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\Form\GDT_Select;
+use GDO\Core\GDT_Select;
 
 /**
  * Command selection GDT.

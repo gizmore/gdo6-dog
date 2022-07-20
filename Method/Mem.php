@@ -4,7 +4,7 @@ namespace GDO\Dog\Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\Perf\GDT_PerfBar;
-use GDO\File\FileUtil;
+use GDO\Util\FileUtil;
 
 /**
  * Show performance statistics.

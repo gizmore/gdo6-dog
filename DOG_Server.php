@@ -58,7 +58,7 @@ final class DOG_Server extends GDO
     ##############
     ### Getter ###
     ##############
-    public function isTLS() { return $this->getValue('serv_tls'); }
+    public function isTLS() { return $this->gdoValue('serv_tls'); }
     public function isActive() { return $this->gdoVar('serv_active') === '1'; }
     
     public function getUsername() { return $this->gdoVar('serv_username'); }
@@ -91,9 +91,9 @@ final class DOG_Server extends GDO
     /**
      * @return URL
      */
-    public function getURL() { return $this->getValue('serv_url'); }
-    public function getConnectTimeout() { return $this->getValue('serv_connect_timeout'); }
-    public function getThrottle() { return $this->getValue('serv_throttle'); }
+    public function getURL() { return $this->gdoValue('serv_url'); }
+    public function getConnectTimeout() { return $this->gdoValue('serv_connect_timeout'); }
+    public function getThrottle() { return $this->gdoValue('serv_throttle'); }
     
     public function getConnectURL()
     {

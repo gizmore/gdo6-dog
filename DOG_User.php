@@ -31,13 +31,13 @@ final class DOG_User extends GDO
 	/**
 	 * @return GDO_User
 	 */
-	public function getGDOUser() { return $this->getValue('doguser_user_id'); }
+	public function getGDOUser() { return $this->gdoValue('doguser_user_id'); }
 	public function getGDOUserID() { return $this->gdoVar('doguser_user_id'); }
 	
 	/**
 	 * @return DOG_Server
 	 */
-	public function getServer() { return $this->getValue('doguser_server'); }
+	public function getServer() { return $this->gdoValue('doguser_server'); }
 	public function getServerID() { return $this->gdoVar('doguser_server'); }
 
 	public function getName() { return $this->gdoVar('doguser_name'); }

@@ -39,7 +39,7 @@ final class DOG_CommandWrapper extends DOG_Command
     
     public function beforeExecute() : void { return $this->method->beforeExecute(); }
     public function isUserRequired() : bool { return $this->method->isUserRequired(); }
-    public function isGuestAllowed() { return $this->method->isGuestAllowed(); }
+    public function isGuestAllowed() : bool { return $this->method->isGuestAllowed(); }
     
     public function formName()
     {

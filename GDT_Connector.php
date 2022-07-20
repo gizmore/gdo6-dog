@@ -1,7 +1,7 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\Form\GDT_Select;
+use GDO\Core\GDT_Select;
 use GDO\Util\Arrays;
 
 class GDT_Connector extends GDT_Select

@@ -6,7 +6,7 @@ use GDO\Core\GDO;
 use GDO\Core\GDO_Hook;
 use GDO\Core\Logger;
 use GDO\Core\Debug;
-use GDO\File\Filewalker;
+use GDO\Util\Filewalker;
 use GDO\Core\ModuleLoader;
 use GDO\Core\GDO_Module;
 use GDO\Install\Installer;

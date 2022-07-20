@@ -42,7 +42,7 @@ class DOG_Room extends GDO
     /**
      * @return DOG_Server
      */
-    public function getServer() { return $this->getValue('room_server'); }
+    public function getServer() { return $this->gdoValue('room_server'); }
     public function getServerID() { return $this->gdoVar('room_server'); }
     
     /**
@@ -55,7 +55,7 @@ class DOG_Room extends GDO
     /**
      * @return GDO_Language
      */
-    public function getLanguage() { return $this->getValue('room_lang'); }
+    public function getLanguage() { return $this->gdoValue('room_lang'); }
     public function getLanguageISO() { return $this->gdoVar('room_lang'); }
     
     ############
