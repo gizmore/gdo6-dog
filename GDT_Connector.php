@@ -14,7 +14,7 @@ class GDT_Connector extends GDT_Select
         $this->caseS();
     }
     
-    public function toValue($var)
+    public function toValue(string $var=null)
     {
     	return @DOG_Connector::connector($var);
     }

@@ -48,7 +48,7 @@ class DOG_Room extends GDO
     /**
      * @return string
      */
-    public function getName() { return  $this->gdoVar('room_name'); }
+    public function getName() : ?string { return  $this->gdoVar('room_name'); }
     public function getPassword() { return $this->gdoVar('room_password'); }
     public function getTrigger() { return  $this->gdoVar('room_trigger'); }
     

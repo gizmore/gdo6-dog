@@ -52,7 +52,7 @@ abstract class DOG_Connector
     
     public function setupServer(DOG_Server $server) {}
     
-    public function getName() { return $this->gdoShortName(); }
+    public function getName() : ?string { return $this->gdoShortName(); }
     
     ###
     public $connected = false;

@@ -19,7 +19,7 @@ final class DOG_User extends GDO
 			GDT_AutoInc::make('doguser_id'),
 			GDT_String::make('doguser_name')->utf8()->max(64)->caseI()->notNull(),
 		    GDT_Server::make('doguser_server')->notNull(),
-		    GDT_User::make('doguser_user_id')->notNull(),
+		    GDT_User::make('doguser_user')->notNull(),
 		    GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),
 		);
 	}
@@ -31,8 +31,8 @@ final class DOG_User extends GDO
 	/**
 	 * @return GDO_User
 	 */
-	public function getGDOUser() { return $this->gdoValue('doguser_user_id'); }
-	public function getGDOUserID() { return $this->gdoVar('doguser_user_id'); }
+	public function getGDOUser() { return $this->gdoValue('doguser_user'); }
+	public function getGDOUserID() { return $this->gdoVar('doguser_user'); }
 	
 	/**
 	 * @return DOG_Server
@@ -40,7 +40,7 @@ final class DOG_User extends GDO
 	public function getServer() { return $this->gdoValue('doguser_server'); }
 	public function getServerID() { return $this->gdoVar('doguser_server'); }
 
-	public function getName() { return $this->gdoVar('doguser_name'); }
+	public function getName() : ?string { return $this->gdoVar('doguser_name'); }
 	public function getFullName() { return sprintf('%s{%s}', $this->getName(), $this->getServerID()); }
 	public function displayName() { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
 	public function displayFullName() { return sprintf('%s{%s}', $this->displayName(), $this->getServerID()); }
@@ -100,7 +100,7 @@ final class DOG_User extends GDO
 		return self::blank(array(
 			'doguser_name' => $name,
 			'doguser_server' => $sid,
-			'doguser_user_id' => $user->getID(),
+			'doguser_user' => $user->getID(),
 		))->insert();
 	}
 	
@@ -113,7 +113,7 @@ final class DOG_User extends GDO
 	{
 	    return GDO_UserPermission::table()->select('dog_user.*')->
 	    joinObject('perm_user_id')->joinObject('perm_perm_id')->
-	    join('JOIN dog_user ON dog_user.doguser_user_id = gdo_user.user_id')->
+	    join('JOIN dog_user ON dog_user.doguser_user = gdo_user.user_id')->
 	    where("perm_name=".self::quoteS($permission))->
 	    exec()->fetchAllObjectsAs(self::table());
 	}

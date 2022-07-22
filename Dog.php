@@ -11,7 +11,7 @@ use GDO\Core\ModuleLoader;
 use GDO\Core\GDO_Module;
 use GDO\Install\Installer;
 use GDO\Cronjob\MethodCronjob;
-use GDO\Core\GDT_Error;
+use GDO\UI\GDT_Error;
 use GDO\Dog\Connector\Bash;
 
 /**

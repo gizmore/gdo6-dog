@@ -79,7 +79,7 @@ final class GDT_DogUser extends GDT_Object
     /**
      * Always use the findByName method.
      */
-    public function toValue($var)
+    public function toValue(string $var=null)
     {
         $_REQUEST['nocompletion_'.$this->name] = 1;
         return parent::toValue($var);
