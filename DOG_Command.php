@@ -382,7 +382,7 @@ abstract class DOG_Command extends MethodForm
 	
 	public function createForm(GDT_Form $form) : void
 	{
-        $form->addFields($this->gdoParameters());
+        $form->addFields(...$this->gdoParameters());
         $form->actions()->addField(GDT_Submit::make());
 	}
 	

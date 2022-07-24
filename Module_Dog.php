@@ -27,7 +27,7 @@ final class Module_Dog extends GDO_Module
 	public function getConfig() : array
 	{
 		return [
-		    GDT_Name::make('default_nickname')->initial('Dog'),
+		    GDT_Name::make('default_nickname')->notNull()->initial('Dog'),
 		];
 	}
 	public function cfgDefaultNickname() { return $this->getConfigVar('default_nickname'); }

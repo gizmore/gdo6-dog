@@ -65,7 +65,7 @@ return array(
 'msg_dog_overall_help' => 'Here you can execute the following commands; %s',
 'msg_dog_help' => '%s - %s',
 
-'ft_dog_lang' => 'Show or change the user interface language.',
+'mt_dog_lang' => 'Show or change the user interface language.',
 'msg_dog_show_language' => 'Your language is currently set to %s. Available languages: %s.',
 'msg_dog_set_language' => 'Your language has been changed from %s to %s.',
     
@@ -82,13 +82,13 @@ return array(
 'msg_dog_not_disabled' => '%s is not disabled in this scope.',
 'msg_dog_enabled' => 'The %s command has been enabled.',
     
-'ft_dog_ping' => 'Test if the bot responds.',
-'ft_dog_help' => 'Show commands or the help for a command',
+'mt_dog_ping' => 'Test if the bot responds.',
+'mt_dog_help' => 'Show commands or the help for a command',
     
-'ft_dogirc_join' => 'Join an IRC channel.',
+'mt_dogirc_join' => 'Join an IRC channel.',
 'msg_dog_room_lang' => 'The room\'s language is currently set to %s.',
 'msg_dog_room_lang_now' => 'The room\'s language changed from %s to %s.',
 
-'ft_dog_bot' => 'Show and toggle bot flag for a user.',
+'mt_dog_bot' => 'Show and toggle bot flag for a user.',
     
 );

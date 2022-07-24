@@ -15,12 +15,12 @@ final class GDT_DogCommand extends GDT_Select
         $this->initChoices();
     }
     
-	public function initChoices()
+	public function getChoices()
 	{
-	    return $this->choices(DOG_Command::$COMMANDS_T);
+	    return DOG_Command::$COMMANDS_T;
 	}
 	
-	public function toVar($value)
+	public function toVar($value) : ?string
 	{
 	    return $value ? $value->getCLITrigger() : null;
 	}

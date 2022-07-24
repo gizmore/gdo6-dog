@@ -6,7 +6,7 @@ use GDO\Core\GDT_Response;
 use GDO\Dog\DOG_User;
 use GDO\Dog\Dog;
 use GDO\Dog\Connector\Bash;
-use GDO\Tests\MethodTest;
+use GDO\Tests\GDT_MethodTest;
 use GDO\Tests\TestCase;
 use GDO\UI\GDT_Page;
 use GDO\User\GDO_User;
@@ -22,7 +22,7 @@ class DogTestCase extends TestCase
         return Bash::instance();
     }
     
-    public function user(GDO_User $user)
+    public function user(GDO_User $user) : GDO_User
     {
         $username = Strings::substrTo($user->getName(), '{', $user->getName());
         $this->doguser = DOG_User::getOrCreateUser($this->getServer(), $username);
@@ -57,9 +57,9 @@ class DogTestCase extends TestCase
      * Restore gizmore because auto coverage messes with him a lot.
      * @param GDO_User $user
      */
-    protected function restoreUserPermissions(GDO_User $user)
+    protected function restoreUserPermissions(GDO_User $user) : void
     {
-        if (count(MethodTest::$USERS))
+        if (count(GDT_MethodTest::$USERS))
         {
             $g1 = GDO_User::getByName('gizmore{1}');
             if ($user->getID() === $g1->getID())

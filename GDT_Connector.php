@@ -9,7 +9,7 @@ class GDT_Connector extends GDT_Select
     protected function __construct()
     {
         parent::__construct();
-        $this->choices($this->initChoices());
+        $this->initChoices();
         $this->encoding = self::ASCII;
         $this->caseS();
     }
@@ -19,9 +19,9 @@ class GDT_Connector extends GDT_Select
     	return @DOG_Connector::connector($var);
     }
     
-    public function initChoices()
+    public function getChoices()
     {
-        $choices = array();
+        $choices = [];
         foreach (DOG_Connector::connectors() as $name => $class)
         {
             $choices[$name] = $class;
@@ -31,7 +31,9 @@ class GDT_Connector extends GDT_Select
     
     protected function errorInvalidChoice()
     {
-    	return $this->error(t('err_connector', [html($this->getVar()), html(Arrays::implodeHuman(array_keys($this->choices)))]));
+    	return $this->error('err_connector', [
+    		html($this->getVar()),
+    		html(Arrays::implodeHuman(array_keys($this->choices)))]);
     }
 
 }
