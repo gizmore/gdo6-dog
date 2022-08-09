@@ -25,7 +25,7 @@ final class GDT_DogCommand extends GDT_Select
 	    return $value ? $value->getCLITrigger() : null;
 	}
 
-	public function toValue(string $var=null)
+	public function toValue($var=null)
 	{
 	    return $var ? @$this->choices[strtolower($var)] : null;
 	}
