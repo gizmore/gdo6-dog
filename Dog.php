@@ -51,7 +51,7 @@ final class Dog
             return;
         }
         $this->loadedPlugins = true;
-        Filewalker::traverse('GDO', null, false, function($entry, $path){
+        Filewalker::traverse('GDO', null, null, function($entry, $path){
             if (preg_match("/^Dog[A-Z0-9]*$/i", $entry))
             {
                 if (!Application::instance()->isUnitTests())
@@ -82,7 +82,7 @@ final class Dog
                     }
                 });
             }
-        }, false);
+        }, 0);
         
         if ($this->loadedPlugins)
         {
