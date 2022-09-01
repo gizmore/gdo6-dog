@@ -451,7 +451,7 @@ abstract class DOG_Command extends MethodForm
 	    
 	    if (!$this->hasUserPermission($message->getGDOUser()))
 	    {
-	        return $message->rply('err_no_permission');
+	        return $message->rply('err_permission_required');
 	    }
 	    
 	    /**
