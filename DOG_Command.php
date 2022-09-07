@@ -11,7 +11,6 @@ use GDO\Dog\Method\Disable;
 use GDO\Core\GDT_Enum;
 use GDO\UI\GDT_Confirm;
 use GDO\CLI\CLI;
-use GDO\Core\Website;
 
 abstract class DOG_Command extends MethodForm
 {
@@ -464,10 +463,9 @@ abstract class DOG_Command extends MethodForm
 	    }
 	    
 		$_REQUEST = [];
-		if (Website::$TOP_RESPONSE)
-		{
-		    Website::$TOP_RESPONSE->clearFields();
-		}
+		
+		# Clear
+		CLI::getTopResponse();
 		
 		if ($message->room)
 		{

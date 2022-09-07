@@ -16,10 +16,10 @@ $dog = new Dog();
 chdir(GDO_PATH);
 Logger::init(null, GDO_ERROR_LEVEL); # 1st init as guest
 
-if (defined('GDO_CONSOLE_VERBOSE'))
-{
-    Logger::logCron("Starting dog...\nLoading Modules...");
-}
+// if (defined('GDO_CONSOLE_VERBOSE'))
+// {
+//     Logger::logCron("Starting dog...\nLoading Modules...");
+// }
 
 Trans::$ISO = GDO_LANGUAGE;
 Debug::init();
@@ -33,10 +33,10 @@ GDT_Page::make();
 
 $modules = (new ModuleLoader(GDO_PATH.'GDO/'))->loadModules(true);
 
-if (GDO_CONSOLE_VERBOSE)
-{
-    printf("Loaded %s modules.\n", count($modules));
-}
+// if (GDO_CONSOLE_VERBOSE)
+// {
+//     printf("Loaded %s modules.\n", count($modules));
+// }
 
 $dog->loadPlugins();
 

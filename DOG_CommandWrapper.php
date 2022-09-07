@@ -2,9 +2,9 @@
 namespace GDO\Dog;
 
 use GDO\Core\Method;
-use GDO\Core\Website;
 use GDO\Form\MethodForm;
 use GDO\Form\GDT_Form;
+use GDO\CLI\CLI;
 
 /**
  * Wrap a gdo method in a dog command. 
@@ -65,10 +65,7 @@ final class DOG_CommandWrapper extends DOG_Command
         try
         {
             $response = $this->method->exec()->renderCLI();
-            if (Website::$TOP_RESPONSE)
-            {
-                $response .= ' ' . Website::$TOP_RESPONSE->renderCLI();
-            }
+            $response .= CLI::getTopResponse();
             return $message->reply(trim($response));
         }
         catch (\Throwable $ex)
