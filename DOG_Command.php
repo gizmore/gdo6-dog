@@ -550,7 +550,7 @@ abstract class DOG_Command extends MethodForm
 	    
 	    foreach ($this->getParametersSorted() as $gdt)
 	    {
-	        if ((!$gdt->editable) || (!$gdt->cli))
+	        if ((!$gdt->writeable) || (!$gdt->cli))
 	        {
 	            continue;
 	        }
