@@ -35,13 +35,13 @@ final class RoomLanguage extends DOG_Command
             {
                 $message->room->saveVar('room_lang', $lang->getID());
                 return $message->rply('msg_dog_room_lang_now', [
-                    $old->displayName(), $lang->displayName()]);
+                    $old->renderName(), $lang->renderName()]);
             }
         }
         else
         {
             return $message->rply('msg_dog_room_lang', [
-                $old->displayName()]);
+                $old->renderName()]);
         }
     }
     

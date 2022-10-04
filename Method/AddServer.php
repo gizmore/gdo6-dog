@@ -47,7 +47,7 @@ final class AddServer extends DOG_Command
 	    
 	    if ($server)
 	    {
-	        return $message->rply('err_dog_server_already_added', [$server->displayName()]);
+	        return $message->rply('err_dog_server_already_added', [$server->renderName()]);
 	    }
 
 	    # Add
@@ -82,7 +82,7 @@ final class AddServer extends DOG_Command
 		
 		Dog::instance()->servers[] = $server;
 		
-		$message->rply('msg_dog_server_added', [$server->getID(), $server->displayName()]);
+		$message->rply('msg_dog_server_added', [$server->getID(), $server->renderName()]);
 	}
 	
 }

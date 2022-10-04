@@ -42,8 +42,8 @@ final class DOG_User extends GDO
 
 	public function getName() : ?string { return $this->gdoVar('doguser_name'); }
 	public function getFullName() { return sprintf('%s{%s}', $this->getName(), $this->getServerID()); }
-	public function displayName() { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
-	public function displayFullName() { return sprintf('%s{%s}', $this->displayName(), $this->getServerID()); }
+	public function renderName(): string { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
+	public function displayFullName() { return sprintf('%s{%s}', $this->renderName(), $this->getServerID()); }
 
 	public function isOnline() { return $this->getServer()->hasUser($this); }
 	public function isService() { return $this->gdoVar('doguser_service'); }

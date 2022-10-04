@@ -68,7 +68,7 @@ final class DOG_Server extends GDO
     public function getNickname() { return $this->getConnector()->getNickname(); }
     public function getDog() { return DOG_User::getUser($this, $this->getNickname()); }
     
-    public function displayName()
+    public function renderName(): string
     {
         $b = $this->isConnected() ? "\x02" : '';
         $name = $this->getURL() ? $this->getDomain() : $this->getConnectorName();

@@ -40,7 +40,7 @@ abstract class DOG_Connector
         self::$connectors[$connector->gdoShortName()] = $connector->gdoClassName();
     }
     
-    public function displayName() { return t('connector_' . $this->gdoShortName()); }
+    public function renderName(): string { return t('connector_' . $this->gdoShortName()); }
     
     ###
     
