@@ -2,17 +2,20 @@
 namespace GDO\Dog\Test;
 
 use GDO\Core\Application;
-use GDO\Core\GDT_Response;
 use GDO\Dog\DOG_User;
 use GDO\Dog\Dog;
 use GDO\Dog\Connector\Bash;
 use GDO\Tests\GDT_MethodTest;
 use GDO\Tests\TestCase;
-use GDO\UI\GDT_Page;
 use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
 use GDO\Util\Strings;
 
+/**
+ * 
+ * @author gizmore
+ *
+ */
 class DogTestCase extends TestCase
 {
     protected $doguser;
@@ -59,7 +62,7 @@ class DogTestCase extends TestCase
      */
     protected function restoreUserPermissions(GDO_User $user) : void
     {
-        if (count(GDT_MethodTest::$USERS))
+        if (count(GDT_MethodTest::$TEST_USERS))
         {
             $g1 = GDO_User::getByName('gizmore{1}');
             if ($user->getID() === $g1->getID())
@@ -87,11 +90,12 @@ class DogTestCase extends TestCase
         try
         {
             ob_start();
+            Application::$INSTANCE->reset(true);
             # Reset vars
-            $_GET = $_POST = $_REQUEST = [];
-            $_REQUEST['_fmt'] = 'cli';
-            GDT_Response::$CODE = 200;
-            GDT_Page::$INSTANCE->reset();
+//             $_GET = $_POST = $_REQUEST = [];
+//             $_REQUEST['_fmt'] = 'cli';
+//             GDT_Response::$CODE = 200;
+//             GDT_Page::$INSTANCE->reset();
             # run cmd
             Dog::instance()->event('dog_cmdline2', $line);
             $response = ob_get_contents();
@@ -99,7 +103,8 @@ class DogTestCase extends TestCase
         }
         catch (\Throwable $ex)
         {
-            return $ex->getMessage();
+        	throw $ex;
+//             return $ex->getMessage();
         }
         finally
         {

@@ -52,7 +52,7 @@ final class Disable extends DOG_Command
     
     public function isDisabled(DOG_Message $message, DOG_Command $command)
     {
-        if ($message->room)
+    	if (isset($message->room))
         {
             if ($this->isDisabledRoom($message, $command))
             {

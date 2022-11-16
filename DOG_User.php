@@ -8,7 +8,13 @@ use GDO\User\GDT_User;
 use GDO\User\GDO_User;
 use GDO\Core\GDT_String;
 use GDO\Core\GDT_Checkbox;
+use GDO\User\GDT_UserType;
 
+/**
+ * 
+ * @author gizmore
+ *
+ */
 final class DOG_User extends GDO
 {
     private $authenticated = false;
@@ -28,16 +34,11 @@ final class DOG_User extends GDO
 	### Getter ###
 	##############
 	public function getID() : ?string { return $this->gdoVar('doguser_id'); }
-	/**
-	 * @return GDO_User
-	 */
-	public function getGDOUser() { return $this->gdoValue('doguser_user'); }
+
+	public function getGDOUser(): GDO_User { return $this->gdoValue('doguser_user'); }
 	public function getGDOUserID() { return $this->gdoVar('doguser_user'); }
 	
-	/**
-	 * @return DOG_Server
-	 */
-	public function getServer() { return $this->gdoValue('doguser_server'); }
+	public function getServer(): DOG_Server { return $this->gdoValue('doguser_server'); }
 	public function getServerID() { return $this->gdoVar('doguser_server'); }
 
 	public function getName() : ?string { return $this->gdoVar('doguser_name'); }
@@ -94,7 +95,7 @@ final class DOG_User extends GDO
 	{
 		$sid = $server->getID();
 		$user = GDO_User::blank(array(
-			'user_type' => GDO_User::MEMBER,
+			'user_type' => GDT_UserType::MEMBER,
 			'user_name' => sprintf('%s{%s}', $name, $sid),
 		))->insert();
 		return self::blank(array(
@@ -118,12 +119,21 @@ final class DOG_User extends GDO
 	    exec()->fetchAllObjectsAs(self::table());
 	}
 	
+	################
+	### Settings ###
+	################
+	public function settingVar(string $moduleName, string $key): ?string
+	{
+		$user = $this->getGDOUser();
+		return $user->settingVar($moduleName, $key);
+	}
+	
 	############
 	### Auth ###
 	############
 	public function isRegistered()
 	{
-	    return !!$this->getGDOUser()->gdoVar('user_password');
+		return !!$this->settingVar('Login', 'password');
 	}
 	
 	public function isAuthenticated()

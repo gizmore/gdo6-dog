@@ -8,7 +8,6 @@ use GDO\Dog\Dog;
 use GDO\Dog\DOG_Connector;
 use GDO\Dog\DOG_User;
 use GDO\User\GDO_User;
-use GDO\Language\Trans;
 
 /**
  * This connector can be called by shell: "GDO/Dog/bin/dog <command> [<..parameters..>]"
@@ -43,12 +42,9 @@ class Bash extends DOG_Connector
         return self::$INSTANCE;
     }
     
-    /**
-     * @return DOG_Server
-     */
-    private function getBashServer()
+    private function getBashServer(): ?DOG_Server
     {
-        return DOG_Server::table()->select('*')->
+        return DOG_Server::table()->select()->
             where("serv_connector='{$this->gdoShortName()}'")->
             first()->exec()->fetchObject();
     }
@@ -58,7 +54,7 @@ class Bash extends DOG_Connector
         $user = DOG_User::getOrCreateUser(self::$INSTANCE, get_current_user());
         GDO_User::setCurrent($user->getGDOUser());
         $user->login();
-        Trans::setISO($user->getGDOUser()->getLangISO());
+//         Trans::setISO($user->getGDOUser()->getLangISO());
         return $user;
     }
     
@@ -98,14 +94,12 @@ class Bash extends DOG_Connector
     {
         parent::sendToUser($user, $text);
         echo "$text\n";
-//         ob_flush();
     }
     
     public function sendToRoom(DOG_Room $room, $text)
     {
         parent::sendToRoom($room, $text);
         echo "$text\n";
-//         ob_flush();
     }
    
     public function sendNoticeToUser(DOG_User $user, $text)

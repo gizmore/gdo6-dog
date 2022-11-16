@@ -3,7 +3,9 @@ namespace GDO\Dog\Method;
 
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
-use GDO\Util\Strings;
+use GDO\Core\Expression\Parser;
+use GDO\UI\GDT_Page;
+use GDO\Core\GDT_Text;
 
 /**
  * Listens to the `dog_message` event and calls a command.
@@ -22,7 +24,7 @@ final class Exec extends DOG_Command
 	    $text = $message->text;
 	    
 	    # Remove trigger char if inside room.
-	    if ($message->room)
+	    if (isset($message->room))
 	    {
 	        if (!str_starts_with($text, $message->room->getTrigger()))
 	        {
@@ -31,18 +33,17 @@ final class Exec extends DOG_Command
 	        $text = substr($text, 1);
 	    }
 	    
-		$trigger = strtolower(Strings::substrTo($text, ' ', $text));
+// 		$trigger = strtolower(Strings::substrTo($text, ' ', $text));
 		
-		if ($command = DOG_Command::byTrigger(trim($trigger, '.')))
-		{
-			$command->onDogExecute($message);
-		}
+		$parser = new Parser();
+		$exp = $parser->parse($text);
+		$exp->method->runAs($message->user->getGDOUser());
+		$result = $exp->execute();
 		
-		# Private message with accidental trigger char. Just try with 1 chop.
-		elseif ($command = DOG_Command::byTrigger(substr($trigger, 1)))
-		{
-		    $command->onDogExecute($message);
-		}
+		$response = GDT_Page::instance()->topResponse()->render();
+		$response .= "\n";
+		$response .= $result->render();
+		return $message->reply(trim($response));
 	}
 
 }

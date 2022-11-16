@@ -2,55 +2,58 @@
 namespace GDO\Dog;
 
 use GDO\Core\Method;
-use GDO\Form\MethodForm;
 use GDO\Form\GDT_Form;
 use GDO\CLI\CLI;
+use GDO\Core\GDO_Module;
 
 /**
- * Wrap a gdo method in a dog command. 
+ * Wrap a gdo method in a dog command.
+ * Used to wrap certain incompatible methods?
+ * 
  * @author gizmore
+ * @deprecated
  */
 final class DOG_CommandWrapper extends DOG_Command
 {
-    private $method;
-    private $command;
+    private Method $method;
     
-    public function __construct(Method $method, $trigger=null)
+//     public function __construct(Method $method, $trigger=null)
+//     {
+//         $module = $method->getModule();
+//         $this->method = $method;
+// //         $this->group = $module->getModuleName();
+// //         $this->priority = $module->priority;
+// //         $this->trigger = $method->gdoShortName();
+//     }
+    
+    public function getModule(): GDO_Module
     {
-        $module = $method->getModule();
-        $this->method = $method;
-        $this->group = $module->getName();
-        $this->priority = $module->module_priority;
-        $this->trigger = $method->gdoShortName();
+    	return $this->method->getModule();
     }
     
-    public function init()
+    public function onMethodInit(): void
     {
-        return $this->method->init();
+        $this->method->onMethodInit();
+    }
+
+    public function getForm(bool $resetForm=false): GDT_Form
+    {
+//     	if ($this->method instanceof MethodForm)
+//     	{
+			return $this->method->getForm($resetForm);
+//     	}
     }
     
-    public function getForm()
-    {
-        if ($this->method instanceof MethodForm)
-        {
-            return $this->method->getForm();
-        }
-    }
-    
-    public function beforeExecute() : void { return $this->method->beforeExecute(); }
+    public function beforeExecute() : void { $this->method->beforeExecute(); }
     public function isUserRequired() : bool { return $this->method->isUserRequired(); }
     public function isGuestAllowed() : bool { return $this->method->isGuestAllowed(); }
     
-    public function formName()
+    public function getFormName(): string
     {
-        if ($this->method instanceof MethodForm)
-        {
-            return $this->method->formName();
-        }
-        return GDT_Form::DEFAULT_NAME;
+		return $this->method->getFormName();
     }
     
-    public function &gdoParameterCache()
+    public function &gdoParameterCache(): array
     {
         return $this->method->gdoParameterCache();
     }
@@ -64,8 +67,8 @@ final class DOG_CommandWrapper extends DOG_Command
     {
         try
         {
-            $response = $this->method->exec()->renderCLI();
-            $response .= CLI::getTopResponse();
+            $response = $this->method->exec()->render();
+            $response = CLI::getTopResponse() . $response;
             return $message->reply(trim($response));
         }
         catch (\Throwable $ex)
@@ -81,19 +84,19 @@ final class DOG_CommandWrapper extends DOG_Command
         return strtolower($t);
     }
  
-    public function getTitle()
+    public function getMethodTitle(): string
     {
-        return $this->method->getTitle();
+        return $this->method->getMethodTitle();
     }
     
-    public function getDescription()
+    public function getMethodDescription(): string
     {
-        return $this->method->getDescription();
+        return $this->method->getMethodDescription();
     }
     
-    public function getButtons()
-    {
-        return $this->method->getButtons();
-    }
+//     public function getButtons()
+//     {
+//         return $this->method->getButtons();
+//     }
     
 }

@@ -82,7 +82,7 @@ abstract class DOG_Connector
     
     public function reply(DOG_Message $message, $text)
     {
-    	if ($message->room)
+    	if (isset($message->room))
     	{
     		$text = $message->user->getName() . ": " . $text;
     		$this->sendToRoom($message->room, $text);

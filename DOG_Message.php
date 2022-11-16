@@ -1,8 +1,6 @@
 <?php
 namespace GDO\Dog;
 
-use GDO\Date\Time;
-use GDO\Language\Trans;
 use GDO\User\GDO_User;
 
 class DOG_Message
@@ -22,29 +20,20 @@ class DOG_Message
 	#################
 	### Variables ###
 	#################
-	/**
-	 * @var DOG_Server
-	 */
-	public $server;
+	public DOG_Server $server;
 	public function server(DOG_Server $server) { $this->server = $server; return $this; }
 	
-	/**
-	 * @var DOG_Room
-	 */
-	public $room;
+	public DOG_Room $room;
 	public function room(DOG_Room $room=null) { $this->room = $room; return $this; }
 	
-	/**
-	 * @var DOG_User
-	 */
-	public $user;
+	public DOG_User $user;
 	public function user(DOG_User $user)
 	{
 	    $this->user = $user;
 	    $gdoUser = $user->getGDOUser();
 	    GDO_User::setCurrent($gdoUser);
-	    Trans::setISO($gdoUser->getLangISO());
-	    Time::setTimezone($gdoUser->getTimezone());
+// 	    Trans::setISO($gdoUser->getLangISO());
+// 	    Time::setTimezone($gdoUser->getTimezone());
 	    return $this;
 	}
 
@@ -74,7 +63,7 @@ class DOG_Message
 	{
         $text = t($key, $args);
         $bot = $this->server->getUsername();
-        $trigger = $this->room ? $this->room->getTrigger() : '';
+        $trigger = isset($this->room) ? $this->room->getTrigger() : '';
         $text = str_replace(['#BOT#', '#CMD#'], [$bot, $trigger], $text);
         return $text;
 	}

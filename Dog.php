@@ -68,12 +68,10 @@ final class Dog
                         {
                             DOG_Command::register(new $class_name());
                         }
-                        
                         if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
                         {
                             DOG_Connector::register(new $class_name());
                         }
-                        
                     }
                     else
                     {
@@ -84,10 +82,11 @@ final class Dog
             }
         }, 0);
         
-        if ($this->loadedPlugins)
-        {
-            $this->loadedPlugins = $this->autoCreateCommands();
-        }
+        $this->loadedPlugins = true;
+//         if ($this->loadedPlugins)
+//         {
+           $this->autoCreateCommands();
+//         }
         
         return $this->loadedPlugins;
     }
@@ -118,8 +117,7 @@ final class Dog
             {
                 return;
             }
-            
-            DOG_Command::register(new DOG_CommandWrapper($method));
+            DOG_Command::register(new $method());
         });
     }
     
@@ -275,8 +273,7 @@ final class Dog
     		    }
     		    catch (\Throwable $ex)
     		    {
-//     		        DOG_Message::$LAST_MESSAGE->server->getConnector()->sendToAdmin($ex->getMessage());
-    		        echo GDT_Error::responseException($ex)->renderCLI();
+    		        echo GDT_Error::fromException($ex)->render();
     		        ob_flush();
     		        Logger::logException($ex);
     		    }
