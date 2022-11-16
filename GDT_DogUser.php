@@ -61,7 +61,7 @@ final class GDT_DogUser extends GDT_Object
         return $this;
     }
     
-    public $thyself = false;
+    public $thyself = true;
     public function thyself($thyself=true)
     {
         $this->thyself = $thyself;

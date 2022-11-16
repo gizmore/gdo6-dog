@@ -17,6 +17,11 @@ abstract class DOG_Command extends MethodForm
 {
 	public static Parser $PARSER;
 	
+	public function isTrivial(): bool
+	{
+		return false;
+	}
+	
     ################
     ### Override ###
     ################

@@ -17,6 +17,12 @@ use GDO\Util\Random;
 
 final class DOG_Server extends GDO
 {
+	
+	public function isTestable(): bool
+	{
+		return false;
+	}
+	
 	/**
 	 * @var DOG_Connector
 	 */

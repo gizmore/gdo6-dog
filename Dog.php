@@ -54,10 +54,10 @@ final class Dog
         Filewalker::traverse('GDO', null, null, function($entry, $path){
             if (preg_match("/^Dog[A-Z0-9]*$/i", $entry))
             {
-                if (!Application::instance()->isUnitTests())
-                {
+//                 if (!Application::instance()->isUnitTests())
+//                 {
                     if (!module_enabled($entry)) { return; }
-                }
+//                 }
                 
                 Filewalker::traverse(["$path/Connector", "$path/Method"], null, function($entry, $path){
                     $class_name = str_replace('/', "\\", $path);
