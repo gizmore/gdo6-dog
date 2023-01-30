@@ -91,12 +91,6 @@ class DogTestCase extends TestCase
         {
             ob_start();
             Application::$INSTANCE->reset(true);
-            # Reset vars
-//             $_GET = $_POST = $_REQUEST = [];
-//             $_REQUEST['_fmt'] = 'cli';
-//             GDT_Response::$CODE = 200;
-//             GDT_Page::$INSTANCE->reset();
-            # run cmd
             Dog::instance()->event('dog_cmdline2', $line);
             $response = ob_get_contents();
             return $response;
@@ -104,7 +98,6 @@ class DogTestCase extends TestCase
         catch (\Throwable $ex)
         {
         	throw $ex;
-//             return $ex->getMessage();
         }
         finally
         {

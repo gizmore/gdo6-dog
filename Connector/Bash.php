@@ -81,7 +81,7 @@ class Bash extends DOG_Connector
         $this->dog_cmdline2($text);
     }
     
-    public function dog_cmdline2($text)
+    public function dog_cmdline2(string $text): void
     {
         $msg = DOG_Message::make()->
             server(self::$INSTANCE)->
@@ -89,7 +89,14 @@ class Bash extends DOG_Connector
             text($text);
         Dog::instance()->event('dog_message', $msg);
     }
-
+    
+    public function send(string $text): bool
+    {
+    	parent::send($text);
+    	echo "$text\n";
+    	return true;
+    }
+    
     public function sendToUser(DOG_User $user, $text)
     {
         parent::sendToUser($user, $text);

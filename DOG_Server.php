@@ -51,7 +51,7 @@ final class DOG_Server extends GDO
         	GDT_Url::make('serv_url'),
             GDT_Checkbox::make('serv_tls')->initial('0')->notNull(),
             GDT_Connector::make('serv_connector')->notNull(),
-            GDT_Username::make('serv_username')->initial('Dog')->notNull(),
+            GDT_Username::make('serv_username')->initial('Dog')->notNull()->unique(false),
             GDT_Secret::make('serv_password'),
             GDT_Duration::make('serv_connect_timeout')->initial('3s')->notNull(),
             GDT_UInt::make('serv_throttle')->initial('4')->notNull(),

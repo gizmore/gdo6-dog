@@ -12,6 +12,7 @@ use GDO\UI\GDT_Confirm;
 use GDO\CLI\CLI;
 use GDO\Core\Expression\Parser;
 use GDO\Core\Method;
+use GDO\Core\GDO_Error;
 
 abstract class DOG_Command extends MethodForm
 {
@@ -39,10 +40,15 @@ abstract class DOG_Command extends MethodForm
 	##############
 	### Helper ###
 	##############
-	public function getCLITrigger()
+	public function getCLITriggerGroup(): string
 	{
 		$m = $this->getModule();
-		$g = strtolower($m->getModuleName());
+		return strtolower($m->getModuleName());
+	}
+	
+	public function getCLITrigger()
+	{
+		$g = $this->getCLITriggerGroup();
 		$t = strtolower($this->getMethodName());
 		return "{$g}.{$t}";
 	}
@@ -356,7 +362,6 @@ abstract class DOG_Command extends MethodForm
 	    self::$COMMANDS[] = $command;
 	    if ($t = $command->getCLITrigger())
 	    {
-// 	    	$t = $command->getCLITrigger();
     	    self::$COMMANDS_T[$t] = $command;
 			Method::addCLIAlias($t, get_class($command));
 	    }
@@ -367,20 +372,26 @@ abstract class DOG_Command extends MethodForm
 		uasort(self::$COMMANDS, function(Method $a, Method $b) {
 			return $a->getModule()->priority - $b->getModule()->priority;
 		});
-			uasort(self::$COMMANDS_T, function(Method $a, Method $b) {
-				return $a->getModule()->priority - $b->getModule()->priority;
+		uasort(self::$COMMANDS_T, function(Method $a, Method $b) {
+			return $a->getModule()->priority - $b->getModule()->priority;
         });
     }
 	
-// 	/**
-// 	 * Get a command by trigger.
-// 	 * @param string $trigger
-// 	 * @return self
-// 	 */
-// 	public static function byTrigger($trigger)
-// 	{
-// 	    return @self::$COMMANDS_T[$trigger];
-// 	}
+	/**
+	 * Get a command by trigger.
+	 */
+	public static function byTrigger(string $trigger, bool $throw=true): self
+	{
+		if (!isset(self::$COMMANDS_T[$trigger]))
+		{
+			if ($throw)
+			{
+				throw new GDO_Error('err_unknown_command');
+			}
+			return null;
+		}
+	    return self::$COMMANDS_T[$trigger];
+	}
 	
 	/**
 	 * Get supported connectors for this command.
@@ -406,6 +417,7 @@ abstract class DOG_Command extends MethodForm
 	    }
 	    $message = new DOG_HTTPMessage();
 	    $m = DOG_Message::$LAST_MESSAGE;
+	    $message->user($m->user);
 	    $message->server($m->server);
 	    if (isset($m->room))
 	    {

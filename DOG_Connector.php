@@ -64,6 +64,12 @@ abstract class DOG_Connector
     
     public function init() {}
     public function obfuscate($string) { return $string; }
+
+    public function send(string $text): bool
+    {
+    	Dog::instance()->event('dog_send', $text);
+    	return true;
+    }
     
     public function sendToUser(DOG_User $user, $text)
     {

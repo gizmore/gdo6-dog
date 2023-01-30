@@ -20,20 +20,18 @@ class DOG_Message
 	#################
 	### Variables ###
 	#################
-	public DOG_Server $server;
+	public ?DOG_Server $server = null;
 	public function server(DOG_Server $server) { $this->server = $server; return $this; }
 	
-	public DOG_Room $room;
+	public ?DOG_Room $room = null;
 	public function room(DOG_Room $room=null) { $this->room = $room; return $this; }
 	
-	public DOG_User $user;
+	public ?DOG_User $user = null;
 	public function user(DOG_User $user)
 	{
 	    $this->user = $user;
 	    $gdoUser = $user->getGDOUser();
 	    GDO_User::setCurrent($gdoUser);
-// 	    Trans::setISO($gdoUser->getLangISO());
-// 	    Time::setTimezone($gdoUser->getTimezone());
 	    return $this;
 	}
 
