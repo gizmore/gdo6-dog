@@ -5,7 +5,6 @@ use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\Core\Expression\Parser;
 use GDO\UI\GDT_Page;
-use GDO\Core\GDT_Text;
 
 /**
  * Listens to the `dog_message` event and calls a command.

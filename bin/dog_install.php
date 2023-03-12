@@ -1,4 +1,5 @@
 <?php
+namespace GDO\Dog\bin;
 use GDO\Core\Debug;
 use GDO\Core\GDT_Template;
 use GDO\Core\Logger;
