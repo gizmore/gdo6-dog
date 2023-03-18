@@ -54,8 +54,7 @@ if (@$argv[1] === 'config')
 elseif ( (@$argv[1] === 'modules') || (@$argv[1] === 'upgrade') )
 {
     echo "Installing modules...\n";
-    ModuleLoader::instance()->loadModules($argv[1] === 'upgrade', true);
-    $modules = ModuleLoader::instance()->getInstallableModules();
+	$modules = ModuleLoader::instance()->loadModules($argv[1] === 'upgrade', true);
     foreach ($modules as $module)
     {
         echo $module->getName() . '... ';
