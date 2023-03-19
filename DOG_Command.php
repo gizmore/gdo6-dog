@@ -346,52 +346,52 @@ abstract class DOG_Command extends MethodForm
 	##################
 	### Repository ###
 	##################
-	
-	/**
-	 * @var Method[]
-	 */
-	public static $COMMANDS = [];
-	
-	/**
-	 * @var Method[]
-	 */
-	public static $COMMANDS_T = []; # By trigger
-	
-	public static function register(Method $command)
-	{
-	    self::$COMMANDS[] = $command;
-	    if ($t = $command->getCLITrigger())
-	    {
-    	    self::$COMMANDS_T[$t] = $command;
-			Method::addCLIAlias($t, get_class($command));
-	    }
-	}
-	
-	public static function sortCommands()
-	{
-		uasort(self::$COMMANDS, function(Method $a, Method $b) {
-			return $a->getModule()->priority - $b->getModule()->priority;
-		});
-		uasort(self::$COMMANDS_T, function(Method $a, Method $b) {
-			return $a->getModule()->priority - $b->getModule()->priority;
-        });
-    }
-	
-	/**
-	 * Get a command by trigger.
-	 */
-	public static function byTrigger(string $trigger, bool $throw=true): self
-	{
-		if (!isset(self::$COMMANDS_T[$trigger]))
-		{
-			if ($throw)
-			{
-				throw new GDO_Error('err_unknown_command');
-			}
-			return null;
-		}
-	    return self::$COMMANDS_T[$trigger];
-	}
+//
+//	/**
+//	 * @var Method[]
+//	 */
+//	public static $COMMANDS = [];
+//
+//	/**
+//	 * @var Method[]
+//	 */
+//	public static $COMMANDS_T = []; # By trigger
+//
+//	public static function register(Method $command)
+//	{
+//	    self::$COMMANDS[] = $command;
+//	    $t = $command->getCLITrigger())
+//	    {
+//    	    self::$COMMANDS_T[$t] = $command;
+////			Method::addCLIAlias($t, get_class($command));
+//	    }
+//	}
+//
+//	public static function sortCommands()
+//	{
+//		uasort(self::$COMMANDS, function(Method $a, Method $b) {
+//			return $a->getModule()->priority - $b->getModule()->priority;
+//		});
+//		uasort(self::$COMMANDS_T, function(Method $a, Method $b) {
+//			return $a->getModule()->priority - $b->getModule()->priority;
+//        });
+//    }
+//
+//	/**
+//	 * Get a command by trigger.
+//	 */
+//	public static function byTrigger(string $trigger, bool $throw=true): static
+//	{
+//		if (!isset(self::$COMMANDS_T[$trigger]))
+//		{
+//			if ($throw)
+//			{
+//				throw new GDO_Error('err_unknown_command');
+//			}
+//			return null;
+//		}
+//	    return self::$COMMANDS_T[$trigger];
+//	}
 	
 	/**
 	 * Get supported connectors for this command.
