@@ -1,4 +1,5 @@
 # gdo6-dog
+
 DOG Chatbot for gdo6. Will be a recode so it is quite empty atm
 
 ## Install
@@ -7,4 +8,3 @@ DOG Chatbot for gdo6. Will be a recode so it is quite empty atm
     cd gdo6
     ./gdoadm.sh provide Dog
     ./gdoadm.sh install Dog
-    

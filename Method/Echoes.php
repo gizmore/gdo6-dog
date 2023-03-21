@@ -7,18 +7,19 @@ use GDO\Dog\GDT_DogString;
 
 final class Echoes extends DOG_Command
 {
-    public $group = '';
-    public $trigger = 'echo';
 
-    public function isWebMethod() { return true; }
-	
-	public function gdoParameters() : array
+	public $group = '';
+	public $trigger = 'echo';
+
+	public function isWebMethod() { return true; }
+
+	public function gdoParameters(): array
 	{
-		return array(
+		return [
 			GDT_DogString::make('text')->notNull(),
-		);
+		];
 	}
-	
+
 	public function dogExecute(DOG_Message $message, $text)
 	{
 		$message->reply($text);

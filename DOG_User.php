@@ -3,153 +3,168 @@ namespace GDO\Dog;
 
 use GDO\Core\GDO;
 use GDO\Core\GDT_AutoInc;
+use GDO\Core\GDT_Checkbox;
+use GDO\Core\GDT_String;
+use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
 use GDO\User\GDT_User;
-use GDO\User\GDO_User;
-use GDO\Core\GDT_String;
-use GDO\Core\GDT_Checkbox;
 use GDO\User\GDT_UserType;
 
 /**
- * 
+ *
  * @author gizmore
  *
  */
 final class DOG_User extends GDO
 {
-    private $authenticated = false;
-    
-    public function gdoColumns() : array
-	{
-		return array(
-			GDT_AutoInc::make('doguser_id'),
-			GDT_String::make('doguser_name')->utf8()->max(64)->caseI()->notNull(),
-		    GDT_Server::make('doguser_server')->notNull(),
-		    GDT_User::make('doguser_user')->notNull(),
-		    GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),
-		);
-	}
-	
-	##############
-	### Getter ###
-	##############
-	public function getID() : ?string { return $this->gdoVar('doguser_id'); }
 
-	public function getGDOUser(): GDO_User { return $this->gdoValue('doguser_user'); }
-	public function getGDOUserID() { return $this->gdoVar('doguser_user'); }
-	
-	public function getServer(): DOG_Server { return $this->gdoValue('doguser_server'); }
-	public function getServerID() { return $this->gdoVar('doguser_server'); }
+	private $authenticated = false;
 
-	public function getName() : ?string { return $this->gdoVar('doguser_name'); }
-	public function getFullName() { return sprintf('%s{%s}', $this->getName(), $this->getServerID()); }
-	public function renderName(): string { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
-	public function displayFullName() { return sprintf('%s{%s}', $this->renderName(), $this->getServerID()); }
-
-	public function isOnline() { return $this->getServer()->hasUser($this); }
-	public function isService() { return $this->gdoVar('doguser_service'); }
-	
-	############
-	### Send ###
-	############
-	public function send($text)
-	{
-	    return $this->getServer()->getConnector()->sendToUser($this, $text);
-	}
-	
-	public function sendNotice($text)
-	{
-	    return $this->getServer()->getConnector()->sendNoticeToUser($this, $text);
-	}
-	
-	##############
-	### Static ###
-	##############
 	/**
 	 * @param DOG_Server $server
 	 * @param string $name
+	 *
 	 * @return self
 	 */
 	public static function getOrCreateUser(DOG_Server $server, $name)
 	{
 		if (!($user = self::getUser($server, $name)))
 		{
-    		$user = self::createUser($server, $name);
+			$user = self::createUser($server, $name);
 		}
 		$server->addUser($user);
 		return $user;
 	}
-	
+
+	##############
+	### Getter ###
+	##############
+
 	public static function getUser(DOG_Server $server, $name)
 	{
-	    if ($user = $server->getUserByName($name))
-	    {
-	        return $user;
-	    }
+		if ($user = $server->getUserByName($name))
+		{
+			return $user;
+		}
 		return self::table()->select()->
-			where(sprintf("doguser_server=%s AND doguser_name=%s", $server->getID(), GDO::quoteS($name)))->
-			first()->exec()->fetchObject();
+		where(sprintf('doguser_server=%s AND doguser_name=%s', $server->getID(), GDO::quoteS($name)))->
+		first()->exec()->fetchObject();
 	}
-	
+
+	public function getID(): ?string { return $this->gdoVar('doguser_id'); }
+
 	public static function createUser(DOG_Server $server, $name)
 	{
 		$sid = $server->getID();
-		$user = GDO_User::blank(array(
+		$user = GDO_User::blank([
 			'user_type' => GDT_UserType::MEMBER,
 			'user_name' => sprintf('%s{%s}', $name, $sid),
-		))->insert();
-		return self::blank(array(
+		])->insert();
+		return self::blank([
 			'doguser_name' => $name,
 			'doguser_server' => $sid,
 			'doguser_user' => $user->getID(),
-		))->insert();
+		])->insert();
 	}
-	
+
+	public function gdoColumns(): array
+	{
+		return [
+			GDT_AutoInc::make('doguser_id'),
+			GDT_String::make('doguser_name')->utf8()->max(64)->caseI()->notNull(),
+			GDT_Server::make('doguser_server')->notNull(),
+			GDT_User::make('doguser_user')->notNull(),
+			GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),
+		];
+	}
+
 	/**
 	 * Get all users with a permission.
+	 *
 	 * @param string $permission
+	 *
 	 * @return self[]
 	 */
 	public static function withPermission($permission)
 	{
-	    return GDO_UserPermission::table()->select('dog_user.*')->
-	    joinObject('perm_user_id')->joinObject('perm_perm_id')->
-	    join('JOIN dog_user ON dog_user.doguser_user = gdo_user.user_id')->
-	    where("perm_name=".self::quoteS($permission))->
-	    exec()->fetchAllObjectsAs(self::table());
+		return GDO_UserPermission::table()->select('dog_user.*')->
+		joinObject('perm_user_id')->joinObject('perm_perm_id')->
+		join('JOIN dog_user ON dog_user.doguser_user = gdo_user.user_id')->
+		where('perm_name=' . self::quoteS($permission))->
+		exec()->fetchAllObjectsAs(self::table());
 	}
-	
+
+	public function getGDOUserID() { return $this->gdoVar('doguser_user'); }
+
+	public function getFullName() { return sprintf('%s{%s}', $this->getName(), $this->getServerID()); }
+
+	public function getName(): ?string { return $this->gdoVar('doguser_name'); }
+
+	public function getServerID() { return $this->gdoVar('doguser_server'); }
+
+	public function displayFullName() { return sprintf('%s{%s}', $this->renderName(), $this->getServerID()); }
+
+	public function renderName(): string { return $this->getServer()->getConnector()->obfuscate($this->getName()); }
+
+	############
+	### Send ###
+	############
+
+	public function getServer(): DOG_Server { return $this->gdoValue('doguser_server'); }
+
+	public function isOnline() { return $this->getServer()->hasUser($this); }
+
+	##############
+	### Static ###
+	##############
+
+	public function isService() { return $this->gdoVar('doguser_service'); }
+
+	public function send($text)
+	{
+		return $this->getServer()->getConnector()->sendToUser($this, $text);
+	}
+
+	public function sendNotice($text)
+	{
+		return $this->getServer()->getConnector()->sendNoticeToUser($this, $text);
+	}
+
+	public function isRegistered()
+	{
+		return !!$this->settingVar('Login', 'password');
+	}
+
 	################
 	### Settings ###
 	################
+
 	public function settingVar(string $moduleName, string $key): ?string
 	{
 		$user = $this->getGDOUser();
 		return $user->settingVar($moduleName, $key);
 	}
-	
+
 	############
 	### Auth ###
 	############
-	public function isRegistered()
-	{
-		return !!$this->settingVar('Login', 'password');
-	}
-	
+
+	public function getGDOUser(): GDO_User { return $this->gdoValue('doguser_user'); }
+
 	public function isAuthenticated()
 	{
-	    return $this->authenticated;
+		return $this->authenticated;
 	}
-	
+
 	public function login()
 	{
-	    $this->authenticated = true;
-	    Dog::instance()->event('dog_authenticated', $this);
+		$this->authenticated = true;
+		Dog::instance()->event('dog_authenticated', $this);
 	}
-	
+
 	public function logout()
 	{
-	    $this->authenticated = false;
+		$this->authenticated = false;
 	}
 
 }

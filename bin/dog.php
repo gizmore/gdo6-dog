@@ -1,14 +1,15 @@
 <?php
 namespace GDO\Dog\bin;
-use GDO\Language\Trans;
+
+use GDO\CLI\CLI;
 use GDO\Core\Debug;
 use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
+use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
-use GDO\CLI\CLI;
 
 require 'GDO6.php';
 require 'protected/config_dog.php';
@@ -32,7 +33,7 @@ Database::init();
 CLI::setServerVars();
 GDT_Page::make();
 
-$modules = (new ModuleLoader(GDO_PATH.'GDO/'))->loadModules(true);
+$modules = (new ModuleLoader(GDO_PATH . 'GDO/'))->loadModules(true);
 
 // if (GDO_CONSOLE_VERBOSE)
 // {
@@ -46,8 +47,8 @@ define('GDO_CORE_STABLE', 1);
 
 $dog->init();
 
-/** @var $argc int **/
-/** @var $argv string[] **/
+/** @var $argc int * */
+/** @var $argv string[] * */
 
 if ($argc === 1)
 {
@@ -59,5 +60,3 @@ else
 	array_shift($argv);
 	$dog->event('dog_cmdline', ...$argv);
 }
-
-
