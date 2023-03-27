@@ -1,8 +1,12 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog;
 
 use GDO\Core\WithName;
 
+/**
+ * An abstract connector for the dog chatbot.
+ */
 abstract class DOG_Connector
 {
 
@@ -12,32 +16,37 @@ abstract class DOG_Connector
 	 * @var DOG_Connector[]
 	 */
 	private static $connectors = [];
-	/**
-	 * @var DOG_Server
-	 */
-	public $server;
-	public $connected = false;
+
+	public DOG_Server $server;
+
+	public bool $connected = false;
 
 	/**
 	 * @return DOG_Connector[]
 	 */
-	public static function connectors() { return self::$connectors; }
+	public static function connectors(): array
+	{
+		return self::$connectors;
+	}
 
 	/**
 	 * @return DOG_Connector
 	 */
-	public static function connector($name)
+	public static function connector(string $name): ?DOG_Connector
 	{
-		/** @var $conn DOG_Connector * */
+		/** @var DOG_Connector $conn * */
 		if ($connectorName = @self::$connectors[$name])
 		{
 			$conn = new $connectorName();
 			$conn->init();
 			return $conn;
 		}
+		return null;
 	}
 
-	public function init() {}
+	protected function init(): void
+	{
+	}
 
 	###
 
@@ -53,7 +62,7 @@ abstract class DOG_Connector
 
 	public function renderName(): string { return t('connector_' . $this->gdoShortName()); }
 
-	public function server(DOG_Server $server)
+	public function server(DOG_Server $server): self
 	{
 		$this->server = $server;
 		return $this;
@@ -63,7 +72,7 @@ abstract class DOG_Connector
 
 	public function setupServer(DOG_Server $server) {}
 
-	public function connected($connected)
+	public function connected(bool $connected): self
 	{
 		$this->connected = $connected;
 		return $this;
