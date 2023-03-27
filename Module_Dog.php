@@ -16,7 +16,7 @@ final class Module_Dog extends GDO_Module
 
 	public int $priority = 40;
 
-	public function defaultEnabled(): bool { return true; }
+	public function defaultEnabled(): string { return true; }
 
 	public function onInstall(): void { DOG_Install::onInstall($this); }
 

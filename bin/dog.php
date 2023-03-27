@@ -11,9 +11,9 @@ use GDO\Dog\DogApp;
 use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
 
-require 'GDO6.php';
+require 'GDO7.php';
 require 'protected/config_dog.php';
-$dog = new DogApp();
+#$dog = new DogApp();
 $dog = new Dog();
 chdir(GDO_PATH);
 Logger::init(null, GDO_ERROR_LEVEL); # 1st init as guest

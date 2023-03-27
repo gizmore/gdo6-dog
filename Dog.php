@@ -4,6 +4,7 @@ namespace GDO\Dog;
 use Error;
 use GDO\Core\Application;
 use GDO\Core\Debug;
+use GDO\Core\Event\Table;
 use GDO\Core\GDO;
 use GDO\Core\GDO_Hook;
 use GDO\Core\GDO_Module;
@@ -13,6 +14,7 @@ use GDO\Cronjob\MethodCronjob;
 use GDO\Dog\Connector\Bash;
 use GDO\Install\Installer;
 use GDO\UI\GDT_Error;
+use GDO\User\GDO_Permission;
 use GDO\Util\Filewalker;
 use Throwable;
 
@@ -26,8 +28,8 @@ use Throwable;
 final class Dog
 {
 
-	public const ADMIN = 'admin';
-	public const STAFF = 'staff';
+	public const ADMIN = GDO_Permission::ADMIN;
+	public const STAFF = GDO_Permission::STAFF;
 
 	public const OWNER = 'owner';
 	public const OPERATOR = 'operator';
@@ -41,7 +43,7 @@ final class Dog
 	 * @var DOG_Server[]
 	 */
 	public $servers;
-	private $loadedPlugins;
+	private bool $loadedPlugins = false;
 
 	public function __construct()
 	{
@@ -52,9 +54,9 @@ final class Dog
 	{
 		if ($this->loadedPlugins)
 		{
-			return;
+			return true;
 		}
-		$this->loadedPlugins = true;
+
 		Filewalker::traverse('GDO', null, null, function ($entry, $path)
 		{
 			if (preg_match('/^Dog[A-Z0-9]*$/i', $entry))
@@ -73,10 +75,10 @@ final class Dog
 					$class_name = substr($class_name, 0, -4);
 					if (class_exists($class_name))
 					{
-						if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
-						{
-							DOG_Command::register(new $class_name());
-						}
+//						if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
+//						{
+//							DOG_Command::register(new $class_name());
+//						}
 						if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
 						{
 							DOG_Connector::register(new $class_name());
@@ -91,11 +93,10 @@ final class Dog
 			}
 		}, 0);
 
-		$this->loadedPlugins = true;
-//         if ($this->loadedPlugins)
-//         {
-		$this->autoCreateCommands();
-//         }
+		if ($this->loadedPlugins)
+		{
+			$this->autoCreateCommands();
+		}
 
 		return $this->loadedPlugins;
 	}
@@ -185,6 +186,7 @@ final class Dog
 	public function mainloopStep()
 	{
 		Application::updateTime();
+		Table::dispatch('tick');
 		foreach ($this->servers as $server)
 		{
 			if ($server->isActive())

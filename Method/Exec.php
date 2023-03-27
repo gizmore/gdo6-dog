@@ -2,6 +2,7 @@
 namespace GDO\Dog\Method;
 
 use GDO\Core\Expression\Parser;
+use GDO\Core\GDT_Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\UI\GDT_Page;
@@ -40,6 +41,12 @@ final class Exec extends DOG_Command
 
 		$parser = new Parser();
 		$exp = $parser->parse($text);
+
+		if (!$this->isMethodEnabled($exp->method, $message))
+		{
+			return $this->error('err_dog_disabled');
+		}
+
 		$exp->method->runAs($message->user->getGDOUser());
 		$result = $exp->execute();
 
@@ -48,5 +55,11 @@ final class Exec extends DOG_Command
 		$response .= $result->render();
 		return $message->reply(trim($response));
 	}
+
+	private function isMethodEnabled(GDT_Method $method, DOG_Message $message): bool
+	{
+		return true;
+	}
+
 
 }

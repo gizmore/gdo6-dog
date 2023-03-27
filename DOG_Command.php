@@ -22,9 +22,6 @@ abstract class DOG_Command extends MethodForm
 	################
 	### Override ###
 	################
-// 	public $group = null;
-// 	public $trigger = null;
-// 	public $priority = 50; # @TODO: make these into functions?
 	private $ccUser = null;
 	private $ccRoom = null;
 	private $ccServer = null;
@@ -128,7 +125,7 @@ abstract class DOG_Command extends MethodForm
 		return $this->getCLITrigger();
 	}
 
-	public function getCLITrigger()
+	public function getCLITrigger(): string
 	{
 		$g = $this->getCLITriggerGroup();
 		$t = strtolower($this->getMethodName());
@@ -180,7 +177,7 @@ abstract class DOG_Command extends MethodForm
 		$form->actions()->addField(GDT_Submit::make());
 	}
 
-	public function formValidated(GDT_Form $form)
+	public function formValidated(GDT_Form $form): GDT
 	{
 		$args = [];
 		foreach ($this->gdoParameterCache() as $gdt)

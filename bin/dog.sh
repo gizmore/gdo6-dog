@@ -8,5 +8,5 @@ if kill -0 $(< "$PF") 2> /dev/null; then # process in pidfile is yours and runni
     exit 0
 else
     echo $$ > "$PF"
-    exec ./GDO/Dog/bin/run_dog.sh
+    exec ./run_dog.sh
 fi

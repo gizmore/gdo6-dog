@@ -13,7 +13,7 @@ use GDO\Dog\DOG_Message;
 class Ping extends DOG_Command
 {
 
-	public function getCLITrigger()
+	public function getCLITrigger(): string
 	{
 		return 'ping';
 	}

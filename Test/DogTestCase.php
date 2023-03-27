@@ -95,7 +95,7 @@ class DogTestCase extends TestCase
 		try
 		{
 			ob_start();
-			Application::$INSTANCE->reset(true);
+			Application::$INSTANCE->reset();
 			Dog::instance()->event('dog_cmdline2', $line);
 			$response = ob_get_contents();
 			return $response;

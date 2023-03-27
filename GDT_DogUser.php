@@ -84,7 +84,7 @@ final class GDT_DogUser extends GDT_Object
 	/**
 	 * Always use the findByName method.
 	 */
-	public function toValue($var = null)
+	public function toValue(null|string|array $var): null|bool|int|float|string|object|array
 	{
 		$_REQUEST['nocompletion_' . $this->name] = 1;
 		return parent::toValue($var);
@@ -93,7 +93,7 @@ final class GDT_DogUser extends GDT_Object
 	/**
 	 * Validate object first, then options.
 	 */
-	public function validate($value): bool
+	public function validate(int|float|string|array|null|object|bool $value): bool
 	{
 		if (!parent::validate($value))
 		{
