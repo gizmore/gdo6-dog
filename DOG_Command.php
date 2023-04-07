@@ -50,27 +50,24 @@ abstract class DOG_Command extends MethodForm
 		return $this->getConfigGDTBot($key)->var;
 	}
 
-	/**
-	 * @return GDT
-	 */
-	public function getConfigGDTBot(string $key)
+	public function getConfigGDTBot(string $key): ?GDT
 	{
 		$conf = $this->getConfigBotCached();
-		return @$conf[$key];
+		return $conf[$key] ?: null;
 	}
 
 	##################
 	### Config Bot ###
 	##################
 
-	private function getConfigBotCached()
+	private function getConfigBotCached(): array
 	{
 		if ($this->ccBot === null)
 		{
 			$this->ccBot = [];
 			foreach ($this->getConfigBot() as $gdt)
 			{
-				$this->ccBot[$gdt->name] = $gdt;
+				$this->ccBot[$gdt->getName()] = $gdt;
 			}
 		}
 		return $this->ccBot;
@@ -79,7 +76,7 @@ abstract class DOG_Command extends MethodForm
 	/**
 	 * @return GDT[]
 	 */
-	public function getConfigBot() { return []; }
+	public function getConfigBot(): array { return []; }
 
 	public function getConfigValueBot($key)
 	{
@@ -111,7 +108,7 @@ abstract class DOG_Command extends MethodForm
 
 	public function getConfigVarUser(DOG_User $user, $key)
 	{
-		if ($var = DOG_ConfigUser::table()->getById($this->gdoClassName(), $key, $user->getID()))
+		if ($var = DOG_ConfigUser::getById($this->gdoClassName(), $key, $user->getID()))
 		{
 			return $var->gdoVar('confu_var');
 		}
@@ -140,25 +137,20 @@ abstract class DOG_Command extends MethodForm
 	### Config User ###
 	###################
 
-	/**
-	 * @param string $key
-	 *
-	 * @return GDT
-	 */
-	public function getConfigGDTUser($key)
+	public function getConfigGDTUser(string $key): ?GDT
 	{
 		$conf = $this->getConfigUserCached();
-		return @$conf[$key];
+		return $conf[$key] ?: null;
 	}
 
-	private function getConfigUserCached()
+	private function getConfigUserCached(): array
 	{
 		if ($this->ccUser === null)
 		{
 			$this->ccUser = [];
 			foreach ($this->getConfigUser() as $gdt)
 			{
-				$this->ccUser[$gdt->name] = $gdt;
+				$this->ccUser[$gdt->getName()] = $gdt;
 			}
 		}
 		return $this->ccUser;
@@ -189,6 +181,10 @@ abstract class DOG_Command extends MethodForm
 		if (isset($m->room))
 		{
 			$message->room($m->room);
+		}
+		if ($this->isDebugging())
+		{
+			xdebug_break();
 		}
 		$this->dogExecute($message, ...$args);
 		return $this->message('%s', [$message->getReply()]);
@@ -694,33 +690,33 @@ abstract class DOG_Command extends MethodForm
 		}
 	}
 
-	private function getDefaultButtonLabel()
-	{
-		if ($form = $this->getForm())
-		{
-			$buttons = $form->actions()->getAllFields();
-			if ($button = array_shift($buttons))
-			{
-				return $button->renderLabel();
-			}
-		}
-		return t('submit');
-	}
-
-	private function getButtonByLabel($label)
-	{
-		if ($form = $this->getForm())
-		{
-			foreach ($form->actions()->getAllFields() as $button)
-			{
-				$myLabel = $button->renderLabel();
-				if (strcasecmp($myLabel, $label) === 0)
-				{
-					return $button->getName();
-				}
-			}
-		}
-	}
+//	private function getDefaultButtonLabel()
+//	{
+//		if ($form = $this->getForm())
+//		{
+//			$buttons = $form->actions()->getAllFields();
+//			if ($button = array_shift($buttons))
+//			{
+//				return $button->renderLabel();
+//			}
+//		}
+//		return t('submit');
+//	}
+//
+//	private function getButtonByLabel($label)
+//	{
+//		if ($form = $this->getForm())
+//		{
+//			foreach ($form->actions()->getAllFields() as $button)
+//			{
+//				$myLabel = $button->renderLabel();
+//				if (strcasecmp($myLabel, $label) === 0)
+//				{
+//					return $button->getName();
+//				}
+//			}
+//		}
+//	}
 
 }
 

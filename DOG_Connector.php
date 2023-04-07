@@ -29,34 +29,36 @@ abstract class DOG_Connector
 		return self::$connectors;
 	}
 
-	/**
-	 * @return DOG_Connector
-	 */
 	public static function connector(string $name): ?DOG_Connector
 	{
 		/** @var DOG_Connector $conn * */
-		if ($connectorName = @self::$connectors[$name])
+		if ($connectorName = self::$connectors[$name]?:null)
 		{
 			$conn = new $connectorName();
-			$conn->init();
-			return $conn;
+			if ($conn->init())
+			{
+				return $conn;
+			}
 		}
 		return null;
 	}
 
 	###
 
-	public static function register(DOG_Connector $connector)
+	public static function register(DOG_Connector $connector): void
 	{
 		self::$connectors[$connector->gdoShortName()] = $connector->gdoClassName();
 	}
 
-	public function getID(): ?string
+	public function getID(): string
 	{
 		return $this->gdoShortName();
 	}
 
-	public function renderName(): string { return t('connector_' . $this->gdoShortName()); }
+	public function renderName(): string
+	{
+		return t('connector_' . $this->gdoShortName());
+	}
 
 	public function server(DOG_Server $server): self
 	{
@@ -64,17 +66,22 @@ abstract class DOG_Connector
 		return $this;
 	}
 
+
 	###
 
-	public function setupServer(DOG_Server $server) {}
 
-	public function connected(bool $connected): self
+	public function setupServer(DOG_Server $server): void {}
+
+	public function connected(bool $connected): static
 	{
 		$this->connected = $connected;
 		return $this;
 	}
 
-	public function obfuscate($string) { return $string; }
+	public function obfuscate(string $string): string
+	{
+		return $string;
+	}
 
 	public function send(string $text): bool
 	{
@@ -125,5 +132,7 @@ abstract class DOG_Connector
 	 * DOG_Message
 	 */
 	abstract public function readMessage();
+
+	abstract public function init(): bool;
 
 }

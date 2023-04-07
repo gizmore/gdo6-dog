@@ -40,12 +40,12 @@ final class Dog
 	final public const MICROSLEEP = 20000;
 	private static self $INSTANCE;
 
-	public $running = true;
+	public bool $running = true;
 
 	/**
 	 * @var DOG_Server[]
 	 */
-	public $servers;
+	public array $servers;
 	private bool $loadedPlugins = false;
 
 	public function __construct()
@@ -76,10 +76,6 @@ final class Dog
 				{
 					$class_name = str_replace('/', "\\", $path);
 					$class_name = substr($class_name, 0, -4);
-					if (is_a($class_name, DOG_Command::class))
-					{
-
-					}
 					if (class_exists($class_name))
 					{
 						if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
@@ -97,28 +93,7 @@ final class Dog
 			}
 		}, 0);
 
-//		if ($this->loadedPlugins)
-//		{
-//			$this->autoCreateCommands();
-//		}
-
 		return $this->loadedPlugins;
-	}
-
-	/**
-	 * Create dog commands automatically from methods.
-	 * Certain method types are skipped, as well those not shown in sitemap.
-	 *
-	 * @return bool
-	 */
-	private function autoCreateCommands()
-	{
-		$modules = ModuleLoader::instance()->getEnabledModules();
-		foreach ($modules as $module)
-		{
-			$this->autoCreateCommandsForModule($module);
-		}
-		return true;
 	}
 
 	public static function instance(): static
@@ -132,27 +107,9 @@ final class Dog
 		return self::$INSTANCE;
 	}
 
-	private function autoCreateCommandsForModule(GDO_Module $module): void
+	public function removeServer(DOG_Server $server): bool
 	{
-		Installer::loopMethods($module, function ($entry, $fullpath, GDO_Module $module)
-		{
-			$method = Installer::loopMethod($module, $fullpath);
-			if (
-				($method instanceof MethodCronjob) || # skip cronjobs
-				($method instanceof DOG_Command) ||  # skip real dog commands
-				(!$method->isCLI()) || # skip non cli
-				($method->isAjax())
-			) # skip ajax
-			{
-				return;
-			}
-			DOG_Command::register(new $method());
-		});
-	}
-
-	public function removeServer(DOG_Server $server)
-	{
-		if (false !== ($index = array_search($server, $this->servers)))
+		if (false !== ($index = array_search($server, $this->servers, true)))
 		{
 			unset($this->servers[$index]);
 			return true;
@@ -168,7 +125,6 @@ final class Dog
 		{
 			Bash::instance()->init();
 			$this->servers = DOG_Server::table()->all();
-			DOG_User:
 		}
 	}
 
@@ -247,13 +203,13 @@ final class Dog
 					$processed++;
 				}
 			}
-			catch (Error $e)
+			catch (Error $ex)
 			{
-				Debug::error($e);
+				echo Debug::backtraceException($ex);
 			}
-			catch (Throwable $e)
+			catch (Throwable $ex)
 			{
-				Debug::exception_handler($e);
+				echo Debug::backtraceException($ex);
 			}
 		}
 	}
@@ -305,10 +261,6 @@ final class Dog
 
 	private function webHookDB($message)
 	{
-		if (GDO_CONSOLE_VERBOSE)
-		{
-			echo "{$message}\n";
-		}
 		$message = json_decode($message, true);
 		$event = $message['event'];
 		$args = $message['args'];

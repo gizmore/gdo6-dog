@@ -16,7 +16,7 @@ trait WithBruteforceProtection
 
 	private $attempts = [];
 
-	public function getConfigBot()
+	public function getConfigBot(): array
 	{
 		return [
 			GDT_Duration::make('timeout')->initial('10'),

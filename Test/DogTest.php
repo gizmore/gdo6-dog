@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog\Test;
 
 use GDO\Dog\Connector\Bash;
@@ -52,7 +53,7 @@ final class DogTest extends DogTestCase
 	public function testHelpCommand()
 	{
 		$r = $this->bashCommand('help help');
-		assertStringContainsString('Print short help for a method', $r, 'Test the help command for command overview.');
+		assertStringContainsString('Print short help for a method', $r, 'Test the help for a single command.');
 		$r = $this->bashCommand('help');
 		assertStringContainsString('core.clearcache', $r, 'Test the help command for all available methods.');
 	}
