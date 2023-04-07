@@ -1,16 +1,17 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog\Test;
 
 use GDO\Core\Application;
 use GDO\Dog\Connector\Bash;
 use GDO\Dog\Dog;
+use GDO\Dog\DOG_Server;
 use GDO\Dog\DOG_User;
 use GDO\Tests\GDT_MethodTest;
 use GDO\Tests\TestCase;
 use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
 use GDO\Util\Strings;
-use Throwable;
 
 /**
  *
@@ -20,22 +21,22 @@ use Throwable;
 class DogTestCase extends TestCase
 {
 
-	protected $doguser;
+	protected DOG_User $doguser;
 
-	public function dogUser($username)
+	public function dogUser(string $username): GDO_User
 	{
 		$user = GDO_User::getByName($username);
 		return $this->user($user);
 	}
 
-	public function user(GDO_User $user): GDO_User
+	protected function user(GDO_User $user): GDO_User
 	{
 		$username = Strings::substrTo($user->getName(), '{', $user->getName());
 		$this->doguser = DOG_User::getOrCreateUser($this->getServer(), $username);
 		return parent::user($user);
 	}
 
-	protected function getServer()
+	protected function getServer(): DOG_Server
 	{
 		return Bash::$BASH_SERVER;
 	}
@@ -44,36 +45,34 @@ class DogTestCase extends TestCase
 	{
 		Dog::instance()->init();
 		parent::setUp();
-		Application::instance()->cli(true);
+		Application::instance()->cli();
 		$this->restoreUserPermissions($this->userGizmore1());
 	}
 
 	/**
 	 * Restore gizmore because auto coverage messes with him a lot.
-	 *
-	 * @param GDO_User $user
 	 */
 	protected function restoreUserPermissions(GDO_User $user): void
 	{
+		$this->user($user);
 		if (count(GDT_MethodTest::$TEST_USERS))
 		{
 			$g1 = GDO_User::getByName('gizmore{1}');
 			if ($user->getID() === $g1->getID())
 			{
-				$table = GDO_UserPermission::table();
-				$table->grant($user, 'admin');
-				$table->grant($user, 'staff');
-				$table->grant($user, 'cronjob');
-				$table->grant($user, Dog::VOICE);
-				$table->grant($user, Dog::HALFOP);
-				$table->grant($user, Dog::OPERATOR);
-				$table->grant($user, Dog::ADMIN);
+				GDO_UserPermission::grant($user, 'admin');
+				GDO_UserPermission::grant($user, 'staff');
+				GDO_UserPermission::grant($user, 'cronjob');
+				GDO_UserPermission::grant($user, Dog::VOICE);
+				GDO_UserPermission::grant($user, Dog::HALFOP);
+				GDO_UserPermission::grant($user, Dog::OPERATOR);
+				GDO_UserPermission::grant($user, Dog::ADMIN);
 				$user->changedPermissions();
 			}
 		}
 	}
 
-	public function userGizmore1()
+	public function userGizmore1(): GDO_User
 	{
 		$g1 = GDO_User::getByName('gizmore{1}');
 		return $this->user($g1);
@@ -81,7 +80,7 @@ class DogTestCase extends TestCase
 
 	protected function tearDown(): void
 	{
-		Application::instance()->cli(false);
+//		Application::instance()->cli(false);
 	}
 
 	/**
@@ -96,6 +95,10 @@ class DogTestCase extends TestCase
 			Dog::instance()->event('dog_cmdline2', $line);
 			return ob_get_contents();
 		}
+//		catch (Throwable $ex)
+//		{
+//			Debug::debugException($ex);
+//		}
 		finally
 		{
 			ob_end_clean();

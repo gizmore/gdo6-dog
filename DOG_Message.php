@@ -21,24 +21,21 @@ class DOG_Message
 		self::$LAST_MESSAGE = $this;
 	}
 
-	/**
-	 * return self
-	 */
-	public static function make() { return new self(); }
+	public static function make(): static { return new static(); }
 
-	public function server(DOG_Server $server)
+	public function server(DOG_Server $server): static
 	{
 		$this->server = $server;
 		return $this;
 	}
 
-	public function room(DOG_Room $room = null)
+	public function room(DOG_Room $room = null): static
 	{
 		$this->room = $room;
 		return $this;
 	}
 
-	public function user(DOG_User $user)
+	public function user(DOG_User $user): static
 	{
 		$this->user = $user;
 		$gdoUser = $user->getGDOUser();
@@ -46,12 +43,9 @@ class DOG_Message
 		return $this;
 	}
 
-	/**
-	 * @return GDO_User
-	 */
-	public function getGDOUser() { return $this->user->getGDOUser(); }
+	public function getGDOUser(): GDO_User { return $this->user->getGDOUser(); }
 
-	public function text($text)
+	public function text($text): static
 	{
 		$this->text = $text;
 		return $this;
@@ -60,18 +54,18 @@ class DOG_Message
 	###############
 	### Methods ###
 	###############
-	public function rply($key, $args = null)
+	public function rply(string $key, array $args = null): bool
 	{
 		return $this->reply($this->t($key, $args));
 	}
 
-	public function reply($text): bool
+	public function reply(string $text): bool
 	{
 		$this->server->getConnector()->reply($this, $text);
 		return true;
 	}
 
-	public function t($key, $args = null)
+	public function t(string $key, array $args = null): array|string
 	{
 		$text = t($key, $args);
 		$bot = $this->server->getUsername();

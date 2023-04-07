@@ -182,8 +182,8 @@ abstract class DOG_Command extends MethodForm
 		{
 			$args[] = $gdt->getValue();
 		}
-		$message = new DOG_HTTPMessage();
 		$m = DOG_Message::$LAST_MESSAGE;
+		$message = new DOG_HTTPMessage();
 		$message->user($m->user);
 		$message->server($m->server);
 		if (isset($m->room))

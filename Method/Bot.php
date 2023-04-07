@@ -21,7 +21,7 @@ final class Bot extends DOG_Command
 		];
 	}
 
-	public function dogExecute(DOG_Message $message, DOG_User $user, $botflag)
+	public function dogExecute(DOG_Message $message, DOG_User $user, bool $botflag)
 	{
 		if ($user->isService())
 		{

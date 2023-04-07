@@ -22,7 +22,7 @@ final class RoomLanguage extends DOG_Command
 	public function gdoParameters(): array
 	{
 		return [
-			GDT_Language::make('lang'),
+			GDT_Language::make('lang')->positional(),
 		];
 	}
 

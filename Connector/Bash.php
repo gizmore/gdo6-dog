@@ -101,7 +101,7 @@ class Bash extends DOG_Connector
 		echo "$text\n";
 	}
 
-	public function dog_cmdline(...$argv): void
+	public function dog_cmdline(string...$argv): void
 	{
 		$text = implode(' ', $argv);
 		$this->dog_cmdline2($text);

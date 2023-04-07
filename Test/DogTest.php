@@ -53,6 +53,8 @@ final class DogTest extends DogTestCase
 	{
 		$r = $this->bashCommand('help help');
 		assertStringContainsString('Print short help for a method', $r, 'Test the help command for command overview.');
+		$r = $this->bashCommand('help');
+		assertStringContainsString('core.clearcache', $r, 'Test the help command for all available methods.');
 	}
 
 	protected function setUp(): void

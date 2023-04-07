@@ -1,10 +1,9 @@
-# gdo6-dog
+# phpgdo-dog
 
-DOG Chatbot for gdo6. Will be a recode so it is quite empty atm
+Dog Chatbot for
+[phpgdo](https://github.com/gizmore/phpgdo).
 
-## Install
 
-    git clone https://github.com/gizmore/gdo6
-    cd gdo6
-    ./gdoadm.sh provide Dog
-    ./gdoadm.sh install Dog
+## phpgdo-dog License
+
+This is properitary software.

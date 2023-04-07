@@ -76,6 +76,10 @@ final class Dog
 				{
 					$class_name = str_replace('/', "\\", $path);
 					$class_name = substr($class_name, 0, -4);
+					if (is_a($class_name, DOG_Command::class))
+					{
+
+					}
 					if (class_exists($class_name))
 					{
 						if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
@@ -122,6 +126,7 @@ final class Dog
 		if (!isset(self::$INSTANCE))
 		{
 			self::$INSTANCE = new self();
+			self::$INSTANCE->init();
 			self::$INSTANCE->loadPlugins();
 		}
 		return self::$INSTANCE;
@@ -163,6 +168,7 @@ final class Dog
 		{
 			Bash::instance()->init();
 			$this->servers = DOG_Server::table()->all();
+			DOG_User:
 		}
 	}
 
@@ -254,11 +260,6 @@ final class Dog
 
 	public function event($name, ...$args)
 	{
-		if (defined('GDO_CONSOLE_VERBOSE'))
-		{
-			Logger::logCron("Dog::event($name) " . count($args));
-		}
-
 		$this->eventB(array_map(function (DOG_Server $s)
 		{
 			return $s->getConnector();
@@ -266,22 +267,22 @@ final class Dog
 		$this->eventB(Method::$CLI_ALIASES, $name, ...$args);
 	}
 
-	private function eventB(array $objects, $name, ...$args)
+	private function eventB(array $objects, string $name, ...$args): void
 	{
 		foreach ($objects as $object)
 		{
 			if (method_exists($object, $name))
 			{
-				try
-				{
+//				try
+//				{
 					call_user_func([$object::make(), $name], ...$args);
-				}
-				catch (Throwable $ex)
-				{
-					echo GDT_Error::fromException($ex)->render();
-					@ob_flush();
-					Logger::logException($ex);
-				}
+//				}
+//				catch (Throwable $ex)
+//				{
+////					echo GDT_Error::fromException($ex)->render();
+////					@ob_flush();
+//					Logger::logException($ex);
+//				}
 			}
 		}
 	}

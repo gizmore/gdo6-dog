@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog\Method;
 
 use GDO\CLI\CLI;
+use GDO\Core\Application;
 use GDO\Core\Expression\Parser;
+use GDO\Core\GDO_ArgException;
 use GDO\Core\GDO_NoSuchCommandError;
 use GDO\Core\GDO_NoSuchMethodError;
 use GDO\Core\GDT_Method;
@@ -10,17 +13,18 @@ use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
 use GDO\UI\GDT_Page;
 
+
 /**
  * Listens to the `dog_message` event and calls a command.
  *
- * @version 6.10.4
+ * @version 7.0.3
  * @since 6.10.2
  * @author gizmore
  */
 final class Exec extends DOG_Command
 {
 
-	public function isHiddenMethod() { return true; }
+//	public function isHiddenMethod() { return true; }
 
 	public function isRoomMethod() { return false; }
 
@@ -35,27 +39,37 @@ final class Exec extends DOG_Command
 		{
 			if (!str_starts_with($text, $message->room->getTrigger()))
 			{
-				return;
+				return null;
 			}
 			$text = substr($text, 1);
 		}
 
-		$parser = new Parser();
-
 		try
 		{
+			$parser = new Parser();
 			$exp = $parser->parse($text);
+			$exp->method->runAs($message->user->getGDOUser());
 
 			if (!$this->isMethodEnabled($exp->method, $message))
 			{
 				return $this->error('err_dog_disabled');
 			}
 
-			$exp->method->runAs($message->user->getGDOUser());
-
 			$result = $exp->execute();
+			$text = $result->render();
+			if (Application::isError())
+			{
+				$text .= CLI::renderCLIHelp($exp->method->method);
+			}
 
-			return $message->reply($result->render());
+			return $message->reply($text);
+		}
+		catch (GDO_ArgException $ex)
+		{
+			global $me;
+			$text = $ex->getMessage();
+			$text .= CLI::renderCLIHelp($me);
+			return $message->reply($text);
 		}
 		catch (GDO_NoSuchCommandError $ex)
 		{

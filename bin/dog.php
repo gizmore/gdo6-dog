@@ -8,19 +8,18 @@ use GDO\Core\GDT;
 use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
+use GDO\Dog\Connector\Bash;
 use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
 use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
+use GDO\User\GDO_User;
 use Ratchet\App;
 
+# Bootstrap
 require 'GDO7.php';
-require 'protected/config_dog.php';
-#$dog = new DogApp();
-$dog = new Dog();
+require 'protected/config.php';
 chdir(GDO_PATH);
-Logger::init(null, GDO_ERROR_LEVEL); # 1st init as guest
-
 Trans::$ISO = GDO_LANGUAGE;
 Debug::init();
 Debug::enableErrorHandler();
@@ -29,26 +28,27 @@ Debug::setDieOnError(false);
 Debug::setMailOnError(GDO_ERROR_MAIL);
 Database::init();
 CLI::setServerVars();
+$app = Application::init();
+$app->cli()->modeDetected(GDT::RENDER_CLI);
 GDT_Page::make();
 
-final class DogApplication extends Application
-{
-
-};
-$app = DogApplication::init();
-$app->cli()->modeDetected(GDT::RENDER_CLI);
-$modules = (new ModuleLoader(GDO_PATH . 'GDO/'))->loadModules(true);
-
-$dog->loadPlugins();
-
-# All fine!
+# Modules
+$loader = ModuleLoader::instance();
+$loader->loadModulesCache();
+Trans::inited();
 define('GDO_CORE_STABLE', 1);
 
+# Dog
+$dog = Dog::instance();
 $dog->init();
+$dog->loadPlugins();
 
+# User
+Bash::instance()->getBashUser();
+
+# Args
 /** @var int $argc * */
 /** @var string[] $argv * */
-
 if ($argc === 1)
 {
 	$dog->mainloop();

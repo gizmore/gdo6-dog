@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog\Method;
 
 use GDO\Crypto\GDT_Password;
@@ -16,14 +17,12 @@ use GDO\User\GDT_Username;
  * Add a generic new server.
  * Useful via command line or connectors that are not like IRC.
  *
- * @version 6.10
- * @since 6.10
+ * @version 7.0.3
+ * @since 6.10.0
  * @author gizmore
  */
 final class AddServer extends DOG_Command
 {
-
-	public $trigger = 'add_server';
 
 	public function getPermission(): ?string { return Dog::OPERATOR; }
 
@@ -31,13 +30,13 @@ final class AddServer extends DOG_Command
 	{
 		return [
 			GDT_Connector::make('connector')->notNull(),
-			GDT_Url::make('url')->allSchemes()->allowInternal()->allowExternal(),
+			GDT_Url::make('url')->allSchemes()->allowInternal()->allowExternal()->positional(),
 			GDT_Username::make('user'),
 			GDT_Password::make('password'),
 		];
 	}
 
-	public function dogExecute(DOG_Message $message, DOG_Connector $connector, URL $url = null, $username, $password)
+	public function dogExecute(DOG_Message $message, DOG_Connector $connector, URL $url = null, string $username=null, string $password=null)
 	{
 		if ($url)
 		{
