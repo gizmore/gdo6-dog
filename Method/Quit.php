@@ -12,7 +12,7 @@ final class Quit extends DOG_Command
 
 	public $trigger = 'die';
 
-	public function getPermission(): ?string { return Dog::OWNER; }
+	public function getPermission(): ?string { return Dog::ADMIN; }
 
 	public function gdoParameters(): array
 	{

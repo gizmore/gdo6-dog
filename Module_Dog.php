@@ -24,7 +24,9 @@ final class Module_Dog extends GDO_Module
 	public function getDependencies(): array
 	{
 		return [
+			'CLI',
 			'Cronjob',
+			'Net',
 		];
 	}
 

@@ -27,7 +27,7 @@ final class DogTest extends DogTestCase
 
 	public function testBashConnector()
 	{
-		$bash = Bash::instance()->getConnector();
+		$bash = Bash::instance();
 		assertTrue($bash instanceof Bash);
 		$response = $this->bashCommand('ping');
 		assertMatchesRegularExpression('/pong/is', $response, 'Test PING via Bash connector.');
@@ -36,11 +36,10 @@ final class DogTest extends DogTestCase
 	public function testGizmoreOp()
 	{
 		$user = $this->userGizmore1();
-		GDO_UserPermission::table()->grant($user, DOG::VOICE);
-		GDO_UserPermission::table()->grant($user, DOG::HALFOP);
-		GDO_UserPermission::table()->grant($user, DOG::OPERATOR);
-		GDO_UserPermission::table()->grant($user, DOG::OWNER);
-		assertTrue($user->hasPermission(Dog::OWNER), 'Test if gizmore{1} is owner.');
+		GDO_UserPermission::grant($user, Dog::VOICE);
+		GDO_UserPermission::grant($user, Dog::HALFOP);
+		GDO_UserPermission::grant($user, Dog::OPERATOR);
+		assertTrue($user->hasPermission(Dog::OPERATOR), 'Test if gizmore{1} is owner.');
 	}
 
 	public function testCoreMethods()
@@ -52,13 +51,13 @@ final class DogTest extends DogTestCase
 
 	public function testHelpCommand()
 	{
-		$r = $this->bashCommand('help');
+		$r = $this->bashCommand('help help');
 		assertStringContainsString('Print short help for a method', $r, 'Test the help command for command overview.');
 	}
 
 	protected function setUp(): void
 	{
-		if (Bash::instance())
+		if (Bash::instance()->init())
 		{
 			parent::setUp();
 		}

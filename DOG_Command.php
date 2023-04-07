@@ -39,11 +39,11 @@ abstract class DOG_Command extends MethodForm
 	### Helper ###
 	##############
 
-	public function getDefaultNickname() { return Module_Dog::instance()->cfgDefaultNickname(); }
+	public function getDefaultNickname(): string { return Module_Dog::instance()->cfgDefaultNickname(); }
 
 	public function getConfigVarBot($key)
 	{
-		if ($var = DOG_ConfigBot::table()->getById($this->gdoClassName(), $key))
+		if ($var = DOG_ConfigBot::getById($this->gdoClassName(), $key))
 		{
 			return $var->gdoVar('confb_var');
 		}
@@ -51,11 +51,9 @@ abstract class DOG_Command extends MethodForm
 	}
 
 	/**
-	 * @param string $key
-	 *
 	 * @return GDT
 	 */
-	public function getConfigGDTBot($key)
+	public function getConfigGDTBot(string $key)
 	{
 		$conf = $this->getConfigBotCached();
 		return @$conf[$key];

@@ -65,7 +65,7 @@ class DOG_Message
 		return $this->reply($this->t($key, $args));
 	}
 
-	public function reply($text)
+	public function reply($text): bool
 	{
 		$this->server->getConnector()->reply($this, $text);
 		return true;

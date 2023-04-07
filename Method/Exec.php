@@ -1,7 +1,10 @@
 <?php
 namespace GDO\Dog\Method;
 
+use GDO\CLI\CLI;
 use GDO\Core\Expression\Parser;
+use GDO\Core\GDO_NoSuchCommandError;
+use GDO\Core\GDO_NoSuchMethodError;
 use GDO\Core\GDT_Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
@@ -37,23 +40,27 @@ final class Exec extends DOG_Command
 			$text = substr($text, 1);
 		}
 
-// 		$trigger = strtolower(Strings::substrTo($text, ' ', $text));
-
 		$parser = new Parser();
-		$exp = $parser->parse($text);
 
-		if (!$this->isMethodEnabled($exp->method, $message))
+		try
 		{
-			return $this->error('err_dog_disabled');
+			$exp = $parser->parse($text);
+
+			if (!$this->isMethodEnabled($exp->method, $message))
+			{
+				return $this->error('err_dog_disabled');
+			}
+
+			$exp->method->runAs($message->user->getGDOUser());
+
+			$result = $exp->execute();
+
+			return $message->reply($result->render());
 		}
-
-		$exp->method->runAs($message->user->getGDOUser());
-		$result = $exp->execute();
-
-		$response = GDT_Page::instance()->topResponse()->render();
-		$response .= "\n";
-		$response .= $result->render();
-		return $message->reply(trim($response));
+		catch (GDO_NoSuchCommandError $ex)
+		{
+			return $message->reply($ex->getMessage());
+		}
 	}
 
 	private function isMethodEnabled(GDT_Method $method, DOG_Message $message): bool

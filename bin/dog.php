@@ -2,7 +2,9 @@
 namespace GDO\Dog\bin;
 
 use GDO\CLI\CLI;
+use GDO\Core\Application;
 use GDO\Core\Debug;
+use GDO\Core\GDT;
 use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
@@ -10,6 +12,7 @@ use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
 use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
+use Ratchet\App;
 
 require 'GDO7.php';
 require 'protected/config_dog.php';
@@ -17,11 +20,6 @@ require 'protected/config_dog.php';
 $dog = new Dog();
 chdir(GDO_PATH);
 Logger::init(null, GDO_ERROR_LEVEL); # 1st init as guest
-
-// if (defined('GDO_CONSOLE_VERBOSE'))
-// {
-//     Logger::logCron("Starting dog...\nLoading Modules...");
-// }
 
 Trans::$ISO = GDO_LANGUAGE;
 Debug::init();
@@ -33,12 +31,13 @@ Database::init();
 CLI::setServerVars();
 GDT_Page::make();
 
-$modules = (new ModuleLoader(GDO_PATH . 'GDO/'))->loadModules(true);
+final class DogApplication extends Application
+{
 
-// if (GDO_CONSOLE_VERBOSE)
-// {
-//     printf("Loaded %s modules.\n", count($modules));
-// }
+};
+$app = DogApplication::init();
+$app->cli()->modeDetected(GDT::RENDER_CLI);
+$modules = (new ModuleLoader(GDO_PATH . 'GDO/'))->loadModules(true);
 
 $dog->loadPlugins();
 
@@ -47,8 +46,8 @@ define('GDO_CORE_STABLE', 1);
 
 $dog->init();
 
-/** @var $argc int * */
-/** @var $argv string[] * */
+/** @var int $argc * */
+/** @var string[] $argv * */
 
 if ($argc === 1)
 {

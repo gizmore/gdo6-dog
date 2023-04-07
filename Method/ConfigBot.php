@@ -12,7 +12,7 @@ final class ConfigBot extends DOG_Command
 
 	public $trigger = 'confb';
 
-	public function getPermission(): ?string { return Dog::OWNER; }
+	public function getPermission(): ?string { return Dog::ADMIN; }
 
 	public function gdoParameters(): array
 	{

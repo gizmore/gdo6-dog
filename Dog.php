@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog;
 
 use Error;
@@ -9,6 +10,7 @@ use GDO\Core\GDO;
 use GDO\Core\GDO_Hook;
 use GDO\Core\GDO_Module;
 use GDO\Core\Logger;
+use GDO\Core\Method;
 use GDO\Core\ModuleLoader;
 use GDO\Cronjob\MethodCronjob;
 use GDO\Dog\Connector\Bash;
@@ -21,24 +23,25 @@ use Throwable;
 /**
  * Dog chatbot instance.
  *
- * @version 6.10.4
+ * @version 7.0.3
  * @since 6.8.0
  * @author gizmore
  */
 final class Dog
 {
 
-	public const ADMIN = GDO_Permission::ADMIN;
-	public const STAFF = GDO_Permission::STAFF;
+	final public const ADMIN = GDO_Permission::ADMIN;
+	final public const STAFF = GDO_Permission::STAFF;
 
-	public const OWNER = 'owner';
-	public const OPERATOR = 'operator';
-	public const HALFOP = 'halfop';
-	public const VOICE = 'voice';
+	final public const OPERATOR = 'operator';
+	final public const HALFOP = 'halfop';
+	final public const VOICE = 'voice';
 
-	public const MICROSLEEP = 20000;
-	private static $INSTANCE;
+	final public const MICROSLEEP = 20000;
+	private static self $INSTANCE;
+
 	public $running = true;
+
 	/**
 	 * @var DOG_Server[]
 	 */
@@ -75,13 +78,10 @@ final class Dog
 					$class_name = substr($class_name, 0, -4);
 					if (class_exists($class_name))
 					{
-//						if (is_a($class_name, '\\GDO\\Dog\\DOG_Command', true))
-//						{
-//							DOG_Command::register(new $class_name());
-//						}
 						if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
 						{
 							DOG_Connector::register(new $class_name());
+							$this->loadedPlugins = true;
 						}
 					}
 					else
@@ -93,10 +93,10 @@ final class Dog
 			}
 		}, 0);
 
-		if ($this->loadedPlugins)
-		{
-			$this->autoCreateCommands();
-		}
+//		if ($this->loadedPlugins)
+//		{
+//			$this->autoCreateCommands();
+//		}
 
 		return $this->loadedPlugins;
 	}
@@ -117,9 +117,17 @@ final class Dog
 		return true;
 	}
 
-	public static function instance() { return self::$INSTANCE; }
+	public static function instance(): static
+	{
+		if (!isset(self::$INSTANCE))
+		{
+			self::$INSTANCE = new self();
+			self::$INSTANCE->loadPlugins();
+		}
+		return self::$INSTANCE;
+	}
 
-	private function autoCreateCommandsForModule(GDO_Module $module)
+	private function autoCreateCommandsForModule(GDO_Module $module): void
 	{
 		Installer::loopMethods($module, function ($entry, $fullpath, GDO_Module $module)
 		{
@@ -147,20 +155,15 @@ final class Dog
 		return false;
 	}
 
+	private bool $inited = false;
+
 	public function init()
 	{
-		(new Bash())->init();
-
-		$this->servers = DOG_Server::table()->all();
-
-		DOG_Command::sortCommands();
-
-//     	DOG_Command::readConfig();
-
-//     	foreach (DOG_Command::$COMMANDS as $command)
-//     	{
-//     	    $command->init();
-//     	}
+		if (!$this->inited)
+		{
+			Bash::instance()->init();
+			$this->servers = DOG_Server::table()->all();
+		}
 	}
 
 	public function mainloop()
@@ -260,7 +263,7 @@ final class Dog
 		{
 			return $s->getConnector();
 		}, $this->servers), $name, ...$args);
-		$this->eventB(DOG_Command::$COMMANDS, $name, ...$args);
+		$this->eventB(Method::$CLI_ALIASES, $name, ...$args);
 	}
 
 	private function eventB(array $objects, $name, ...$args)
@@ -271,12 +274,12 @@ final class Dog
 			{
 				try
 				{
-					call_user_func([$object, $name], ...$args);
+					call_user_func([$object::make(), $name], ...$args);
 				}
 				catch (Throwable $ex)
 				{
 					echo GDT_Error::fromException($ex)->render();
-					ob_flush();
+					@ob_flush();
 					Logger::logException($ex);
 				}
 			}

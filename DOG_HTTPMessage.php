@@ -8,6 +8,7 @@ final class DOG_HTTPMessage extends DOG_Message
 
 	public function __construct()
 	{
+		parent::__construct();
 //     	self::$LAST_MESSAGE = $this;
 	}
 
@@ -16,9 +17,10 @@ final class DOG_HTTPMessage extends DOG_Message
 		return $this->reply;
 	}
 
-	public function reply($text)
+	public function reply($text): bool
 	{
 		$this->reply = $text;
+		return true;
 	}
 
 }

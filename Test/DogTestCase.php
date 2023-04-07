@@ -37,11 +37,12 @@ class DogTestCase extends TestCase
 
 	protected function getServer()
 	{
-		return Bash::instance();
+		return Bash::$BASH_SERVER;
 	}
 
 	protected function setUp(): void
 	{
+		Dog::instance()->init();
 		parent::setUp();
 		Application::instance()->cli(true);
 		$this->restoreUserPermissions($this->userGizmore1());
@@ -66,7 +67,7 @@ class DogTestCase extends TestCase
 				$table->grant($user, Dog::VOICE);
 				$table->grant($user, Dog::HALFOP);
 				$table->grant($user, Dog::OPERATOR);
-				$table->grant($user, Dog::OWNER);
+				$table->grant($user, Dog::ADMIN);
 				$user->changedPermissions();
 			}
 		}
@@ -85,24 +86,15 @@ class DogTestCase extends TestCase
 
 	/**
 	 * Execute a bash command and return output.
-	 *
-	 * @param string $line
-	 *
-	 * @return string
 	 */
-	public function bashCommand($line)
+	public function bashCommand(string $line): string
 	{
 		try
 		{
 			ob_start();
 			Application::$INSTANCE->reset();
 			Dog::instance()->event('dog_cmdline2', $line);
-			$response = ob_get_contents();
-			return $response;
-		}
-		catch (Throwable $ex)
-		{
-			throw $ex;
+			return ob_get_contents();
 		}
 		finally
 		{

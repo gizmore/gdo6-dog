@@ -15,7 +15,7 @@ abstract class DOG_Connector
 	/**
 	 * @var DOG_Connector[]
 	 */
-	private static $connectors = [];
+	private static array $connectors = [];
 
 	public DOG_Server $server;
 
@@ -42,10 +42,6 @@ abstract class DOG_Connector
 			return $conn;
 		}
 		return null;
-	}
-
-	protected function init(): void
-	{
 	}
 
 	###
