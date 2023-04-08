@@ -32,9 +32,13 @@ class Bash extends DOG_Connector
 		return self::$INSTANCE;
 	}
 
-	public static DOG_Server $BASH_SERVER;
 
 	public static self $INSTANCE;
+
+
+
+	public static DOG_Server $BASH_SERVER;
+
 
 	public function init(): bool
 	{
@@ -59,7 +63,7 @@ class Bash extends DOG_Connector
 		first()->exec()->fetchObject();
 	}
 
-	public function connect(): true
+	public function connect(): bool
 	{
 		$this->connected = true;
 		return true;
@@ -71,34 +75,33 @@ class Bash extends DOG_Connector
 		$this->connected = false;
 	}
 
-	public function readMessage()
+	public function readMessage(): ?DOG_Message
 	{
-		return false;
+		return null;
 	}
 
 	public function send(string $text): bool
 	{
-		parent::send($text);
-		echo "$text\n";
-		return true;
+		echo "{$this->server->renderName()} >> {$text}\n";
+		return parent::send($text);
 	}
 
-	public function sendToUser(DOG_User $user, $text)
+	public function sendToUser(DOG_User $user, string $text): bool
 	{
-		parent::sendToUser($user, $text);
-		echo "$text\n";
+		echo "{$user->renderName()} >> {$text}\n";
+		return parent::sendToUser($user, $text);
 	}
 
-	public function sendToRoom(DOG_Room $room, $text): void
+	public function sendToRoom(DOG_Room $room, string $text): bool
 	{
-		parent::sendToRoom($room, $text);
-		echo "$text\n";
+		echo "{$this->server->renderName()} >> {$text}\n";
+		return parent::sendToRoom($room, $text);
 	}
 
-	public function sendNoticeToUser(DOG_User $user, $text): void
+	public function sendNoticeToUser(DOG_User $user, string $text): bool
 	{
-		parent::sendNoticeToUser($user, $text);
-		echo "$text\n";
+		echo "{$user->renderName()} >> NOTE: {$text}\n";
+		return parent::sendNoticeToUser($user, $text);
 	}
 
 	public function dog_cmdline(string...$argv): void
@@ -122,6 +125,10 @@ class Bash extends DOG_Connector
 		GDO_User::setCurrent($user->getGDOUser());
 		$user->login();
 		return $user;
+	}
+
+	public function setupServer(DOG_Server $server): void
+	{
 	}
 
 }

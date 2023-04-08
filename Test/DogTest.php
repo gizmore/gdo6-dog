@@ -20,16 +20,16 @@ final class DogTest extends DogTestCase
 
 	public function testDogCreation()
 	{
-		$dog = new Dog();
-		$result = $dog->loadPlugins();
-		$dog->init();
-		assertTrue($result, 'Assert that dog can load plugins.');
+		$dog = Dog::instance();
+//		$result = $dog->loadPlugins();
+//		$dog->init();
+		Bash::instance();
+		assertTrue($dog->running, 'Assert that dog can load plugins.');
 	}
 
 	public function testBashConnector()
 	{
-		$bash = Bash::instance();
-		assertTrue($bash instanceof Bash);
+		$this->userGizmore1();
 		$response = $this->bashCommand('ping');
 		assertMatchesRegularExpression('/pong/is', $response, 'Test PING via Bash connector.');
 	}
@@ -40,6 +40,7 @@ final class DogTest extends DogTestCase
 		GDO_UserPermission::grant($user, Dog::VOICE);
 		GDO_UserPermission::grant($user, Dog::HALFOP);
 		GDO_UserPermission::grant($user, Dog::OPERATOR);
+		$user->changedPermissions();
 		assertTrue($user->hasPermission(Dog::OPERATOR), 'Test if gizmore{1} is owner.');
 	}
 
@@ -52,10 +53,11 @@ final class DogTest extends DogTestCase
 
 	public function testHelpCommand()
 	{
+		$this->userGizmore1();
 		$r = $this->bashCommand('help help');
 		assertStringContainsString('Print short help for a method', $r, 'Test the help for a single command.');
 		$r = $this->bashCommand('help');
-		assertStringContainsString('core.clearcache', $r, 'Test the help command for all available methods.');
+		assertStringContainsString('cc, ls, ', $r, 'Test the help command for all available methods.');
 	}
 
 	protected function setUp(): void

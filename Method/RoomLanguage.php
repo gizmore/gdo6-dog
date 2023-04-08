@@ -13,11 +13,11 @@ final class RoomLanguage extends DOG_Command
 
 	public function isWebMethod() { return false; }
 
-	public function isHiddenMethod() { return false; }
+	public function isHiddenMethod(): bool { return false; }
 
-	public function isRoomMethod() { return true; }
+	protected function isRoomMethod(): bool { return true; }
 
-	public function isPrivateMethod() { return false; }
+	protected function isPrivateMethod(): bool { return false; }
 
 	public function gdoParameters(): array
 	{

@@ -26,13 +26,15 @@ final class Exec extends DOG_Command
 
 //	public function isHiddenMethod() { return true; }
 
-	public function isRoomMethod() { return false; }
+	protected function isRoomMethod(): bool { return false; }
 
-	public function isPrivateMethod() { return false; }
+	protected function isPrivateMethod(): bool { return false; }
 
 	public function dog_message(DOG_Message $message)
 	{
 		$text = $message->text;
+
+		Application::$MODE = $message->server->getConnector()->gdtRenderMode();
 
 		# Remove trigger char if inside room.
 		if (isset($message->room))

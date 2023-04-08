@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
 use GDO\Core\GDT_Object;
+use GDO\Core\GDT_ObjectSelect;
 use GDO\Util\Arrays;
 use GDO\Util\Strings;
 
@@ -19,23 +21,23 @@ use GDO\Util\Strings;
  * @TODO registrered - only select registered users
  * @TODO authenticated - only select registered and authenticated users
  *
- * @version 6.10.4
+ * @version 7.0.3
  * @since 6.10.0
  * @author gizmore
  */
 final class GDT_DogUser extends GDT_Object
 {
 
-	public $online = false;
+	public bool $online = false;
 
 	###############
 	### Options ###
 	###############
-	public $sameRoom = false;
-	public $sameServer = false;
-	public $exact = false;
-	public $thyself = true;
-	private $ambigious = false;
+	public bool $sameRoom = false;
+	public bool $sameServer = false;
+	public bool $exact = false;
+	public bool $thyself = true;
+	private bool $ambigious = false;
 
 	protected function __construct()
 	{
@@ -43,25 +45,25 @@ final class GDT_DogUser extends GDT_Object
 		$this->table = DOG_User::table();
 	}
 
-	public function online($online = true)
+	public function online(bool $online = true): static
 	{
 		$this->online = $online;
 		return $this;
 	}
 
-	public function sameRoom($sameRoom = true)
+	public function sameRoom(bool $sameRoom = true): static
 	{
 		$this->sameRoom = $sameRoom;
 		return $this;
 	}
 
-	public function sameServer($sameServer = true)
+	public function sameServer(bool $sameServer = true): static
 	{
 		$this->sameServer = $sameServer;
 		return $this;
 	}
 
-	public function exact($exact = true)
+	public function exact(bool $exact = true): static
 	{
 		$this->exact = $exact;
 		return $this;
@@ -71,7 +73,7 @@ final class GDT_DogUser extends GDT_Object
 	### Ambigious hack ###
 	######################
 
-	public function thyself($thyself = true)
+	public function thyself(bool $thyself = true): static
 	{
 		$this->thyself = $thyself;
 		return $this;
@@ -81,14 +83,14 @@ final class GDT_DogUser extends GDT_Object
 	### GDT_Object ###
 	##################
 
-	/**
-	 * Always use the findByName method.
-	 */
-	public function toValue(null|string|array $var): null|bool|int|float|string|object|array
-	{
-		$_REQUEST['nocompletion_' . $this->name] = 1;
-		return parent::toValue($var);
-	}
+//	/**
+//	 * Always use the findByName method.
+//	 */
+//	public function toValue(null|string|array $var): null|bool|int|float|string|object|array
+//	{
+//		$_REQUEST['nocompletion_' . $this->name] = 1;
+//		return parent::toValue($var);
+//	}
 
 	/**
 	 * Validate object first, then options.

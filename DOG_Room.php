@@ -39,23 +39,19 @@ class DOG_Room extends GDO
 	### Getter ###
 	##############
 
-	/**
-	 * @param DOG_Server $server
-	 * @param string $roomName
-	 *
-	 * @return self
-	 */
-	public static function getByName(DOG_Server $server, $roomName)
+	public static function getByName(DOG_Server $server, string $roomName): ?DOG_Room
 	{
 		if ($room = $server->getRoomByName($roomName))
 		{
 			return $room;
 		}
 		$name = GDO::quoteS($roomName);
-		return self::table()->select()->where("room_server={$server->getID()} AND room_name={$name}")->first()->exec()->fetchObject();
+		return self::table()->select()->
+		where("room_server={$server->getID()} AND room_name={$name}")->
+		first()->exec()->fetchObject();
 	}
 
-	public static function create(DOG_Server $server, $roomName, $description = null)
+	public static function create(DOG_Server $server, string $roomName, string $description = null): DOG_Room
 	{
 		return self::blank([
 			'room_server' => $server->getID(),
@@ -77,31 +73,28 @@ class DOG_Room extends GDO
 		];
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getName(): ?string { return $this->gdoVar('room_name'); }
+	public function getName(): string { return $this->gdoVar('room_name'); }
 
-	public function getServerID() { return $this->gdoVar('room_server'); }
+	public function getServerID(): string { return $this->gdoVar('room_server'); }
 
-	public function getPassword() { return $this->gdoVar('room_password'); }
+	public function getPassword(): string { return $this->gdoVar('room_password'); }
 
-	public function getTrigger() { return $this->gdoVar('room_trigger'); }
+	public function getTrigger(): string { return $this->gdoVar('room_trigger'); }
 
 	############
 	### Send ###
 	############
 
-	/**
-	 * @return GDO_Language
-	 */
-	public function getLanguage() { return $this->gdoValue('room_lang'); }
+	public function getLanguage(): GDO_Language
+	{
+		return $this->gdoValue('room_lang');
+	}
 
 	##############
 	### Static ###
 	##############
 
-	public function getLanguageISO() { return $this->gdoVar('room_lang'); }
+	public function getLanguageISO(): string { return $this->gdoVar('room_lang'); }
 
 	public function send($text)
 	{

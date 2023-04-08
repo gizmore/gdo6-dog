@@ -3,12 +3,18 @@ namespace GDO\Dog;
 
 use GDO\User\GDO_User;
 
+/**
+ * A message for the chatbot.
+ */
 class DOG_Message
 {
 
 	public static $LAST_MESSAGE = null;
 	public ?DOG_Server $server = null;
 	public ?DOG_Room $room = null;
+
+	public ?string $reply = null;
+
 
 	#################
 	### Variables ###
@@ -45,7 +51,7 @@ class DOG_Message
 
 	public function getGDOUser(): GDO_User { return $this->user->getGDOUser(); }
 
-	public function text($text): static
+	public function text(string $text): static
 	{
 		$this->text = $text;
 		return $this;
@@ -61,7 +67,10 @@ class DOG_Message
 
 	public function reply(string $text): bool
 	{
-		$this->server->getConnector()->reply($this, $text);
+		if ($text !== '')
+		{
+			$this->server->getConnector()->reply($this, $text);
+		}
 		return true;
 	}
 
@@ -72,6 +81,11 @@ class DOG_Message
 		$trigger = isset($this->room) ? $this->room->getTrigger() : '';
 		$text = str_replace(['#BOT#', '#CMD#'], [$bot, $trigger], $text);
 		return $text;
+	}
+
+	public function getReply(): ?string
+	{
+		return $this->reply;
 	}
 
 }

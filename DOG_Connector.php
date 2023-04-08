@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace GDO\Dog;
 
+use GDO\Core\GDT;
 use GDO\Core\WithName;
 
 /**
@@ -31,7 +32,6 @@ abstract class DOG_Connector
 
 	public static function connector(string $name): ?DOG_Connector
 	{
-		/** @var DOG_Connector $conn * */
 		if ($connectorName = self::$connectors[$name]?:null)
 		{
 			$conn = new $connectorName();
@@ -60,7 +60,7 @@ abstract class DOG_Connector
 		return t('connector_' . $this->gdoShortName());
 	}
 
-	public function server(DOG_Server $server): self
+	public function server(DOG_Server $server): static
 	{
 		$this->server = $server;
 		return $this;
@@ -69,8 +69,6 @@ abstract class DOG_Connector
 
 	###
 
-
-	public function setupServer(DOG_Server $server): void {}
 
 	public function connected(bool $connected): static
 	{
@@ -83,56 +81,62 @@ abstract class DOG_Connector
 		return $string;
 	}
 
+	public function gdtRenderMode(): int
+	{
+		return GDT::RENDER_CLI;
+	}
+
 	public function send(string $text): bool
 	{
-		Dog::instance()->event('dog_send', $text);
-		return true;
+		return Dog::instance()->event('dog_send', $text);
 	}
 
-	public function sendNoticeToUser(DOG_User $user, $text)
+	public function sendNoticeToUser(DOG_User $user, string $text): bool
 	{
-		Dog::instance()->event('dog_send_notice_to_user', $user, $text);
+		return Dog::instance()->event('dog_send_notice_to_user', $user, $text);
 	}
 
-	public function reply(DOG_Message $message, $text)
+	public function reply(DOG_Message $message, string $text): bool
 	{
 		if (isset($message->room))
 		{
 			$text = $message->user->getName() . ': ' . $text;
-			$this->sendToRoom($message->room, $text);
+			return $this->sendToRoom($message->room, $text);
 		}
 		else
 		{
-			$this->sendToUser($message->user, $text);
+			return $this->sendToUser($message->user, $text);
 		}
 	}
 
-	public function getName(): ?string { return $this->gdoShortName(); }
-
-	public function sendToRoom(DOG_Room $room, $text)
+	public function getName(): ?string
 	{
-		Dog::instance()->event('dog_send_to_room', $room, $text);
+		return $this->gdoShortName();
 	}
 
-	public function sendToUser(DOG_User $user, $text)
+	public function sendToRoom(DOG_Room $room, string $text): bool
 	{
-		Dog::instance()->event('dog_send_to_user', $user, $text);
+		return Dog::instance()->event('dog_send_to_room', $room, $text);
 	}
 
-	public function getNickname()
+	public function sendToUser(DOG_User $user, string $text): bool
+	{
+		return Dog::instance()->event('dog_send_to_user', $user, $text);
+	}
+
+	public function getNickname(): string
 	{
 		return Module_Dog::instance()->cfgDefaultNickname();
 	}
 
-	abstract public function connect();
+	abstract public function connect(): bool;
 
-	abstract public function disconnect($reason);
+	abstract public function disconnect(string $reason): void;
 
-	/**
-	 * DOG_Message
-	 */
-	abstract public function readMessage();
+	abstract public function readMessage(): ?DOG_Message;
 
 	abstract public function init(): bool;
+
+	abstract public function setupServer(DOG_Server $server): void;
 
 }

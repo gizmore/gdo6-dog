@@ -2,20 +2,14 @@
 declare(strict_types=1);
 namespace GDO\Dog;
 
-use Error;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Event\Table;
 use GDO\Core\GDO;
 use GDO\Core\GDO_Hook;
-use GDO\Core\GDO_Module;
 use GDO\Core\Logger;
 use GDO\Core\Method;
-use GDO\Core\ModuleLoader;
-use GDO\Cronjob\MethodCronjob;
 use GDO\Dog\Connector\Bash;
-use GDO\Install\Installer;
-use GDO\UI\GDT_Error;
 use GDO\User\GDO_Permission;
 use GDO\Util\Filewalker;
 use Throwable;
@@ -37,7 +31,7 @@ final class Dog
 	final public const HALFOP = 'halfop';
 	final public const VOICE = 'voice';
 
-	final public const MICROSLEEP = 20000;
+	final public const MICROSLEEP = 10000;
 	private static self $INSTANCE;
 
 	public bool $running = true;
@@ -48,12 +42,7 @@ final class Dog
 	public array $servers;
 	private bool $loadedPlugins = false;
 
-	public function __construct()
-	{
-		self::$INSTANCE = $this;
-	}
-
-	public function loadPlugins()
+	public function loadPlugins(): bool
 	{
 		if ($this->loadedPlugins)
 		{
@@ -62,23 +51,19 @@ final class Dog
 
 		Filewalker::traverse('GDO', null, null, function ($entry, $path)
 		{
-			if (preg_match('/^Dog[A-Z0-9]*$/i', $entry))
+			if (preg_match('/^Dog[_A-Z0-9]*$/iD', $entry))
 			{
-//                 if (!Application::instance()->isUnitTests())
-//                 {
 				if (!module_enabled($entry))
 				{
 					return;
 				}
-//                 }
-
 				Filewalker::traverse(["$path/Connector", "$path/Method"], null, function ($entry, $path)
 				{
 					$class_name = str_replace('/', "\\", $path);
 					$class_name = substr($class_name, 0, -4);
 					if (class_exists($class_name))
 					{
-						if (is_a($class_name, '\\GDO\\Dog\\DOG_Connector', true))
+						if (is_a($class_name, DOG_Connector::class , true))
 						{
 							DOG_Connector::register(new $class_name());
 							$this->loadedPlugins = true;
@@ -86,8 +71,8 @@ final class Dog
 					}
 					else
 					{
-						$this->loadedPlugins = false;
 						Logger::logCron("Error loading $class_name");
+						$this->loadedPlugins = false;
 					}
 				});
 			}
@@ -96,7 +81,7 @@ final class Dog
 		return $this->loadedPlugins;
 	}
 
-	public static function instance(): static
+	public static function instance(): self
 	{
 		if (!isset(self::$INSTANCE))
 		{
@@ -119,7 +104,7 @@ final class Dog
 
 	private bool $inited = false;
 
-	public function init()
+	public function init(): void
 	{
 		if (!$this->inited)
 		{
@@ -128,7 +113,7 @@ final class Dog
 		}
 	}
 
-	public function mainloop()
+	public function mainloop(): void
 	{
 		$lastIPC = Application::$TIME;
 		while ($this->running)
@@ -148,7 +133,7 @@ final class Dog
 		}
 	}
 
-	public function mainloopStep()
+	public function mainloopStep(): void
 	{
 		Application::updateTime();
 		Table::dispatch('tick');
@@ -161,7 +146,7 @@ final class Dog
 		}
 	}
 
-	private function mainloopServer(DOG_Server $server)
+	private function mainloopServer(DOG_Server $server): void
 	{
 		$connector = $server->getConnector();
 
@@ -203,10 +188,6 @@ final class Dog
 					$processed++;
 				}
 			}
-			catch (Error $ex)
-			{
-				echo Debug::backtraceException($ex);
-			}
 			catch (Throwable $ex)
 			{
 				echo Debug::backtraceException($ex);
@@ -214,36 +195,28 @@ final class Dog
 		}
 	}
 
-	public function event($name, ...$args)
+	public function event(string $name, mixed ...$args): bool
 	{
 		$this->eventB(array_map(function (DOG_Server $s)
 		{
 			return $s->getConnector();
 		}, $this->servers), $name, ...$args);
-		$this->eventB(Method::$CLI_ALIASES, $name, ...$args);
+		return $this->eventB(Method::$CLI_ALIASES, $name, ...$args);
 	}
 
-	private function eventB(array $objects, string $name, ...$args): void
+	private function eventB(array $objects, string $name, mixed ...$args): bool
 	{
 		foreach ($objects as $object)
 		{
 			if (method_exists($object, $name))
 			{
-//				try
-//				{
-					call_user_func([$object::make(), $name], ...$args);
-//				}
-//				catch (Throwable $ex)
-//				{
-////					echo GDT_Error::fromException($ex)->render();
-////					@ob_flush();
-//					Logger::logException($ex);
-//				}
+				call_user_func([$object::make(), $name], ...$args);
 			}
 		}
+		return true;
 	}
 
-	private function ipcTimer()
+	private function ipcTimer(): void
 	{
 		if ($messages = GDO_Hook::table()->select()->exec()->fetchAllRows())
 		{
@@ -259,7 +232,7 @@ final class Dog
 	### IPC ###
 	###########
 
-	private function webHookDB($message)
+	private function webHookDB(string $message): void
 	{
 		$message = json_decode($message, true);
 		$event = $message['event'];
@@ -269,20 +242,20 @@ final class Dog
 		{
 			$param = array_merge($param, $args);
 		}
-		return $this->webHook($param);
+		$this->webHook($param);
 	}
 
-	private function webHook(array $hookData)
+	private function webHook(array $hookData): void
 	{
 		$event = array_shift($hookData);
-		$method_name = "hook$event";
+		$method_name = "hook{$event}";
 		if (method_exists($this, $method_name))
 		{
 			call_user_func([$this, $method_name], ...$hookData);
 		}
 	}
 
-	private function hasPendingConnections()
+	private function hasPendingConnections(): bool
 	{
 		foreach ($this->servers as $server)
 		{
@@ -294,7 +267,7 @@ final class Dog
 		return false;
 	}
 
-	public function hookCacheInvalidate($table, $id)
+	public function hookCacheInvalidate($table, $id): void
 	{
 		$table = GDO::tableFor($table);
 		$table->reload($id);

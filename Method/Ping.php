@@ -19,9 +19,9 @@ class Ping extends DOG_Command
 		return 'ping';
 	}
 
-	public function dogExecute(DOG_Message $message)
+	public function dogExecute(DOG_Message $message): void
 	{
-		return $message->rply('dog_pong');
+		$message->rply('dog_pong');
 	}
 
 }

@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog\lang;
 
 return [
 	'none' => 'none',
 	'usage' => 'Usage: #CMD#%s %s',
+	'serv_connector' => 'Service Connector',
 
 	#####
 	'cfg_default_nickname' => 'Default nickname',

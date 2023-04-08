@@ -41,13 +41,10 @@ class DogTestCase extends TestCase
 		return Bash::$BASH_SERVER;
 	}
 
-	protected function setUp(): void
-	{
-		Dog::instance()->init();
-		parent::setUp();
-		Application::instance()->cli();
-		$this->restoreUserPermissions($this->userGizmore1());
-	}
+//	protected function setUp(): void
+//	{
+//		parent::setUp();
+//	}
 
 	/**
 	 * Restore gizmore because auto coverage messes with him a lot.
@@ -75,12 +72,12 @@ class DogTestCase extends TestCase
 	public function userGizmore1(): GDO_User
 	{
 		$g1 = GDO_User::getByName('gizmore{1}');
+		$this->restoreUserPermissions($g1);
 		return $this->user($g1);
 	}
 
 	protected function tearDown(): void
 	{
-//		Application::instance()->cli(false);
 	}
 
 	/**
@@ -95,10 +92,6 @@ class DogTestCase extends TestCase
 			Dog::instance()->event('dog_cmdline2', $line);
 			return ob_get_contents();
 		}
-//		catch (Throwable $ex)
-//		{
-//			Debug::debugException($ex);
-//		}
 		finally
 		{
 			ob_end_clean();

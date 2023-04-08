@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace GDO\Dog;
 
 use GDO\Core\Application;
@@ -12,8 +13,9 @@ use GDO\Core\GDT_UInt;
 use GDO\Date\GDT_Duration;
 use GDO\Net\GDT_Url;
 use GDO\Net\URL;
+use GDO\UI\TextStyle;
 use GDO\User\GDT_Username;
-use GDO\Util\Common;
+use GDO\Util\Math;
 use GDO\Util\Random;
 
 final class DOG_Server extends GDO
@@ -22,38 +24,31 @@ final class DOG_Server extends GDO
 	/**
 	 * @var DOG_User[]
 	 */
-	public $users = [];
+	public array $users = [];
 	/**
 	 * @var DOG_Room[]
 	 */
-	public $rooms = [];
+	public array $rooms = [];
 
 	##############
 	### Online ###
 	##############
-	public $connectionAttemptMax = 10000;
-	/**
-	 * @var DOG_Connector
-	 */
-	private $connector;
+	public int $connectionAttemptMax = 100;
+
+	private DOG_Connector $connector;
 
 	###########
 	### GDO ###
 	###########
-	private $connectionAttemptNum = 0;
+	private int $connectionAttemptNum = 0;
 
 	##############
 	### Getter ###
 	##############
-	private $connectionAttemptTime = 0;
-	private $connectionAttemptNext = 0;
+//	private float $connectionAttemptTime = 0.0;
+	private float $connectionAttemptNext = 0.0;
 
-	/**
-	 * @param string $url
-	 *
-	 * @return self
-	 */
-	public static function getByArg($url)
+	public static function getByArg(string $url): ?self
 	{
 		if ($server = self::getById($url))
 		{
@@ -92,73 +87,67 @@ final class DOG_Server extends GDO
 
 	public function renderName(): string
 	{
-		$b = $this->isConnected() ? "\x02" : '';
 		$name = $this->getURL() ? $this->getDomain() : $this->getConnectorName();
-		return sprintf('%s%s%s-%s', $b, $this->getID(), $b, $name);
+		return sprintf('%s-%s', TextStyle::bold($this->getID(), $this->isConnected()), $name);
 	}
 
-	public function isConnected()
+	public function isConnected(): bool
 	{
-		return $this->connector && $this->connector->connected;
+		return $this->connector->connected;
 	}
 
-	/**
-	 * @return URL
-	 */
-	public function getURL() { return $this->gdoValue('serv_url'); }
+	public function getURL(): ?URL
+	{
+		return $this->gdoValue('serv_url');
+	}
 
-	/**
-	 * @return URL
-	 */
-	public function getDomain($short = false)
+	public function getDomain($short = false): string
 	{
 		return $short ? $this->getURL()->getTLD() : $this->getURL()->getHost();
 	}
 
-	public function getConnectorName() { return $this->gdoVar('serv_connector'); }
+	public function getConnectorName(): string { return $this->gdoVar('serv_connector'); }
 
-	public function isTLS() { return $this->gdoValue('serv_tls'); }
+	public function isTLS(): bool { return $this->gdoValue('serv_tls'); }
 
-	public function isActive() { return $this->gdoVar('serv_active') === '1'; }
+	public function isActive(): bool { return $this->gdoVar('serv_active') === '1'; }
 
-	public function getPassword() { return $this->gdoVar('serv_password'); }
+	public function getPassword(): ?string { return $this->gdoVar('serv_password'); }
 
 	##################
 	### Connection ###
 	##################
 
-	public function nextUsername() { return $this->getUsername() . '_' . Random::randomKey(4, Random::NUMERIC); }
+	public function nextUsername(): string { return $this->getUsername() . '_' . Random::randomKey(4, Random::NUMERIC); }
 
-	public function getUsername() { return $this->gdoVar('serv_username'); }
+	public function getUsername(): string { return $this->gdoVar('serv_username'); }
 
-	public function getDog() { return DOG_User::getUser($this, $this->getNickname()); }
+	public function getDog(): DOG_User { return DOG_User::getUser($this, $this->getNickname()); }
 
-	public function getNickname() { return $this->getConnector()->getNickname(); }
+	public function getNickname(): string { return $this->getConnector()->getNickname(); }
 
-	/**
-	 * @return DOG_Connector
-	 */
-	public function getConnector()
+	public function getConnector(): DOG_Connector
 	{
-		if (!$this->connector)
+		if (!isset($this->connector))
 		{
 			$this->setConnector(DOG_Connector::connector($this->getConnectorName()));
 		}
+		Application::$MODE = $this->connector->gdtRenderMode();
 		return $this->connector;
 	}
 
-	public function setConnector(DOG_Connector $connector)
+	public function setConnector(DOG_Connector $connector): self
 	{
 		$this->connector = $connector;
 		$this->connector->server($this);
 		return $this;
 	}
 
-	public function getConnectTimeout() { return $this->gdoValue('serv_connect_timeout'); }
+	public function getConnectTimeout(): float { return $this->gdoValue('serv_connect_timeout'); }
 
-	public function getThrottle() { return $this->gdoValue('serv_throttle'); }
+	public function getThrottle(): int { return $this->gdoValue('serv_throttle'); }
 
-	public function getConnectURL()
+	public function getConnectURL() :?string
 	{
 		$url = $this->getURL();
 		if ($url)
@@ -170,18 +159,19 @@ final class DOG_Server extends GDO
 			}
 			return $host;
 		}
+		return null;
 	}
 
-	public function shouldConnect()
+	public function shouldConnect(): bool
 	{
 		if ($this->shouldGiveUp())
 		{
 			return false;
 		}
-		return Application::$TIME >= $this->connectionAttemptNext;
+		return Application::$MICROTIME >= $this->connectionAttemptNext;
 	}
 
-	public function shouldGiveUp()
+	public function shouldGiveUp(): bool
 	{
 		return $this->connectionAttemptNum >= $this->connectionAttemptMax;
 	}
@@ -190,15 +180,15 @@ final class DOG_Server extends GDO
 	### Static ###
 	##############
 
-	public function nextAttempt()
+	public function nextAttempt(): void
 	{
 		$this->connectionAttemptNum++;
-		$wait = 5 * $this->connectionAttemptNum;
-		$wait = Common::clamp($wait, 0, 600);
-		$this->connectionAttemptNext = Application::$TIME + $wait;
+		$wait = 5.0 * $this->connectionAttemptNum;
+		$wait = Math::clampFloat($wait, 5.0, 600.0);
+		$this->connectionAttemptNext = Application::$MICROTIME + $wait;
 	}
 
-	public function disconnect($text)
+	public function disconnect($text): void
 	{
 		foreach ($this->rooms as $room)
 		{
@@ -214,16 +204,16 @@ final class DOG_Server extends GDO
 	### Live Data ###
 	#################
 
-	public function resetConnectionAttempt()
+	public function resetConnectionAttempt(): void
 	{
-		$this->connectionAttemptNext = $this->connectionAttemptNum = $this->connectionAttemptTime = 0;
+		$this->connectionAttemptNum = 0;
 	}
 
 	#############
 	### Rooms ###
 	#############
 
-	public function addRoom(DOG_Room $room)
+	public function addRoom(DOG_Room $room): void
 	{
 		if (!isset($this->rooms[$room->getID()]))
 		{
@@ -232,12 +222,12 @@ final class DOG_Server extends GDO
 		}
 	}
 
-	public function hasRoom(DOG_Room $room = null)
+	public function hasRoom(DOG_Room $room = null): bool
 	{
-		return $room ? isset($this->rooms[$room->getID()]) : false;
+		return $room && isset($this->rooms[$room->getID()]);
 	}
 
-	public function getRoomByName($roomName)
+	public function getRoomByName($roomName): ?DOG_Room
 	{
 		foreach ($this->rooms as $room)
 		{
@@ -246,9 +236,10 @@ final class DOG_Server extends GDO
 				return $room;
 			}
 		}
+		return null;
 	}
 
-	public function removeRoom(DOG_Room $room)
+	public function removeRoom(DOG_Room $room): void
 	{
 		unset($this->rooms[$room->getID()]);
 	}
@@ -256,21 +247,22 @@ final class DOG_Server extends GDO
 	#############
 	### Users ###
 	#############
-	public function addUser(DOG_User $user)
+	public function addUser(DOG_User $user): void
 	{
-		if (!isset($this->users[$user->getID()]))
+		$uid = $user->getID();
+		if (!isset($this->users[$uid]))
 		{
-			$this->users[$user->getID()] = $user;
+			$this->users[$uid] = $user;
 			Dog::instance()->event('dog_user_added', $this, $user);
 		}
 	}
 
-	public function hasUser(DOG_User $user)
+	public function hasUser(DOG_User $user): bool
 	{
 		return isset($this->users[$user->getID()]);
 	}
 
-	public function getUserByName($username)
+	public function getUserByName(string $username): ?DOG_User
 	{
 		foreach ($this->users as $user)
 		{
@@ -279,9 +271,10 @@ final class DOG_Server extends GDO
 				return $user;
 			}
 		}
+		return null;
 	}
 
-	public function removeUser(DOG_User $user)
+	public function removeUser(DOG_User $user): void
 	{
 		unset($this->users[$user->getID()]);
 	}

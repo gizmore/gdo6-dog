@@ -20,7 +20,7 @@ final class Trigger extends DOG_Command
 
 	public function getPermission(): ?string { return Dog::HALFOP; }
 
-	public function isPrivateMethod() { return false; }
+	protected function isPrivateMethod(): bool { return false; }
 
 	public function gdoParameters(): array
 	{
