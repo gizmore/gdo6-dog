@@ -15,11 +15,6 @@ use GDO\UI\GDT_Repeat;
 final class GDT_DogString extends GDT_Repeat
 {
 
-//	protected function __construct()
-//	{
-//		parent::__construct();
-//	}
-
 	public static function make(string $name = null): static
 	{
 		return parent::makeAs($name, GDT_String::make());
@@ -29,5 +24,6 @@ final class GDT_DogString extends GDT_Repeat
 	{
 		return $value === null ? null : implode(',', $value);
 	}
+
 
 }

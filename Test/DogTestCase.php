@@ -38,6 +38,7 @@ class DogTestCase extends TestCase
 
 	protected function getServer(): DOG_Server
 	{
+		Bash::instance();
 		return Bash::$BASH_SERVER;
 	}
 

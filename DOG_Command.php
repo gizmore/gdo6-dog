@@ -93,7 +93,7 @@ abstract class DOG_Command extends MethodForm
 	##################
 
 
-	public function getConfigVarBot(string $key): ?string
+	public function getConfigVarBot(string $key): string|array|null
 	{
 		if ($var = DOG_ConfigBot::getById($this->gdoClassName(), $key))
 		{
@@ -165,7 +165,7 @@ abstract class DOG_Command extends MethodForm
 
 
 
-	public function getConfigVarUser(DOG_User $user, string $key): ?string
+	public function getConfigVarUser(DOG_User $user, string $key): string|array|null
 	{
 		if ($var = DOG_ConfigUser::getById($this->gdoClassName(), $key, $user->getID()))
 		{
@@ -271,7 +271,7 @@ abstract class DOG_Command extends MethodForm
 	 */
 	protected function getConfigRoom(): array { return GDT::EMPTY_ARRAY; }
 
-	public function getConfigVarRoom(DOG_Room $room, string $key): ?string
+	public function getConfigVarRoom(DOG_Room $room, string $key): string|array|null
 	{
 		if ($var = DOG_ConfigRoom::getById($this->gdoClassName(), $key, $room->getID()))
 		{
@@ -345,7 +345,7 @@ abstract class DOG_Command extends MethodForm
 	 */
 	protected function getConfigServer(): array { return GDT::EMPTY_ARRAY; }
 
-	public function getConfigVarServer(DOG_Server $server, string $key): ?string
+	public function getConfigVarServer(DOG_Server $server, string $key): string|array|null
 	{
 		if ($var = DOG_ConfigServer::getById($this->gdoClassName(), $key, $server->getID()))
 		{
