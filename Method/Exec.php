@@ -58,11 +58,13 @@ final class Exec extends DOG_Command
 			}
 
 			$result = $exp->execute();
+//			$text = CLI::getTopResponse();
 			$text = $result->render();
 			if (Application::isError())
 			{
 				$text .= CLI::renderCLIHelp($exp->method->method);
 			}
+
 
 			return $message->reply($text);
 		}
