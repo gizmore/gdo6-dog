@@ -91,11 +91,6 @@ final class DOG_Server extends GDO
 		return sprintf('%s-%s', TextStyle::bold($this->getID(), $this->isConnected()), $name);
 	}
 
-	public function isConnected(): bool
-	{
-		return $this->connector->connected;
-	}
-
 	public function getURL(): ?URL
 	{
 		return $this->gdoValue('serv_url');
@@ -107,6 +102,11 @@ final class DOG_Server extends GDO
 	}
 
 	public function getConnectorName(): string { return $this->gdoVar('serv_connector'); }
+
+	public function isConnected(): bool
+	{
+		return $this->connector->connected;
+	}
 
 	public function isTLS(): bool { return $this->gdoValue('serv_tls'); }
 
@@ -147,7 +147,7 @@ final class DOG_Server extends GDO
 
 	public function getThrottle(): int { return $this->gdoValue('serv_throttle'); }
 
-	public function getConnectURL() :?string
+	public function getConnectURL(): ?string
 	{
 		$url = $this->getURL();
 		if ($url)

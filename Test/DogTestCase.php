@@ -47,6 +47,13 @@ class DogTestCase extends TestCase
 //		parent::setUp();
 //	}
 
+	public function userGizmore1(): GDO_User
+	{
+		$g1 = GDO_User::getByName('gizmore{1}');
+		$this->restoreUserPermissions($g1);
+		return $this->user($g1);
+	}
+
 	/**
 	 * Restore gizmore because auto coverage messes with him a lot.
 	 */
@@ -70,16 +77,7 @@ class DogTestCase extends TestCase
 		}
 	}
 
-	public function userGizmore1(): GDO_User
-	{
-		$g1 = GDO_User::getByName('gizmore{1}');
-		$this->restoreUserPermissions($g1);
-		return $this->user($g1);
-	}
-
-	protected function tearDown(): void
-	{
-	}
+	protected function tearDown(): void {}
 
 	/**
 	 * Execute a bash command and return output.

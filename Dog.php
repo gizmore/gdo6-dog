@@ -41,56 +41,7 @@ final class Dog
 	 */
 	public array $servers;
 	private bool $loadedPlugins = false;
-
-	public function loadPlugins(): bool
-	{
-		if ($this->loadedPlugins)
-		{
-			return true;
-		}
-
-		Filewalker::traverse('GDO', null, null, function ($entry, $path)
-		{
-			if (preg_match('/^Dog[_A-Z0-9]*$/iD', $entry))
-			{
-				if (!module_enabled($entry))
-				{
-					return;
-				}
-				Filewalker::traverse(["$path/Connector", "$path/Method"], null, function ($entry, $path)
-				{
-					$class_name = str_replace('/', "\\", $path);
-					$class_name = substr($class_name, 0, -4);
-					if (class_exists($class_name))
-					{
-						if (is_a($class_name, DOG_Connector::class , true))
-						{
-							DOG_Connector::register(new $class_name());
-							$this->loadedPlugins = true;
-						}
-					}
-					else
-					{
-						Logger::logCron("Error loading $class_name");
-						$this->loadedPlugins = false;
-					}
-				});
-			}
-		}, 0);
-
-		return $this->loadedPlugins;
-	}
-
-	public static function instance(): self
-	{
-		if (!isset(self::$INSTANCE))
-		{
-			self::$INSTANCE = new self();
-			self::$INSTANCE->init();
-			self::$INSTANCE->loadPlugins();
-		}
-		return self::$INSTANCE;
-	}
+	private bool $inited = false;
 
 	public function removeServer(DOG_Server $server): bool
 	{
@@ -100,17 +51,6 @@ final class Dog
 			return true;
 		}
 		return false;
-	}
-
-	private bool $inited = false;
-
-	public function init(): void
-	{
-		if (!$this->inited)
-		{
-			Bash::instance()->init();
-			$this->servers = DOG_Server::table()->all();
-		}
 	}
 
 	public function mainloop(): void
@@ -214,6 +154,65 @@ final class Dog
 			}
 		}
 		return true;
+	}
+
+	public static function instance(): self
+	{
+		if (!isset(self::$INSTANCE))
+		{
+			self::$INSTANCE = new self();
+			self::$INSTANCE->init();
+			self::$INSTANCE->loadPlugins();
+		}
+		return self::$INSTANCE;
+	}
+
+	public function init(): void
+	{
+		if (!$this->inited)
+		{
+			Bash::instance()->init();
+			$this->servers = DOG_Server::table()->all();
+		}
+	}
+
+	public function loadPlugins(): bool
+	{
+		if ($this->loadedPlugins)
+		{
+			return true;
+		}
+
+		Filewalker::traverse('GDO', null, null, function ($entry, $path)
+		{
+			if (preg_match('/^Dog[_A-Z0-9]*$/iD', $entry))
+			{
+				if (!module_enabled($entry))
+				{
+					return;
+				}
+				Filewalker::traverse(["$path/Connector", "$path/Method"], null, function ($entry, $path)
+				{
+					$class_name = str_replace('/', "\\", $path);
+					$class_name = substr($class_name, 0, -4);
+					if (class_exists($class_name))
+					{
+						if (is_a($class_name, DOG_Connector::class, true))
+						{
+							DOG_Connector::register(new $class_name());
+							$this->loadedPlugins = true;
+						}
+					}
+					else
+					{
+						Logger::logCron("Error loading $class_name");
+						$this->loadedPlugins = false;
+					}
+				});
+			}
+		}, 0);
+
+		return $this->loadedPlugins;
 	}
 
 	private function ipcTimer(): void

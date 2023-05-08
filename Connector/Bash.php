@@ -22,6 +22,32 @@ use GDO\User\GDO_User;
 class Bash extends DOG_Connector
 {
 
+	public static self $INSTANCE;
+	public static DOG_Server $BASH_SERVER;
+
+	public function dog_cmdline(string...$argv): void
+	{
+		$text = implode(' ', $argv);
+		$this->dog_cmdline2($text);
+	}
+
+	public function dog_cmdline2(string $text): void
+	{
+		$msg = DOG_Message::make()->
+		server(self::$BASH_SERVER)->
+		user($this->getBashUser())->
+		text($text);
+		Dog::instance()->event('dog_message', $msg);
+	}
+
+	public function getBashUser(): DOG_User
+	{
+		$user = DOG_User::getOrCreateUser(self::$BASH_SERVER, get_current_user());
+		GDO_User::setCurrent($user->getGDOUser());
+		$user->login();
+		return $user;
+	}
+
 	public static function instance(): self
 	{
 		if (!isset(self::$INSTANCE))
@@ -31,14 +57,6 @@ class Bash extends DOG_Connector
 		}
 		return self::$INSTANCE;
 	}
-
-
-	public static self $INSTANCE;
-
-
-
-	public static DOG_Server $BASH_SERVER;
-
 
 	public function init(): bool
 	{
@@ -104,31 +122,6 @@ class Bash extends DOG_Connector
 		return parent::sendNoticeToUser($user, $text);
 	}
 
-	public function dog_cmdline(string...$argv): void
-	{
-		$text = implode(' ', $argv);
-		$this->dog_cmdline2($text);
-	}
-
-	public function dog_cmdline2(string $text): void
-	{
-		$msg = DOG_Message::make()->
-		server(self::$BASH_SERVER)->
-		user($this->getBashUser())->
-		text($text);
-		Dog::instance()->event('dog_message', $msg);
-	}
-
-	public function getBashUser(): DOG_User
-	{
-		$user = DOG_User::getOrCreateUser(self::$BASH_SERVER, get_current_user());
-		GDO_User::setCurrent($user->getGDOUser());
-		$user->login();
-		return $user;
-	}
-
-	public function setupServer(DOG_Server $server): void
-	{
-	}
+	public function setupServer(DOG_Server $server): void {}
 
 }

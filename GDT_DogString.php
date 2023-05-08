@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace GDO\Dog;
 
-use GDO\Core\GDT_Field;
 use GDO\Core\GDT_String;
 use GDO\UI\GDT_Repeat;
 

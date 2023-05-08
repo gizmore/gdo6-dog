@@ -36,7 +36,7 @@ final class AddServer extends DOG_Command
 		];
 	}
 
-	public function dogExecute(DOG_Message $message, DOG_Connector $connector, URL $url = null, string $username=null, string $password=null)
+	public function dogExecute(DOG_Message $message, DOG_Connector $connector, URL $url = null, string $username = null, string $password = null)
 	{
 		if ($url)
 		{

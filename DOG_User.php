@@ -33,10 +33,6 @@ final class DOG_User extends GDO
 	##############
 	### Getter ###
 	##############
-	public static function getFor(GDO_User $user): ?self
-	{
-		return self::getBy('doguser_user', $user->getID());
-	}
 
 	public static function getUser(DOG_Server $server, $name): ?self
 	{
@@ -77,6 +73,11 @@ final class DOG_User extends GDO
 			GDT_User::make('doguser_user')->notNull(),
 			GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),
 		];
+	}
+
+	public static function getFor(GDO_User $user): ?self
+	{
+		return self::getBy('doguser_user', $user->getID());
 	}
 
 	/**

@@ -71,16 +71,16 @@ final class Disable extends DOG_Command
 		return false;
 	}
 
-	public function isDisabledRoom(DOG_Message $message, DOG_Command $command): bool
-	{
-		$key = 'disable_' . $command->getCLITrigger();
-		return $this->getConfigValueRoom($message->room, $key);
-	}
-
 	public function isDisabledServer(DOG_Message $message, DOG_Command $command): bool
 	{
 		$key = 'disable_' . $command->getCLITrigger();
 		return $this->getConfigValueServer($message->server, $key);
+	}
+
+	public function isDisabledRoom(DOG_Message $message, DOG_Command $command): bool
+	{
+		$key = 'disable_' . $command->getCLITrigger();
+		return $this->getConfigValueRoom($message->room, $key);
 	}
 
 	public function dogExecute(DOG_Message $message, DOG_Command $command): bool

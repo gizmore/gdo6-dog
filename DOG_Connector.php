@@ -32,7 +32,7 @@ abstract class DOG_Connector
 
 	public static function connector(string $name): ?DOG_Connector
 	{
-		if ($connectorName = self::$connectors[$name]?:null)
+		if ($connectorName = self::$connectors[$name] ?: null)
 		{
 			$conn = new $connectorName();
 			if ($conn->init())
@@ -44,6 +44,8 @@ abstract class DOG_Connector
 	}
 
 	###
+
+	abstract public function init(): bool;
 
 	public static function register(DOG_Connector $connector): void
 	{
@@ -60,15 +62,14 @@ abstract class DOG_Connector
 		return t('connector_' . $this->gdoShortName());
 	}
 
+
+	###
+
 	public function server(DOG_Server $server): static
 	{
 		$this->server = $server;
 		return $this;
 	}
-
-
-	###
-
 
 	public function connected(bool $connected): static
 	{
@@ -134,8 +135,6 @@ abstract class DOG_Connector
 	abstract public function disconnect(string $reason): void;
 
 	abstract public function readMessage(): ?DOG_Message;
-
-	abstract public function init(): bool;
 
 	abstract public function setupServer(DOG_Server $server): void;
 

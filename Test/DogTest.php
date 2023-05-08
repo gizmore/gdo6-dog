@@ -5,7 +5,6 @@ namespace GDO\Dog\Test;
 use GDO\Dog\Connector\Bash;
 use GDO\Dog\Dog;
 use GDO\User\GDO_UserPermission;
-use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertMatchesRegularExpression;
 use function PHPUnit\Framework\assertStringContainsString;
 use function PHPUnit\Framework\assertTrue;

@@ -4,7 +4,6 @@ namespace GDO\Dog;
 
 use GDO\Core\GDO;
 use GDO\Core\GDT_Object;
-use GDO\Core\GDT_ObjectSelect;
 use GDO\Util\Arrays;
 use GDO\Util\Strings;
 

@@ -5,7 +5,6 @@ use GDO\CLI\CLI;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\GDT;
-use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Connector\Bash;
@@ -13,7 +12,6 @@ use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
 use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
-use GDO\User\GDO_User;
 use Ratchet\App;
 
 # Bootstrap

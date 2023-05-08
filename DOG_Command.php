@@ -48,50 +48,10 @@ abstract class DOG_Command extends MethodForm
 
 	public function isTrivial(): bool { return false; }
 
-
-	public function getID(): ?string { return $this->getCLITrigger(); }
-
-
-	protected function isRoomMethod(): bool { return true; }
-
-	protected function isPrivateMethod(): bool { return true; }
-
-
-	##############
-	### Helper ###
-	##############
-
 	public function getDefaultNickname(): string
 	{
 		return Module_Dog::instance()->cfgDefaultNickname();
 	}
-
-	public function getCLITriggerGroup(): string
-	{
-		$m = $this->getModule();
-		return strtolower($m->getModuleName());
-	}
-
-
-	public function getCLITrigger(): string
-	{
-		$g = $this->getCLITriggerGroup();
-		$t = strtolower($this->getMethodName());
-		return "{$g}.{$t}";
-	}
-
-	protected function createForm(GDT_Form $form): void
-	{
-		$form->addFields(...$this->gdoParameters());
-		$form->addField(GDT_AntiCSRF::make());
-		$form->actions()->addField(GDT_Submit::make());
-	}
-
-
-	##################
-	### Config Bot ###
-	##################
-
 
 	public function getConfigVarBot(string $key): string|array|null
 	{
@@ -107,6 +67,11 @@ abstract class DOG_Command extends MethodForm
 		$conf = $this->getConfigBotCached();
 		return $conf[$key] ?: null;
 	}
+
+
+	##############
+	### Helper ###
+	##############
 
 	/**
 	 * @return GDT[]
@@ -142,6 +107,11 @@ abstract class DOG_Command extends MethodForm
 		return $this->setConfigValueBot($key, $value);
 	}
 
+
+	##################
+	### Config Bot ###
+	##################
+
 	public function setConfigValueBot(string $key, float|object|int|bool|array|string|null $value): bool
 	{
 		$gdt = $this->getConfigGDTBot($key);
@@ -157,14 +127,6 @@ abstract class DOG_Command extends MethodForm
 		return true;
 	}
 
-
-
-	###################
-	### Config User ###
-	###################
-
-
-
 	public function getConfigVarUser(DOG_User $user, string $key): string|array|null
 	{
 		if ($var = DOG_ConfigUser::getById($this->gdoClassName(), $key, $user->getID()))
@@ -172,6 +134,21 @@ abstract class DOG_Command extends MethodForm
 			return $var->gdoVar('confu_var');
 		}
 		return $this->getConfigGDTUser($key)->getVar();
+	}
+
+	public function getID(): ?string { return $this->getCLITrigger(); }
+
+	public function getCLITrigger(): string
+	{
+		$g = $this->getCLITriggerGroup();
+		$t = strtolower($this->getMethodName());
+		return "{$g}.{$t}";
+	}
+
+	public function getCLITriggerGroup(): string
+	{
+		$m = $this->getModule();
+		return strtolower($m->getModuleName());
 	}
 
 	public function getConfigGDTUser(string $key): ?GDT
@@ -196,11 +173,92 @@ abstract class DOG_Command extends MethodForm
 		return $this->ccUser;
 	}
 
+
+
+	###################
+	### Config User ###
+	###################
+
 	/**
 	 * @return GDT[]
 	 */
 	public function getConfigUser(): array { return GDT::EMPTY_ARRAY; }
 
+	protected function createForm(GDT_Form $form): void
+	{
+		$form->addFields(...$this->gdoParameters());
+		$form->addField(GDT_AntiCSRF::make());
+		$form->actions()->addField(GDT_Submit::make());
+	}
+
+	public function hasPermission(GDO_User $user, string &$error, array &$args): bool
+	{
+		$message = DOG_Message::$LAST_MESSAGE;
+		if (!$this->connectorMatches($message))
+		{
+			$error = 'err_dog_connector_match';
+			$args = [$message->server->getConnectorName()];
+			return false;
+		}
+		if ($message->room)
+		{
+			if (!$this->isRoomMethod())
+			{
+				$error = 'err_dog_cmd_not_room';
+				return false;
+			}
+		}
+		elseif (!$this->isPrivateMethod())
+		{
+			$error = 'err_dog_cmd_only_room';
+			return false;
+		}
+		return true;
+	}
+
+	private function connectorMatches(DOG_Message $message): bool
+	{
+		return in_array($message->server->getConnectorName(), $this->getConnectors(), true);
+	}
+
+	/**
+	 * Get all supported connectors for this command.
+	 *
+	 * @return string[]
+	 */
+	protected function getConnectors(): array
+	{
+		return array_keys(DOG_Connector::connectors());
+	}
+
+	protected function isRoomMethod(): bool { return true; }
+
+	protected function isPrivateMethod(): bool { return true; }
+
+
+	###################
+	### Config Room ###
+	###################
+
+	public function formValidated(GDT_Form $form): GDT
+	{
+		$args = [];
+		foreach ($this->gdoParameterCache() as $gdt)
+		{
+			$args[] = $gdt->getValue();
+		}
+
+		$message = DOG_Message::$LAST_MESSAGE;
+
+		if ($this->isDebugging())
+		{
+			xdebug_break();
+		}
+
+		$this->dogExecute($message, ...$args);
+
+		return GDT_Response::make();
+	}
 
 	public function getConfigValueUser(DOG_User $user, string $key): float|object|int|bool|array|string|null
 	{
@@ -231,12 +289,6 @@ abstract class DOG_Command extends MethodForm
 		return true;
 	}
 
-
-	###################
-	### Config Room ###
-	###################
-
-
 	public function getConfigValueRoom(DOG_Room $room, string $key): float|object|array|bool|int|string|null
 	{
 		$gdt = $this->getConfigGDTRoom($key);
@@ -265,6 +317,11 @@ abstract class DOG_Command extends MethodForm
 		}
 		return $this->ccRoom;
 	}
+
+
+	#####################
+	### Config Server ###
+	#####################
 
 	/**
 	 * @return GDT[]
@@ -303,20 +360,12 @@ abstract class DOG_Command extends MethodForm
 		return true;
 	}
 
-
-	#####################
-	### Config Server ###
-	#####################
-
-
-
 	public function getConfigValueServer(DOG_Server $server, string $key): float|object|array|bool|int|string|null
 	{
 		$gdt = $this->getConfigGDTServer($key);
 		$var = $this->getConfigVarServer($server, $key);
 		return $gdt->toValue($var);
 	}
-
 
 	public function getConfigGDTServer(string $key): GDT
 	{
@@ -340,10 +389,20 @@ abstract class DOG_Command extends MethodForm
 		return $this->ccServer;
 	}
 
+
+	#############
+	### Perms ###
+	#############
+
 	/**
 	 * @return GDT[]
 	 */
 	protected function getConfigServer(): array { return GDT::EMPTY_ARRAY; }
+
+
+	##################
+	### Repository ###
+	##################
 
 	public function getConfigVarServer(DOG_Server $server, string $key): string|array|null
 	{
@@ -375,77 +434,6 @@ abstract class DOG_Command extends MethodForm
 			'confs_var' => $gdt->toVar($value),
 		])->softReplace();
 		return true;
-	}
-
-
-	#############
-	### Perms ###
-	#############
-	public function hasPermission(GDO_User $user, string &$error, array &$args): bool
-	{
-		$message = DOG_Message::$LAST_MESSAGE;
-		if (!$this->connectorMatches($message))
-		{
-			$error = 'err_dog_connector_match';
-			$args = [$message->server->getConnectorName()];
-			return false;
-		}
-		if ($message->room)
-		{
-			if (!$this->isRoomMethod())
-			{
-				$error = 'err_dog_cmd_not_room';
-				return false;
-			}
-		}
-		elseif (!$this->isPrivateMethod())
-		{
-			$error = 'err_dog_cmd_only_room';
-			return false;
-		}
-		return true;
-	}
-
-
-	##################
-	### Repository ###
-	##################
-
-	/**
-	 * Get all supported connectors for this command.
-	 *
-	 * @return string[]
-	 */
-	protected function getConnectors(): array
-	{
-		return array_keys(DOG_Connector::connectors());
-	}
-
-
-	private function connectorMatches(DOG_Message $message): bool
-	{
-		return in_array($message->server->getConnectorName(), $this->getConnectors(), true);
-	}
-
-
-	public function formValidated(GDT_Form $form): GDT
-	{
-		$args = [];
-		foreach ($this->gdoParameterCache() as $gdt)
-		{
-			$args[] = $gdt->getValue();
-		}
-
-		$message = DOG_Message::$LAST_MESSAGE;
-
-		if ($this->isDebugging())
-		{
-			xdebug_break();
-		}
-
-		$this->dogExecute($message, ...$args);
-
-		return GDT_Response::make();
 	}
 
 }

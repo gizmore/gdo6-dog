@@ -6,11 +6,9 @@ use GDO\CLI\CLI;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Expression\Parser;
-use GDO\Core\GDO_MethodError;
 use GDO\Core\GDT_Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
-use GDO\UI\GDT_Page;
 
 
 /**
@@ -23,10 +21,6 @@ use GDO\UI\GDT_Page;
 final class Exec extends DOG_Command
 {
 
-
-	protected function isRoomMethod(): bool { return false; }
-
-	protected function isPrivateMethod(): bool { return false; }
 
 	public function dog_message(DOG_Message $message): bool
 	{
@@ -75,6 +69,10 @@ final class Exec extends DOG_Command
 	{
 		return true;
 	}
+
+	protected function isRoomMethod(): bool { return false; }
+
+	protected function isPrivateMethod(): bool { return false; }
 
 
 }
