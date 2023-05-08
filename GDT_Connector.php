@@ -20,7 +20,7 @@ class GDT_Connector extends GDT_Select
 		return DOG_Connector::connector($var);
 	}
 
-	public function getChoices(): array
+	protected function getChoices(): array
 	{
 		$choices = [];
 		foreach (DOG_Connector::connectors() as $name => $class)

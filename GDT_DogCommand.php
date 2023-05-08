@@ -17,7 +17,7 @@ final class GDT_DogCommand extends GDT_Select
 		$this->initChoices();
 	}
 
-	public function getChoices(): array
+	protected function getChoices(): array
 	{
 		return DOG_Command::$COMMANDS_T;
 	}

@@ -4,10 +4,9 @@ namespace GDO\Dog\Method;
 
 use GDO\CLI\CLI;
 use GDO\Core\Application;
+use GDO\Core\Debug;
 use GDO\Core\Expression\Parser;
-use GDO\Core\GDO_ArgException;
-use GDO\Core\GDO_NoSuchCommandError;
-use GDO\Core\GDO_NoSuchMethodError;
+use GDO\Core\GDO_MethodError;
 use GDO\Core\GDT_Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
@@ -24,13 +23,12 @@ use GDO\UI\GDT_Page;
 final class Exec extends DOG_Command
 {
 
-//	public function isHiddenMethod() { return true; }
 
 	protected function isRoomMethod(): bool { return false; }
 
 	protected function isPrivateMethod(): bool { return false; }
 
-	public function dog_message(DOG_Message $message)
+	public function dog_message(DOG_Message $message): bool
 	{
 		$text = $message->text;
 
@@ -41,7 +39,7 @@ final class Exec extends DOG_Command
 		{
 			if (!str_starts_with($text, $message->room->getTrigger()))
 			{
-				return null;
+				return false;
 			}
 			$text = substr($text, 1);
 		}
@@ -54,30 +52,22 @@ final class Exec extends DOG_Command
 
 			if (!$this->isMethodEnabled($exp->method, $message))
 			{
-				return $this->error('err_dog_disabled');
+				$this->error('err_dog_disabled');
+				return false;
 			}
 
 			$result = $exp->execute();
-//			$text = CLI::getTopResponse();
 			$text = $result->render();
 			if (Application::isError())
 			{
 				$text .= CLI::renderCLIHelp($exp->method->method);
 			}
-
-
 			return $message->reply($text);
 		}
-		catch (GDO_ArgException $ex)
+		catch (\Throwable $ex)
 		{
-			global $me;
-			$text = $ex->getMessage();
-			$text .= CLI::renderCLIHelp($me);
-			return $message->reply($text);
-		}
-		catch (GDO_NoSuchCommandError $ex)
-		{
-			return $message->reply($ex->getMessage());
+			echo Debug::debugException($ex);
+			return false;
 		}
 	}
 

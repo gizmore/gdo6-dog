@@ -67,11 +67,7 @@ class DOG_Message
 
 	public function reply(string $text): bool
 	{
-		if ($text !== '')
-		{
-			$this->server->getConnector()->reply($this, $text);
-		}
-		return true;
+		return $this->server->getConnector()->reply($this, $text);
 	}
 
 	public function t(string $key, array $args = null): array|string

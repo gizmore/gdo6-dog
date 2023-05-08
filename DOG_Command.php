@@ -80,7 +80,7 @@ abstract class DOG_Command extends MethodForm
 		return "{$g}.{$t}";
 	}
 
-	public function createForm(GDT_Form $form): void
+	protected function createForm(GDT_Form $form): void
 	{
 		$form->addFields(...$this->gdoParameters());
 		$form->addField(GDT_AntiCSRF::make());
