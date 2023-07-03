@@ -45,8 +45,9 @@ abstract class DOG_Command extends MethodForm
 	### Flags ###
 	#############
 
+    public function isCLI(): bool { return true; }
 
-	public function isTrivial(): bool { return false; }
+    public function isTrivial(): bool { return false; }
 
 	public function getDefaultNickname(): string
 	{

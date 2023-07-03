@@ -56,7 +56,11 @@ final class Exec extends DOG_Command
 			{
 				$text .= CLI::renderCLIHelp($exp->method->method);
 			}
-			return $message->reply($text);
+            if (trim($text))
+            {
+                return $message->reply($text);
+            }
+            return true;
 		}
 		catch (\Throwable $ex)
 		{
