@@ -3,7 +3,6 @@ declare(strict_types=1);
 namespace GDO\Dog\lang;
 
 return [
-	'none' => 'none',
 	'usage' => 'Usage: #CMD#%s %s',
 	'serv_connector' => 'Service Connector',
 
