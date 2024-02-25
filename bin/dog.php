@@ -5,6 +5,7 @@ use GDO\CLI\CLI;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\GDT;
+use GDO\Core\Logger;
 use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Connector\Bash;
@@ -14,11 +15,14 @@ use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
 use Ratchet\App;
 
+define('GDO_TIME_START', microtime(true));
+
 # Bootstrap
-require 'GDO7.php';
 require 'protected/config.php';
+require 'GDO7.php';
 chdir(GDO_PATH);
 Trans::$ISO = GDO_LANGUAGE;
+Logger::init(null, Logger::ALL, 'protected/logs/__dog');
 Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();

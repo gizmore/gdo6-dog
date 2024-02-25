@@ -6,6 +6,7 @@ use GDO\Core\GDO;
 use GDO\Core\GDT_AutoInc;
 use GDO\Core\GDT_Checkbox;
 use GDO\Core\GDT_Name;
+use GDO\Core\GDT_UInt;
 use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
 use GDO\User\GDT_User;
@@ -20,11 +21,11 @@ final class DOG_User extends GDO
 
 	private bool $authenticated = false;
 
-	public static function getOrCreateUser(DOG_Server $server, string $name): self
+	public static function getOrCreateUser(DOG_Server $server, string $name, ?string $displayName=null): self
 	{
 		if (!($user = self::getUser($server, $name)))
 		{
-			$user = self::createUser($server, $name);
+			$user = self::createUser($server, $name, $displayName);
 		}
 		$server->addUser($user);
 		return $user;
@@ -50,7 +51,7 @@ final class DOG_User extends GDO
 		return $this->gdoVar('doguser_id');
 	}
 
-	public static function createUser(DOG_Server $server, $name): DOG_User
+	public static function createUser(DOG_Server $server, string $name, ?string $displayName=null): DOG_User
 	{
 		$sid = $server->getID();
 		$user = GDO_User::blank([
@@ -58,7 +59,8 @@ final class DOG_User extends GDO
 			'user_name' => sprintf('%s{%s}', $name, $sid),
 		])->insert();
 		return self::blank([
-			'doguser_name' => $name,
+            'doguser_name' => $name,
+            'doguser_displayname' => $displayName,
 			'doguser_server' => $sid,
 			'doguser_user' => $user->getID(),
 		])->insert();
@@ -68,7 +70,8 @@ final class DOG_User extends GDO
 	{
 		return [
 			GDT_AutoInc::make('doguser_id'),
-			GDT_Name::make('doguser_name')->utf8()->max(64)->caseI()->notNull()->unique(false),
+            GDT_Name::make('doguser_name')->utf8()->max(64)->caseI()->notNull()->unique(false),
+            GDT_Name::make('doguser_displayname')->utf8()->max(64)->caseI()->notNull(false)->unique(false),
 			GDT_Server::make('doguser_server')->notNull(),
 			GDT_User::make('doguser_user')->notNull(),
 			GDT_Checkbox::make('doguser_service')->notNull()->initial('0'),

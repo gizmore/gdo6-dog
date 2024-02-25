@@ -50,11 +50,12 @@ final class Exec extends DOG_Command
 				return false;
 			}
 
+            Application::$RESPONSE_CODE = 200;
 			$result = $exp->execute();
 			$text = $result->render();
 			if (Application::isError())
 			{
-				$text .= CLI::renderCLIHelp($exp->method->method);
+				$text .= ' ' . CLI::renderCLIHelp($exp->method->method);
 			}
             if (trim($text))
             {
@@ -65,7 +66,8 @@ final class Exec extends DOG_Command
 		catch (\Throwable $ex)
 		{
 			echo Debug::debugException($ex);
-			return false;
+            $message->reply($ex->getMessage());
+            return false;
 		}
 	}
 
