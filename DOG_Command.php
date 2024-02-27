@@ -195,6 +195,10 @@ abstract class DOG_Command extends MethodForm
 	public function hasPermission(GDO_User $user, string &$error, array &$args): bool
 	{
 		$message = DOG_Message::$LAST_MESSAGE;
+        if (!$message)
+        {
+            return true;
+        }
 		if (!$this->connectorMatches($message))
 		{
 			$error = 'err_dog_connector_match';
