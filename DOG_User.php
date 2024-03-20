@@ -117,7 +117,7 @@ final class DOG_User extends GDO
 
 	public function renderName(): string
 	{
-		if ($name = $this->getName())
+		if ($name = $this->getDisplayName())
 		{
 			return $this->getServer()->getConnector()->obfuscate($name);
 		}
@@ -193,5 +193,14 @@ final class DOG_User extends GDO
 	{
 		$this->authenticated = false;
 	}
+
+    public function renderFullName(): string
+    {
+        if (!($name = $this->gdoVar('doguser_displayname')))
+        {
+            $name = $this->getName();
+        }
+        return $name;
+    }
 
 }

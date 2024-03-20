@@ -102,7 +102,7 @@ abstract class DOG_Connector
 	{
 		if (isset($message->room))
 		{
-			$text = $message->user->getName() . ': ' . $text;
+			$text = $message->user->renderFullName() . ': ' . $text;
 			return $this->sendToRoom($message->room, $text);
 		}
 		else

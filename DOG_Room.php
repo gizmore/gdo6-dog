@@ -74,6 +74,7 @@ class DOG_Room extends GDO
 			GDT_AutoInc::make('room_id'),
 			GDT_Server::make('room_server')->notNull(),
 			GDT_String::make('room_name')->notNull()->max(64),
+            GDT_String::make('room_displayname')->max(128),
 			GDT_Secret::make('room_password')->max(64),
 			GDT_Char::make('room_trigger')->length(1)->initial('$')->notNull(),
 			GDT_String::make('room_description')->max(512),
@@ -89,7 +90,16 @@ class DOG_Room extends GDO
 
 	public function getTrigger(): string { return $this->gdoVar('room_trigger'); }
 
-	############
+    public function renderName(): string
+    {
+        if (!($name = $this->gdoVar('room_displayname')))
+        {
+            $name = $this->getName();
+        }
+        return $name;
+    }
+
+    ############
 	### Send ###
 	############
 
