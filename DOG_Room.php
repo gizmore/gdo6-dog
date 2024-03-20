@@ -2,6 +2,7 @@
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
+use GDO\Core\GDO_DBException;
 use GDO\Core\GDT_AutoInc;
 use GDO\Core\GDT_Char;
 use GDO\Core\GDT_Secret;
@@ -26,11 +27,18 @@ class DOG_Room extends GDO
 	### GDO ###
 	###########
 
-	public static function getOrCreate(DOG_Server $server, $roomName, $description = null)
+    /**
+     * @throws GDO_DBException
+     */
+    public static function getOrCreate(DOG_Server $server, string $roomName, string $description = null, string $trigger='$')
 	{
 		if ($room = self::getByName($server, $roomName))
 		{
-			return $room->saveVar('room_description', $description);
+			return $room->saveVars([
+                'room_description' => $description,
+                'room_trigger' => $trigger,
+            ]);
+
 		}
 		return self::create($server, $roomName, $description);
 	}
@@ -77,7 +85,7 @@ class DOG_Room extends GDO
 
 	public function getServerID(): string { return $this->gdoVar('room_server'); }
 
-	public function getPassword(): string { return $this->gdoVar('room_password'); }
+	public function getPassword(): ?string { return $this->gdoVar('room_password'); }
 
 	public function getTrigger(): string { return $this->gdoVar('room_trigger'); }
 

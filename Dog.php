@@ -6,7 +6,9 @@ use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Event\Table;
 use GDO\Core\GDO;
+use GDO\Core\GDO_DBException;
 use GDO\Core\GDO_Hook;
+use GDO\Core\GDT_Hook;
 use GDO\Core\Logger;
 use GDO\Core\Method;
 use GDO\Dog\Connector\Bash;
@@ -53,17 +55,23 @@ final class Dog
 		return false;
 	}
 
-	public function mainloop(): void
+    /**
+     * @throws GDO_DBException
+     */
+    public function mainloop(): void
 	{
 		$lastIPC = Application::$TIME;
 		while ($this->running)
 		{
 			$this->mainloopStep();
-			if ((Application::$TIME - $lastIPC) >= 10)
-			{
-				$lastIPC = Application::$TIME;
-				$this->ipcTimer();
-			}
+            if ($this->areAllConnected())
+            {
+                if ((Application::$TIME - $lastIPC) >= 10)
+                {
+                    $lastIPC = Application::$TIME;
+                    $this->ipcTimer();
+                }
+            }
 			usleep(self::MICROSLEEP);
 		}
 
@@ -215,7 +223,10 @@ final class Dog
 		return $this->loadedPlugins;
 	}
 
-	private function ipcTimer(): void
+    /**
+     * @throws GDO_DBException
+     */
+    private function ipcTimer(): void
 	{
 		if ($messages = GDO_Hook::table()->select()->exec()->fetchAllRows())
 		{
@@ -236,23 +247,24 @@ final class Dog
 		$message = json_decode($message, true);
 		$event = $message['event'];
 		$args = $message['args'];
-		$param = [$event];
-		if ($args)
-		{
-			$param = array_merge($param, $args);
-		}
-		$this->webHook($param);
+        GDT_Hook::callHook($event, ...$args);
+//		$param = [$event];
+//		if ($args)
+//		{
+//			$param = array_merge($param, $args);
+//		}
+//		$this->webHook($param);
 	}
 
-	private function webHook(array $hookData): void
-	{
-		$event = array_shift($hookData);
-		$method_name = "hook{$event}";
-		if (method_exists($this, $method_name))
-		{
-			call_user_func([$this, $method_name], ...$hookData);
-		}
-	}
+//	private function webHook(array $hookData): void
+//	{
+//		$event = array_shift($hookData);
+//		$method_name = "hook{$event}";
+//		if (method_exists($this, $method_name))
+//		{
+//			call_user_func([$this, $method_name], ...$hookData);
+//		}
+//	}
 
 	private function hasPendingConnections(): bool
 	{
@@ -285,5 +297,27 @@ final class Dog
 //             $gdo->tempReset();
 //         }
 //     }
+
+//    public function announce(string $message): void
+//    {
+//        foreach ($this->servers as $server)
+//        {
+//            $server->announce($message);
+//        }
+//    }
+    private function areAllConnected(): bool
+    {
+        foreach ($this->servers as $server)
+        {
+            if (!$server->isConnected())
+            {
+                if ($server->shouldConnect())
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
 }

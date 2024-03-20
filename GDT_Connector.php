@@ -17,7 +17,7 @@ class GDT_Connector extends GDT_Select
 
 	public function toValue(null|string|array $var): null|bool|int|float|string|object|array
 	{
-		return DOG_Connector::connector($var);
+		return $var ? DOG_Connector::connector($var) : null;
 	}
 
 	protected function getChoices(): array
@@ -36,5 +36,11 @@ class GDT_Connector extends GDT_Select
 			html($this->getVar()),
 			html(Arrays::implodeHuman(array_keys($this->choices)))]);
 	}
+
+    protected function validateSingle($conn): bool
+    {
+        return !!$conn;
+    }
+
 
 }

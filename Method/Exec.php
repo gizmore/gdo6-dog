@@ -6,6 +6,7 @@ use GDO\CLI\CLI;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Expression\Parser;
+use GDO\Core\GDO_NoSuchCommandError;
 use GDO\Core\GDT_Method;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
@@ -63,6 +64,11 @@ final class Exec extends DOG_Command
             }
             return true;
 		}
+        catch (GDO_NoSuchCommandError $ex)
+        {
+            $message->reply($ex->getMessage());
+            return false;
+        }
 		catch (\Throwable $ex)
 		{
 			echo Debug::debugException($ex);

@@ -30,7 +30,7 @@ final class AddServer extends DOG_Command
 	{
 		return [
 			GDT_Connector::make('connector')->notNull(),
-			GDT_Url::make('url')->allSchemes()->allowInternal()->allowExternal()->positional(),
+			GDT_Url::make('url')->allSchemes()->allowInternal()->allowExternal()->positional()->reachable(false),
 			GDT_Username::make('user'),
 			GDT_Password::make('password'),
 		];

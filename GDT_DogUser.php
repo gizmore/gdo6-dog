@@ -3,6 +3,8 @@ declare(strict_types=1);
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
+use GDO\Core\GDO_DBException;
+use GDO\Core\GDO_Exception;
 use GDO\Core\GDT_Object;
 use GDO\Util\Arrays;
 use GDO\Util\Strings;
@@ -36,7 +38,7 @@ final class GDT_DogUser extends GDT_Object
 	public bool $sameServer = false;
 	public bool $exact = false;
 	public bool $thyself = true;
-	private bool $ambigious = false;
+	private ?array $ambigious = null;
 
 	protected function __construct()
 	{
@@ -149,7 +151,7 @@ final class GDT_DogUser extends GDT_Object
 			}
 		}
 
-		if ($this->ambigious !== false)
+		if ($this->ambigious !== null)
 		{
 			return $this->error('err_username_ambigous', [Arrays::implodeHuman($this->ambigious)]);
 		}
@@ -165,7 +167,11 @@ final class GDT_DogUser extends GDT_Object
 		return true;
 	}
 
-	public function findByName($name)
+    /**
+     * @throws GDO_DBException
+     * @throws GDO_Exception
+     */
+    protected function getByName(string $var): ?GDO
 	{
 		$this->ambigious = false;
 
@@ -174,13 +180,13 @@ final class GDT_DogUser extends GDT_Object
 		if (!$this->sameServer)
 		{
 			$matches = null;
-			if (preg_match('/\\{(\\d+)\\}$/iuD', $name, $matches))
+			if (preg_match('/\\{(\\d+)\\}$/iuD', $var, $matches))
 			{
 				$server = DOG_Server::findById($matches[1]);
 			}
 		}
 
-		$_name = Strings::substrTo($name, '{', $name);
+		$_name = Strings::substrTo($var, '{', $var);
 		$ename = GDO::escapeSearchS($_name);
 
 		$query = $this->table->select()->
@@ -212,14 +218,14 @@ final class GDT_DogUser extends GDT_Object
 				{
 					if (!$this->sameServer)
 					{
-						if ($user->getFullName() === $name)
+						if ($user->getFullName() === $_name)
 						{
 							return $user; # exact match
 						}
 					}
 					else
 					{
-						if ($user->getName() === $name)
+						if ($user->getName() === $_name)
 						{
 							return $user;
 						}
@@ -230,7 +236,7 @@ final class GDT_DogUser extends GDT_Object
 				$possible = [];
 				foreach ($users as $user)
 				{
-					if (stripos($user->displayFullName(), $name) === 0)
+					if (stripos($user->displayFullName(), $_name) === 0)
 					{
 						$possible[] = $user;
 					}

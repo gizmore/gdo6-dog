@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace GDO\Dog;
 
 use GDO\Core\GDO;
+use GDO\Core\GDO_DBException;
 use GDO\Core\GDT_AutoInc;
 use GDO\Core\GDT_Checkbox;
 use GDO\Core\GDT_Name;
@@ -66,7 +67,11 @@ final class DOG_User extends GDO
 		])->insert();
 	}
 
-	public function gdoColumns(): array
+    public static function getByGDOUser(GDO_User $user)
+    {
+    }
+
+    public function gdoColumns(): array
 	{
 		return [
 			GDT_AutoInc::make('doguser_id'),
@@ -78,7 +83,10 @@ final class DOG_User extends GDO
 		];
 	}
 
-	public static function getFor(GDO_User $user): ?self
+    /**
+     * @throws GDO_DBException
+     */
+    public static function getFor(GDO_User $user): ?self
 	{
 		return self::getBy('doguser_user', $user->getID());
 	}

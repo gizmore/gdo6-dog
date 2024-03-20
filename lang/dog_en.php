@@ -44,6 +44,7 @@ return [
 	'dog_help_ping' => 'Test if #BOT# responds.',
 	'dog_pong' => 'PONG!',
 
+    'mt_dog_add_server' => 'Add server',
 	'dog_help_add_server' => 'Add a new server to your #BOT# installation.',
 	'err_dog_server_already_added' => 'A server with this url or connector has already been added: %s',
 	'msg_dog_server_added' => 'Server %s has been added: %s.',

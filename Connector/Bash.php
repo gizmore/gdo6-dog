@@ -2,6 +2,9 @@
 declare(strict_types=1);
 namespace GDO\Dog\Connector;
 
+use GDO\Core\GDO_DBException;
+use GDO\Core\GDO_Hook;
+use GDO\Core\GDT_Hook;
 use GDO\Dog\Dog;
 use GDO\Dog\DOG_Connector;
 use GDO\Dog\DOG_Message;
@@ -93,9 +96,19 @@ class Bash extends DOG_Connector
 		$this->connected = false;
 	}
 
-	public function readMessage(): ?DOG_Message
-	{
-		return null;
+    /**
+     * Read Web/IPC messages
+     * @throws GDO_DBException
+     */
+    public function readMessage(): bool
+    {
+//        $result = GDO_Hook::table()->select()->exec();
+//        while ($row = $result->fetchRow())
+//        {
+//            $this->processIPC($result[0]);
+//        }
+
+		return false;
 	}
 
 	public function send(string $text): bool
@@ -123,5 +136,13 @@ class Bash extends DOG_Connector
 	}
 
 	public function setupServer(DOG_Server $server): void {}
+
+//    private function processIPC(string $message): void
+//    {
+//        $msg = json_decode($message);
+//        $event = $msg['event'];
+//        $args = $msg['args'];
+//        GDT_Hook::callHook($event, ...$args);
+//    }
 
 }

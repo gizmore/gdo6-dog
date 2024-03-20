@@ -4,6 +4,7 @@ namespace GDO\Dog;
 
 use GDO\Core\Application;
 use GDO\Core\GDO;
+use GDO\Core\GDO_DBException;
 use GDO\Core\GDT_AutoInc;
 use GDO\Core\GDT_Checkbox;
 use GDO\Core\GDT_CreatedAt;
@@ -57,13 +58,26 @@ final class DOG_Server extends GDO
 		return self::getByURL($url);
 	}
 
-	public static function getByURL(string $url): self
+    /**
+     * @throws GDO_DBException
+     */
+    public static function getByURL(string $url): ?self
 	{
 		$url = GDO::escapeSearchS($url);
 		return self::table()->getWhere("serv_url LIKE '%$url%'");
 	}
 
-	public function isTestable(): bool
+    /**
+     * @throws GDO_DBException
+     */
+    public static function getByConnector(string $name): ?self
+    {
+        return self::getByVars([
+            'serv_connector' => $name,
+        ]);
+    }
+
+    public function isTestable(): bool
 	{
 		return false;
 	}
@@ -105,7 +119,7 @@ final class DOG_Server extends GDO
 
 	public function isConnected(): bool
 	{
-		return $this->connector->connected;
+		return isset($this->connector) ? $this->connector->connected : false;
 	}
 
 	public function isTLS(): bool { return $this->gdoValue('serv_tls'); }
@@ -157,6 +171,10 @@ final class DOG_Server extends GDO
 			{
 				$host .= ':' . $port;
 			}
+            else
+            {
+                $host .= ':6667';
+            }
 			return $host;
 		}
 		return null;
@@ -274,10 +292,27 @@ final class DOG_Server extends GDO
 		return null;
 	}
 
+    public function queryUser(string $username): DOG_User
+    {
+        return DOG_User::getOrCreateUser($this, $username);
+    }
+
 	public function removeUser(DOG_User $user): void
 	{
 		unset($this->users[$user->getID()]);
 	}
 
+    public function announce(string $message): bool
+    {
+        foreach ($this->rooms as $room)
+        {
+            $room->send($message);
+        }
+    }
+
+//    public function getLangISO(): string
+//    {
+// rooms and users need langs... servers not?
+//    }
 
 }
