@@ -67,8 +67,9 @@ final class DOG_User extends GDO
 		])->insert();
 	}
 
-    public static function getByGDOUser(GDO_User $user)
+    public static function getForWithConnector(GDO_User $user): self
     {
+        self::table()->select('dog_user.*')->where();
     }
 
     public function gdoColumns(): array

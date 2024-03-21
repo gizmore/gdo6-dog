@@ -14,6 +14,9 @@ use GDO\User\GDO_User;
  * A dog command adds Dog config to a method.
  * The permission is additionally checked for channel/private/connector scopes.
  *
+ * Implement gdoParameters() and then success is called with:
+ * 		$this->dogExecute($message, ...$args);
+ *
  * @version 7.0.3
  * @author gizmore
  */
