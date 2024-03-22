@@ -7,9 +7,13 @@ use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Expression\Parser;
 use GDO\Core\GDO_NoSuchCommandError;
+use GDO\Core\GDT;
 use GDO\Core\GDT_Method;
+use GDO\Core\GDT_Response;
+use GDO\DB\Database;
 use GDO\Dog\DOG_Command;
 use GDO\Dog\DOG_Message;
+use GDO\UI\GDT_Page;
 
 
 /**
@@ -23,7 +27,7 @@ final class Exec extends DOG_Command
 {
 
 
-	public function dog_message(DOG_Message $message): bool
+	public function dog_message(DOG_Message $message): GDT
 	{
 		$text = $message->text;
 
@@ -34,7 +38,7 @@ final class Exec extends DOG_Command
 		{
 			if (!str_starts_with($text, $message->room->getTrigger()))
 			{
-				return false;
+                return GDT_Response::make();
 			}
 			$text = substr($text, 1);
 		}
@@ -47,13 +51,15 @@ final class Exec extends DOG_Command
 
 			if (!$this->isMethodEnabled($exp->method, $message))
 			{
-				$this->error('err_dog_disabled');
-				return false;
+				return $this->error('err_dog_disabled');
 			}
 
+            GDT_Page::instance()->reset();
             Application::$RESPONSE_CODE = 200;
-			$result = $exp->execute();
-			$text = $result->render();
+            Database::instance()->transactionBegin();
+            $result = $exp->execute();
+            $text = GDT_Page::instance()->topResponse()->render();
+			$text .= $result->render();
 			if (Application::isError())
 			{
 				$text .= ' ' . CLI::renderCLIHelp($exp->method->method);
@@ -62,20 +68,25 @@ final class Exec extends DOG_Command
             {
                 return $message->reply($text);
             }
-            return true;
+            return GDT_Response::make();
 		}
         catch (GDO_NoSuchCommandError $ex)
         {
             $message->reply($ex->getMessage());
-            return false;
+            Database::instance()->transactionRollback();
         }
 		catch (\Throwable $ex)
 		{
 			echo Debug::debugException($ex);
             $message->reply($ex->getMessage());
-            return false;
+            Database::instance()->transactionRollback();
 		}
-	}
+        finally
+        {
+            Database::instance()->transactionEnd();
+        }
+        return GDT_Response::make();
+    }
 
 	private function isMethodEnabled(GDT_Method $method, DOG_Message $message): bool
 	{

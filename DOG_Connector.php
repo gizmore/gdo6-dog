@@ -75,8 +75,14 @@ abstract class DOG_Connector
 	public function connected(bool $connected): static
 	{
 		$this->connected = $connected;
+        $this->onConnected();
 		return $this;
 	}
+
+    protected function onConnected(): void
+    {
+
+    }
 
 	public function obfuscate(string $string): string
 	{
@@ -142,6 +148,11 @@ abstract class DOG_Connector
     public function getTrigger(): string
     {
         return "@{$this->server->getDog()->getName()} ";
+    }
+
+    public function hasUserSubscribedRoom(DOG_User $user, DOG_Room $param): bool
+    {
+        return false;
     }
 
 

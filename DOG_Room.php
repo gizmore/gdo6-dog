@@ -5,6 +5,7 @@ use GDO\Core\GDO;
 use GDO\Core\GDO_DBException;
 use GDO\Core\GDT_AutoInc;
 use GDO\Core\GDT_Char;
+use GDO\Core\GDT_Name;
 use GDO\Core\GDT_Secret;
 use GDO\Core\GDT_String;
 use GDO\Language\GDO_Language;
@@ -30,7 +31,7 @@ class DOG_Room extends GDO
     /**
      * @throws GDO_DBException
      */
-    public static function getOrCreate(DOG_Server $server, string $roomName, string $description = null, string $trigger='$')
+    public static function getOrCreate(DOG_Server $server, string $roomName, string $description = null, string $trigger='$', string $displayName=null)
 	{
 		if ($room = self::getByName($server, $roomName))
 		{
@@ -74,7 +75,7 @@ class DOG_Room extends GDO
 			GDT_AutoInc::make('room_id'),
 			GDT_Server::make('room_server')->notNull(),
 			GDT_String::make('room_name')->notNull()->max(64),
-            GDT_String::make('room_displayname')->max(128),
+            GDT_Name::make('room_displayname')->utf8()->max(128),
 			GDT_Secret::make('room_password')->max(64),
 			GDT_Char::make('room_trigger')->length(1)->initial('$')->notNull(),
 			GDT_String::make('room_description')->max(512),
@@ -136,13 +137,22 @@ class DOG_Room extends GDO
 	#############
 	### Users ###
 	#############
-	public function hasUser(DOG_User $user = null)
+	public function hasUser(DOG_User $user): bool
 	{
-		return $user ? isset($this->users[$user->getID()]) : false;
+        if (isset($this->users[$user->getID()]))
+        {
+            return true;
+        }
+        if ($this->getServer()->getConnector()->hasUserSubscribedRoom($user, $this))
+        {
+            $this->users[$user->getID()] = $user;
+            return true;
+        }
+		return false;
 	}
 
-	public function addUser(DOG_User $user)
-	{
+	public function addUser(DOG_User $user): void
+    {
 		$userId = $user->getID();
 		if (!isset($this->users[$userId]))
 		{
@@ -150,8 +160,8 @@ class DOG_Room extends GDO
 		}
 	}
 
-	public function removeUser(DOG_User $user)
-	{
+	public function removeUser(DOG_User $user): void
+    {
 		unset($this->users[$user->getID()]);
 	}
 

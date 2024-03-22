@@ -37,6 +37,7 @@ final class Module_Dog extends GDO_Module
 			DOG_Server::class,
 			DOG_Room::class,
 			DOG_User::class,
+            DOG_RoomUser::class,
 			DOG_ConfigBot::class,
 			DOG_ConfigRoom::class,
 			DOG_ConfigServer::class,

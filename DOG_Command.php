@@ -263,7 +263,10 @@ abstract class DOG_Command extends MethodForm
 			xdebug_break();
 		}
 
-		$this->dogExecute($message, ...$args);
+        if ($result = $this->dogExecute($message, ...$args))
+        {
+            return $result;
+        }
 
 		return GDT_Response::make();
 	}

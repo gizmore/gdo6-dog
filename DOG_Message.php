@@ -1,6 +1,8 @@
 <?php
 namespace GDO\Dog;
 
+use GDO\Core\GDT;
+use GDO\Core\GDT_Response;
 use GDO\User\GDO_User;
 
 /**
@@ -60,14 +62,15 @@ class DOG_Message
 	###############
 	### Methods ###
 	###############
-	public function rply(string $key, array $args = null): bool
+	public function rply(string $key, array $args = null): GDT
 	{
 		return $this->reply($this->t($key, $args));
 	}
 
-	public function reply(string $text): bool
+	public function reply(string $text): GDT
 	{
-		return $this->server->getConnector()->reply($this, $text);
+		$this->server->getConnector()->reply($this, $text);
+        return GDT_Response::make();
 	}
 
 	public function t(string $key, array $args = null): array|string

@@ -7,6 +7,7 @@ use GDO\Core\GDO_DBException;
 use GDO\Core\GDT_AutoInc;
 use GDO\Core\GDT_Checkbox;
 use GDO\Core\GDT_Name;
+use GDO\Core\GDT_String;
 use GDO\Core\GDT_UInt;
 use GDO\User\GDO_User;
 use GDO\User\GDO_UserPermission;
@@ -57,11 +58,11 @@ final class DOG_User extends GDO
 		$sid = $server->getID();
 		$user = GDO_User::blank([
 			'user_type' => GDT_UserType::MEMBER,
-			'user_name' => sprintf('%s{%s}', $name, $sid),
+			'user_name' => sprintf('%s{%s}', $displayName?:$name, $sid),
 		])->insert();
 		return self::blank([
             'doguser_name' => $name,
-            'doguser_displayname' => $displayName,
+            'doguser_displayname' => $displayName?:$name,
 			'doguser_server' => $sid,
 			'doguser_user' => $user->getID(),
 		])->insert();
@@ -76,7 +77,7 @@ final class DOG_User extends GDO
 	{
 		return [
 			GDT_AutoInc::make('doguser_id'),
-            GDT_Name::make('doguser_name')->utf8()->max(64)->caseI()->notNull()->unique(false),
+            GDT_String::make('doguser_name')->ascii()->max(64)->caseI()->notNull()->unique(false),
             GDT_Name::make('doguser_displayname')->utf8()->max(64)->caseI()->notNull(false)->unique(false),
 			GDT_Server::make('doguser_server')->notNull(),
 			GDT_User::make('doguser_user')->notNull(),
@@ -115,6 +116,15 @@ final class DOG_User extends GDO
 	public function getServerID(): string { return $this->gdoVar('doguser_server'); }
 
 	public function displayFullName(): string { return sprintf('%s{%s}', $this->renderName(), $this->getServerID()); }
+
+    public function getDisplayName(): string
+    {
+        if ($name = $this->gdoVar('doguser_displayname'))
+        {
+            return $name;
+        }
+        return $this->getName();
+    }
 
 	public function renderName(): string
 	{

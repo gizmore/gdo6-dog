@@ -314,5 +314,24 @@ final class DOG_Server extends GDO
 //    {
 // rooms and users need langs... servers not?
 //    }
+    public function reloadRooms(): void
+    {
+        $result = DOG_Room::table()->select()->where("room_server={$this->getID()}")->exec();
+        /**
+         * @var DOG_Room $room
+         */
+        while ($room = $result->fetchObject())
+        {
+            $this->addRoom($room);
+            $result2 = DOG_RoomUser::table()->select('ru_user_t.*')->fetchTable(DOG_User::table())
+                ->joinObject('ru_user')
+                ->where("ru_room={$room->getID()}")->exec();
+            while ($user = $result2->fetchObject())
+            {
+                $room->addUser($user);
+            }
+        }
+
+    }
 
 }

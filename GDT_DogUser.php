@@ -6,6 +6,7 @@ use GDO\Core\GDO;
 use GDO\Core\GDO_DBException;
 use GDO\Core\GDO_Exception;
 use GDO\Core\GDT_Object;
+use GDO\User\GDO_User;
 use GDO\Util\Arrays;
 use GDO\Util\Strings;
 
@@ -40,6 +41,8 @@ final class GDT_DogUser extends GDT_Object
 	public bool $thyself = true;
 	private ?array $ambigious = null;
 
+    public bool $defaultCurrent = false;
+
 	protected function __construct()
 	{
 		parent::__construct();
@@ -51,6 +54,12 @@ final class GDT_DogUser extends GDT_Object
 		$this->online = $online;
 		return $this;
 	}
+
+    public function defaultCurrent(bool $defaultCurrent=true): static
+    {
+        $this->defaultCurrent = $defaultCurrent;
+        return $this;
+    }
 
 	public function sameRoom(bool $sameRoom = true): static
 	{
@@ -84,14 +93,17 @@ final class GDT_DogUser extends GDT_Object
 	### GDT_Object ###
 	##################
 
-//	/**
-//	 * Always use the findByName method.
-//	 */
-//	public function toValue(null|string|array $var): null|bool|int|float|string|object|array
-//	{
-//		$_REQUEST['nocompletion_' . $this->name] = 1;
-//		return parent::toValue($var);
-//	}
+	public function toValue(null|string|array $var): null|bool|int|float|string|object|array
+	{
+        if ($var === null)
+        {
+            if ($this->defaultCurrent)
+            {
+                return DOG_Message::$LAST_MESSAGE->user;
+            }
+        }
+        return parent::toValue($var);
+	}
 
 	/**
 	 * Validate object first, then options.
@@ -173,7 +185,7 @@ final class GDT_DogUser extends GDT_Object
      */
     protected function getByName(string $var): ?GDO
 	{
-		$this->ambigious = false;
+		$this->ambigious = null;
 
 		$server = DOG_Message::$LAST_MESSAGE->server;
 
@@ -190,7 +202,7 @@ final class GDT_DogUser extends GDT_Object
 		$ename = GDO::escapeSearchS($_name);
 
 		$query = $this->table->select()->
-		where("doguser_name LIKE '%$ename%' ")->
+		where("doguser_displayname LIKE '%$ename%' ")->
 		where('doguser_service = 0')->
 		limit(10);
 
