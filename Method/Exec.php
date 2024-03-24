@@ -6,6 +6,7 @@ use GDO\CLI\CLI;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Expression\Parser;
+use GDO\Core\GDO_ArgError;
 use GDO\Core\GDO_NoSuchCommandError;
 use GDO\Core\GDT;
 use GDO\Core\GDT_Method;
@@ -31,16 +32,18 @@ final class Exec extends DOG_Command
 	{
 		$text = $message->text;
 
+        Application::instance()->reset();
 		Application::$MODE = $message->server->getConnector()->gdtRenderMode();
 
 		# Remove trigger char if inside room.
 		if (isset($message->room))
 		{
-			if (!str_starts_with($text, $message->room->getTrigger()))
+            $trigger = $message->room->getTrigger();
+			if (!str_starts_with($text, $trigger))
 			{
                 return GDT_Response::make();
 			}
-			$text = substr($text, 1);
+			$text = substr($text, strlen($trigger));
 		}
 
 		try
@@ -54,8 +57,6 @@ final class Exec extends DOG_Command
 				return $this->error('err_dog_disabled');
 			}
 
-            GDT_Page::instance()->reset();
-            Application::$RESPONSE_CODE = 200;
             Database::instance()->transactionBegin();
             $result = $exp->execute();
             $text = GDT_Page::instance()->topResponse()->render();
@@ -64,13 +65,14 @@ final class Exec extends DOG_Command
 			{
 				$text .= ' ' . CLI::renderCLIHelp($exp->method->method);
 			}
-            if (trim($text))
+            $text = trim($text);
+            if ($text)
             {
                 return $message->reply($text);
             }
             return GDT_Response::make();
 		}
-        catch (GDO_NoSuchCommandError $ex)
+        catch (GDO_ArgError|GDO_NoSuchCommandError $ex)
         {
             $message->reply($ex->getMessage());
             Database::instance()->transactionRollback();

@@ -155,5 +155,9 @@ abstract class DOG_Connector
         return false;
     }
 
+    public function getSubscriberModule(): ?string
+    {
+        return null;
+    }
 
 }
