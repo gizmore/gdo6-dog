@@ -154,6 +154,10 @@ final class Dog
 
 	private function eventB(array $objects, string $name, mixed ...$args): bool
 	{
+//        if ($name === 'dog_message')
+//        {
+//            echo "$name\n";
+//        }
 		foreach ($objects as $object)
 		{
 			if (method_exists($object, $name))
