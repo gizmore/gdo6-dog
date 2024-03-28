@@ -31,6 +31,9 @@ final class DOG_Server extends GDO
 	 */
 	public array $rooms = [];
 
+
+    private array $inbox = [];
+
 	##############
 	### Online ###
 	##############
@@ -332,6 +335,25 @@ final class DOG_Server extends GDO
             }
         }
 
+    }
+
+    public function processInbox(): void
+    {
+        if (count($this->inbox))
+        {
+            $messages = $this->inbox;
+            $this->inbox = [];
+            foreach ($messages as $message)
+            {
+                DOG_Message::$LAST_MESSAGE = $message;
+                Dog::instance()->event('dog_message', $message);
+            }
+        }
+    }
+
+    public function enqueue(DOG_Message $message): void
+    {
+        $this->inbox[] = $message;
     }
 
 }

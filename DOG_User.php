@@ -23,13 +23,16 @@ final class DOG_User extends GDO
 
 	private bool $authenticated = false;
 
-	public static function getOrCreateUser(DOG_Server $server, string $name, ?string $displayName=null): self
+	public static function getOrCreateUser(DOG_Server $server, string $name, ?string $displayName=null, bool $add=true): self
 	{
 		if (!($user = self::getUser($server, $name)))
 		{
 			$user = self::createUser($server, $name, $displayName);
 		}
-		$server->addUser($user);
+        if ($add)
+        {
+            $server->addUser($user);
+        }
 		return $user;
 	}
 
@@ -56,10 +59,14 @@ final class DOG_User extends GDO
 	public static function createUser(DOG_Server $server, string $name, ?string $displayName=null): DOG_User
 	{
 		$sid = $server->getID();
-		$user = GDO_User::blank([
-			'user_type' => GDT_UserType::MEMBER,
-			'user_name' => sprintf('%s{%s}', $displayName?:$name, $sid),
-		])->insert();
+        $username = sprintf('%s{%s}', $displayName?:$name, $sid);
+        if (!($user = GDO_User::getByName($username)))
+        {
+            $user = GDO_User::blank([
+                'user_type' => GDT_UserType::MEMBER,
+                'user_name' => $username,
+            ])->insert();
+        }
 		return self::blank([
             'doguser_name' => $name,
             'doguser_displayname' => $displayName?:$name,

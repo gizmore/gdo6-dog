@@ -24,9 +24,12 @@ class DOG_Message
 	public ?DOG_User $user = null;
 	public $text;
 
-	public function __construct()
+	public function __construct(bool $remember=true)
 	{
-		self::$LAST_MESSAGE = $this;
+        if ($remember)
+        {
+            self::$LAST_MESSAGE = $this;
+        }
 	}
 
 	public static function make(): static { return new static(); }

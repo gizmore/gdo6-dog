@@ -38,6 +38,8 @@ final class Dog
 
 	public bool $running = true;
 
+    public Worker $worker;
+
 	/**
 	 * @var DOG_Server[]
 	 */
@@ -127,7 +129,8 @@ final class Dog
 			$processed = 0;
 			try
 			{
-				while ($processed < 5)
+                $server->processInbox();
+                while ($processed < 5)
 				{
 					if (!$connector->readMessage())
 					{
@@ -185,6 +188,8 @@ final class Dog
 		{
 			Bash::instance()->init();
 			$this->servers = DOG_Server::table()->all();
+            $this->worker = new Worker();
+            $this->worker->start();
 		}
 	}
 

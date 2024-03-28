@@ -212,13 +212,13 @@ abstract class DOG_Command extends MethodForm
 		{
 			if (!$this->isRoomMethod())
 			{
-				$error = 'err_dog_cmd_not_room';
+				$error = 'err_not_in_room';
 				return false;
 			}
 		}
 		elseif (!$this->isPrivateMethod())
 		{
-			$error = 'err_dog_cmd_only_room';
+			$error = 'err_not_in_private';
 			return false;
 		}
 		return true;

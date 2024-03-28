@@ -29,7 +29,6 @@ Debug::enableExceptionHandler();
 Debug::setDieOnError(false);
 Debug::setMailOnError(GDO_ERROR_MAIL);
 Database::init();
-CLI::setServerVars();
 $app = Application::init();
 $app->cli()->modeDetected(GDT::RENDER_CLI);
 GDT_Page::make();
@@ -47,6 +46,7 @@ $dog->loadPlugins();
 
 # User
 Bash::instance()->getBashUser();
+CLI::setServerVars();
 
 # Args
 /** @var int $argc * */
