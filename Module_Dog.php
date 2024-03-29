@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace GDO\Dog;
 
 use GDO\Core\GDO_Module;
+use GDO\Core\GDT_Float;
 use GDO\Core\GDT_Name;
 use GDO\Core\GDT_Token;
 
@@ -50,9 +51,19 @@ final class Module_Dog extends GDO_Module
 	{
 		return [
 			GDT_Name::make('default_nickname')->notNull()->initial('Dog'),
+            GDT_Float::make('dog_idle_sleep')->notNull()->min(0.01)->max(2.0)->initial('0.2'),
 		];
 	}
 
+    public function cfgIdleSleep(): float
+    {
+        return $this->getConfigValue('dog_idle_sleep');
+    }
+
+    public function cfgIdleSleepMicros(): int
+    {
+        return (int)round($this->cfgIdleSleep()*1000000);
+    }
 
 	public function cfgDefaultNickname(): string
 	{

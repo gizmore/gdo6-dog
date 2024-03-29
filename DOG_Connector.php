@@ -13,6 +13,11 @@ abstract class DOG_Connector
 
 	use WithName;
 
+//    public function getGDOUsername(DOG_User $user): string
+//    {
+//        return "{$user->displayFullName()}";
+//    }
+
 	/**
 	 * @var DOG_Connector[]
 	 */
@@ -63,6 +68,10 @@ abstract class DOG_Connector
 		return t('connector_' . $this->gdoShortName());
 	}
 
+    public function getDog(): DOG_User
+    {
+        return $this->server->getDog();
+    }
 
 	###
 
@@ -158,6 +167,11 @@ abstract class DOG_Connector
     public function getSubscriberModule(): ?string
     {
         return null;
+    }
+
+    public function getGDOUserName(string $username, DOG_Server $server): string
+    {
+        return sprintf('%s{%s}', $username, $server->getID());
     }
 
 }

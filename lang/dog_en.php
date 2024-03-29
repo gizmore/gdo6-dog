@@ -92,4 +92,19 @@ return [
 	'msg_dog_room_lang_now' => 'The room\'s language changed from %s to %s.',
 
 	'mt_dog_bot' => 'Show and toggle bot flag for a user.',
+
+
+    'dog_docs' => [
+        'Documentation.',
+        'syntax' => 'Dog commands start with the channel trigger followed by the command.
+             For parameters append a space and separate parameters with comma.
+             Optional parameters are named in the format --name=foo.
+             Example: $mail --lazy=1,giz,Hi There,This is the mail body,,with commas escaped.',
+        'commands' => [
+            'Most useful commands are help, '
+        ],
+        'shadowdawg' => [
+            "This is a game which i am working on...",
+        ]
+    ],
 ];

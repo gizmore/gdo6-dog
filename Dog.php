@@ -11,6 +11,7 @@ use GDO\Core\GDO_Hook;
 use GDO\Core\GDT_Hook;
 use GDO\Core\Logger;
 use GDO\Core\Method;
+use GDO\DB\Cache;
 use GDO\Dog\Connector\Bash;
 use GDO\User\GDO_Permission;
 use GDO\Util\Filewalker;
@@ -208,7 +209,7 @@ final class Dog
 				{
 					return;
 				}
-				Filewalker::traverse(["$path/Connector", "$path/Method"], null, function ($entry, $path)
+				Filewalker::traverse(["{$path}/Connector", "{$path}/Method"], null, function ($entry, $path)
 				{
 					$class_name = str_replace('/', "\\", $path);
 					$class_name = substr($class_name, 0, -4);

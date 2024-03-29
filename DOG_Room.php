@@ -28,18 +28,32 @@ class DOG_Room extends GDO
 	### GDO ###
 	###########
 
+    public function gdoColumns(): array
+    {
+        return [
+            GDT_AutoInc::make('room_id'),
+            GDT_Server::make('room_server')->notNull(),
+            GDT_String::make('room_name')->notNull()->max(64),
+            GDT_Name::make('room_displayname')->utf8()->max(128),
+            GDT_Secret::make('room_password')->max(64),
+            GDT_Char::make('room_trigger')->length(1)->initial('$')->notNull(),
+            GDT_String::make('room_description')->max(512),
+            GDT_Language::make('room_lang')->notNull()->initial(GDO_LANGUAGE),
+        ];
+    }
+
     /**
      * @throws GDO_DBException
      */
-    public static function getOrCreate(DOG_Server $server, string $roomName, string $description = null, string $trigger='$', string $displayName=null)
-	{
+    public static function getOrCreate(DOG_Server $server, string $roomName, string $description = null, string $trigger='$', string $displayName=null): DOG_Room
+    {
 		if ($room = self::getByName($server, $roomName))
 		{
 			return $room->saveVars([
                 'room_description' => $description,
                 'room_trigger' => $trigger,
+                'room_displayname' => $displayName?:$roomName,
             ]);
-
 		}
 		return self::create($server, $roomName, $description);
 	}
@@ -67,20 +81,6 @@ class DOG_Room extends GDO
 			'room_name' => $roomName,
 			'room_description' => $description,
 		])->insert();
-	}
-
-	public function gdoColumns(): array
-	{
-		return [
-			GDT_AutoInc::make('room_id'),
-			GDT_Server::make('room_server')->notNull(),
-			GDT_String::make('room_name')->notNull()->max(64),
-            GDT_Name::make('room_displayname')->utf8()->max(128),
-			GDT_Secret::make('room_password')->max(64),
-			GDT_Char::make('room_trigger')->length(1)->initial('$')->notNull(),
-			GDT_String::make('room_description')->max(512),
-			GDT_Language::make('room_lang')->notNull()->initial(GDO_LANGUAGE),
-		];
 	}
 
 	public function getName(): string { return $this->gdoVar('room_name'); }

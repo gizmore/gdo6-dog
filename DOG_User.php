@@ -56,10 +56,13 @@ final class DOG_User extends GDO
 		return $this->gdoVar('doguser_id');
 	}
 
-	public static function createUser(DOG_Server $server, string $name, ?string $displayName=null): DOG_User
+    /**
+     * @throws GDO_DBException
+     */
+    public static function createUser(DOG_Server $server, string $name, ?string $displayName=null): DOG_User
 	{
 		$sid = $server->getID();
-        $username = sprintf('%s{%s}', $displayName?:$name, $sid);
+        $username = $server->getConnector()->getGDOUserName($displayName?:$name, $server);
         if (!($user = GDO_User::getByName($username)))
         {
             $user = GDO_User::blank([
@@ -75,10 +78,10 @@ final class DOG_User extends GDO
 		])->insert();
 	}
 
-    public static function getForWithConnector(GDO_User $user): self
-    {
-        self::table()->select('dog_user.*')->where();
-    }
+//    public static function getForWithConnector(GDO_User $user): self
+//    {
+//        self::table()->select('dog_user.*')->where();
+//    }
 
     public function gdoColumns(): array
 	{
