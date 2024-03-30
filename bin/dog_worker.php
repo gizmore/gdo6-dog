@@ -36,7 +36,7 @@ final class dog_telegram extends Application
 $loader = ModuleLoader::instance();
 $loader->loadModulesCache();
 
-$worker = new \GDO\Dog\Worker();
+$worker = new \GDO\Dog\DogWorker();
 
 while (true)
 {

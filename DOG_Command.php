@@ -258,6 +258,11 @@ abstract class DOG_Command extends MethodForm
 
 		$message = DOG_Message::$LAST_MESSAGE;
 
+        if (!$message)
+        {
+            $message = new DOG_Message();
+        }
+
 		if ($this->isDebugging())
 		{
 			xdebug_break();

@@ -11,6 +11,7 @@ use GDO\DB\Database;
 use GDO\Dog\Connector\Bash;
 use GDO\Dog\Dog;
 use GDO\Dog\DogApp;
+use GDO\Dog\DogWorker;
 use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
 use Ratchet\App;
@@ -23,6 +24,7 @@ require 'GDO7.php';
 chdir(GDO_PATH);
 Trans::$ISO = GDO_LANGUAGE;
 Logger::init(null, Logger::ALL, 'protected/logs/__dog');
+DogWorker::init();
 Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();
@@ -53,7 +55,14 @@ CLI::setServerVars();
 /** @var string[] $argv * */
 if ($argc === 1)
 {
-	$dog->mainloop();
+//    if (Worker::isChild())
+//    {
+//        Worker::run();
+//    }
+//    else
+//    {
+        $dog->mainloop();
+//    }
 }
 else
 {

@@ -1,0 +1,9 @@
+{
+    "require": {
+        "amphp/amp": "^3.0",
+        "amphp/parallel": "*",
+        "revolt/event-loop": "*"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

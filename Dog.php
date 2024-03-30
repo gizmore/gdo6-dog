@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace GDO\Dog;
 
+use Amp\Loop;
 use GDO\Core\Application;
 use GDO\Core\Debug;
 use GDO\Core\Event\Table;
@@ -11,10 +12,10 @@ use GDO\Core\GDO_Hook;
 use GDO\Core\GDT_Hook;
 use GDO\Core\Logger;
 use GDO\Core\Method;
-use GDO\DB\Cache;
 use GDO\Dog\Connector\Bash;
 use GDO\User\GDO_Permission;
 use GDO\Util\Filewalker;
+use Revolt\EventLoop;
 use Throwable;
 
 /**
@@ -63,6 +64,49 @@ final class Dog
      */
     public function mainloop(): void
 	{
+
+        echo "HERE!\n";
+
+        $dog = $this;
+
+        EventLoop::repeat(1, function () use ($dog) {
+            $lastIPC = Application::$TIME;
+
+            // Main loop to check the status of tasks
+            while ($dog->running) {
+//                // Check each task's status
+//                foreach ($tasks as $index => $task) {
+//                    if ($task->isComplete()) {
+//                        // Task is complete, retrieve the result
+//                        $result = $task->getResult();
+//                        echo "Task $index: $result\n";
+//                        // Remove the completed task from the array
+//                        unset($tasks[$index]);
+//                    }
+//                }
+                // Wait for a short duration before checking again
+                $dog->mainloopStep();
+                if ($dog->areAllConnected())
+                {
+                    if ((Application::$TIME - $lastIPC) >= 10)
+                    {
+                        $lastIPC = Application::$TIME;
+                        $dog->ipcTimer();
+                    }
+                }
+                usleep(100000);
+//                yield \Amp\delay(self::MICROSLEEP/1000000.0);
+            }
+        });
+        EventLoop::run();
+
+        while ($this->hasPendingConnections())
+        {
+            sleep(1);
+        }
+        return;
+
+
 		$lastIPC = Application::$TIME;
 		while ($this->running)
 		{
@@ -78,11 +122,11 @@ final class Dog
 			usleep(self::MICROSLEEP);
 		}
 
-		while ($this->hasPendingConnections())
-		{
-			sleep(1);
-		}
-	}
+        while ($this->hasPendingConnections())
+        {
+            sleep(1);
+        }
+    }
 
 	public function mainloopStep(): void
 	{
@@ -189,8 +233,8 @@ final class Dog
 		{
 			Bash::instance()->init();
 			$this->servers = DOG_Server::table()->all();
-            $this->worker = new Worker();
-            $this->worker->start();
+//            $this->worker = new Worker();
+//            $this->worker->start();
 		}
 	}
 
