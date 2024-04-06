@@ -6,6 +6,7 @@ use GDO\Core\GDO_Module;
 use GDO\Core\GDT_Float;
 use GDO\Core\GDT_Name;
 use GDO\Core\GDT_Token;
+use GDO\Dog\Connector\Bash;
 
 /**
  * Dog chatbot.
@@ -75,6 +76,11 @@ final class Module_Dog extends GDO_Module
         return [
             GDT_Token::make('dog_token'),
         ];
+    }
+
+    public function onModuleInit(): void
+    {
+        DOG_Connector::register(Bash::instance());
     }
 
 }

@@ -10,11 +10,8 @@ use GDO\Core\ModuleLoader;
 use GDO\DB\Database;
 use GDO\Dog\Connector\Bash;
 use GDO\Dog\Dog;
-use GDO\Dog\DogApp;
-use GDO\Dog\DogWorker;
 use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
-use Ratchet\App;
 
 define('GDO_TIME_START', microtime(true));
 
@@ -24,7 +21,6 @@ require 'GDO7.php';
 chdir(GDO_PATH);
 Trans::$ISO = GDO_LANGUAGE;
 Logger::init(null, Logger::ALL, 'protected/logs/__dog');
-DogWorker::init();
 Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();

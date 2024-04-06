@@ -15,7 +15,6 @@ use GDO\Core\Method;
 use GDO\Dog\Connector\Bash;
 use GDO\User\GDO_Permission;
 use GDO\Util\Filewalker;
-use Revolt\EventLoop;
 use Throwable;
 
 /**
@@ -64,47 +63,48 @@ final class Dog
      */
     public function mainloop(): void
 	{
-
-        echo "HERE!\n";
-
-        $dog = $this;
-
-        EventLoop::repeat(1, function () use ($dog) {
-            $lastIPC = Application::$TIME;
-
-            // Main loop to check the status of tasks
-            while ($dog->running) {
-//                // Check each task's status
-//                foreach ($tasks as $index => $task) {
-//                    if ($task->isComplete()) {
-//                        // Task is complete, retrieve the result
-//                        $result = $task->getResult();
-//                        echo "Task $index: $result\n";
-//                        // Remove the completed task from the array
-//                        unset($tasks[$index]);
+//
+//        echo "HERE!\n";
+//
+//        $dog = $this;
+//
+//        EventLoop::repeat(1, function () use ($dog) {
+//            $lastIPC = Application::$TIME;
+//
+//            // Main loop to check the status of tasks
+//            while ($dog->running) {
+//
+////                // Check each task's status
+////                foreach ($tasks as $index => $task) {
+////                    if ($task->isComplete()) {
+////                        // Task is complete, retrieve the result
+////                        $result = $task->getResult();
+////                        echo "Task $index: $result\n";
+////                        // Remove the completed task from the array
+////                        unset($tasks[$index]);
+////                    }
+////                }
+//                // Wait for a short duration before checking again
+//                $dog->mainloopStep();
+//                if ($dog->areAllConnected())
+//                {
+//                    if ((Application::$TIME - $lastIPC) >= 10)
+//                    {
+//                        $lastIPC = Application::$TIME;
+//                        $dog->ipcTimer();
 //                    }
 //                }
-                // Wait for a short duration before checking again
-                $dog->mainloopStep();
-                if ($dog->areAllConnected())
-                {
-                    if ((Application::$TIME - $lastIPC) >= 10)
-                    {
-                        $lastIPC = Application::$TIME;
-                        $dog->ipcTimer();
-                    }
-                }
-                usleep(100000);
-//                yield \Amp\delay(self::MICROSLEEP/1000000.0);
-            }
-        });
-        EventLoop::run();
-
-        while ($this->hasPendingConnections())
-        {
-            sleep(1);
-        }
-        return;
+//                usleep(100000);
+////                yield \Amp\delay(self::MICROSLEEP/1000000.0);
+//            }
+//        });
+//        EventLoop::run();
+//
+//        while ($this->hasPendingConnections())
+//        {
+//            sleep(1);
+//        }
+//        return;
 
 
 		$lastIPC = Application::$TIME;
@@ -231,7 +231,7 @@ final class Dog
 	{
 		if (!$this->inited)
 		{
-			Bash::instance()->init();
+            Bash::instance()->init();
 			$this->servers = DOG_Server::table()->all();
 //            $this->worker = new Worker();
 //            $this->worker->start();
@@ -240,41 +240,42 @@ final class Dog
 
 	public function loadPlugins(): bool
 	{
-		if ($this->loadedPlugins)
-		{
-			return true;
-		}
-
-		Filewalker::traverse('GDO', null, null, function ($entry, $path)
-		{
-			if (preg_match('/^Dog[_A-Z0-9]*$/iD', $entry))
-			{
-				if (!module_enabled($entry))
-				{
-					return;
-				}
-				Filewalker::traverse(["{$path}/Connector", "{$path}/Method"], null, function ($entry, $path)
-				{
-					$class_name = str_replace('/', "\\", $path);
-					$class_name = substr($class_name, 0, -4);
-					if (class_exists($class_name))
-					{
-						if (is_a($class_name, DOG_Connector::class, true))
-						{
-							DOG_Connector::register(new $class_name());
-							$this->loadedPlugins = true;
-						}
-					}
-					else
-					{
-						Logger::logCron("Error loading $class_name");
-						$this->loadedPlugins = false;
-					}
-				});
-			}
-		}, 0);
-
-		return $this->loadedPlugins;
+        return true;
+//		if ($this->loadedPlugins)
+//		{
+//			return true;
+//		}
+//
+//		Filewalker::traverse('GDO', null, null, function ($entry, $path)
+//		{
+//			if (preg_match('/^Dog[_A-Z0-9]*$/iD', $entry))
+//			{
+//				if (!module_enabled($entry))
+//				{
+//					return;
+//				}
+//				Filewalker::traverse(["{$path}/Connector", "{$path}/Method"], null, function ($entry, $path)
+//				{
+//					$class_name = str_replace('/', "\\", $path);
+//					$class_name = substr($class_name, 0, -4);
+//					if (class_exists($class_name))
+//					{
+//						if (is_a($class_name, DOG_Connector::class, true))
+//						{
+//							DOG_Connector::register(new $class_name());
+//							$this->loadedPlugins = true;
+//						}
+//					}
+//					else
+//					{
+//						Logger::logCron("Error loading $class_name");
+//						$this->loadedPlugins = false;
+//					}
+//				});
+//			}
+//		}, 0);
+//
+//		return $this->loadedPlugins;
 	}
 
     /**
