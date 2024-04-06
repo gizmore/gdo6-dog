@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # http://stackoverflow.com/questions/27062668/shell-script-with-a-cron-job-to-start-a-program-if-not-running/27063586#27063586
 # http://stackoverflow.com/a/27063586
 cd "$(dirname "$0")"
