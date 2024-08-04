@@ -14,7 +14,7 @@ use GDO\Language\Trans;
 use GDO\UI\GDT_Page;
 
 define('GDO_TIME_START', microtime(true));
-
+pcntl_sigprocmask(SIG_BLOCK, array(SIGCHLD));
 # Bootstrap
 require 'protected/config.php';
 require 'GDO7.php';
