@@ -25,7 +25,7 @@ Debug::init();
 Debug::enableErrorHandler();
 Debug::enableExceptionHandler();
 Debug::setDieOnError(false);
-Debug::setMailOnError(GDO_ERROR_MAIL);
+Debug::setMailOnError(GDO_ERROR_MAILS);
 Database::init();
 $app = Application::init();
 $app->cli()->modeDetected(GDT::RENDER_CLI);
